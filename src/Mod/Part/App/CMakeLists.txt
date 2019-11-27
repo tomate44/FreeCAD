@@ -91,6 +91,8 @@ generate_from_xml(TopoShapeSolidPy)
 generate_from_xml(TopoShapeVertexPy)
 generate_from_xml(TopoShapeWirePy)
 generate_from_xml(BRepOffsetAPI_MakePipeShellPy)
+generate_from_xml(AppDef_MultiLinePy)
+generate_from_xml(AppDef_MultiPointConstraintPy)
 
 # make sure to create the directory at configure time
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Geom2d)
@@ -296,6 +298,10 @@ SET(Python_SRCS
     TopoShapeWirePyImp.cpp
     BRepOffsetAPI_MakePipeShellPy.xml
     BRepOffsetAPI_MakePipeShellPyImp.cpp
+    AppDef_MultiLinePy.xml
+    AppDef_MultiLinePyImp.cpp
+    AppDef_MultiPointConstraintPy.xml
+    AppDef_MultiPointConstraintPyImp.cpp
     PartPyCXX.cpp
     PartPyCXX.h
 )

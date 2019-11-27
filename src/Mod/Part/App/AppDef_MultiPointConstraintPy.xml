@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+      Father="PyObjectBase"
+      Name="AppDef_MultiPointConstraintPy"
+      PythonName="Part.AppDef_MultiPointConstraint"
+      Twin="AppDef_MultiPointConstraint"
+      TwinPointer="AppDef_MultiPointConstraint"
+      Include="AppDef_MultiPointConstraint.hxx"
+      Namespace="Part"
+      FatherInclude="Base/PyObjectBase.h"
+      FatherNamespace="Base"
+      Constructor="true">
+		<Documentation>
+			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+			<UserDocu>Describes a MultiPointConstraint used in a Multiline.</UserDocu>
+		</Documentation>
+		<Attribute Name="NbPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of points of this MultiPointConstraint</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints" Type="Long"/>
+		</Attribute>
+		<Methode Name="Dimension" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Dimension(idx)
+					Returns the dimension of the point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="Point" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Point(idx)
+					Returns the point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+	</PythonExport>
+</GenerateModel>

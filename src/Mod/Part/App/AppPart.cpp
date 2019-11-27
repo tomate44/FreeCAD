@@ -105,6 +105,8 @@
 #include "Mod/Part/App/BRepOffsetAPI_MakePipeShellPy.h"
 #include "Mod/Part/App/PartFeaturePy.h"
 #include "Mod/Part/App/AttachEnginePy.h"
+#include "Mod/Part/App/AppDef_MultiLinePy.h"
+#include "Mod/Part/App/AppDef_MultiPointConstraintPy.h"
 #include <Mod/Part/App/Geom2d/ArcOfCircle2dPy.h>
 #include <Mod/Part/App/Geom2d/ArcOfConic2dPy.h>
 #include <Mod/Part/App/Geom2d/ArcOfEllipse2dPy.h>
@@ -377,6 +379,21 @@ PyMOD_INIT_FUNC(Part)
     Py_INCREF(brepModule);
     PyModule_AddObject(partModule, "BRepOffsetAPI", brepModule);
     Base::Interpreter().addType(&Part::BRepOffsetAPI_MakePipeShellPy::Type,brepModule,"MakePipeShell");
+
+#if PY_MAJOR_VERSION >= 3
+    static struct PyModuleDef AppDefDef = {
+        PyModuleDef_HEAD_INIT,
+        "AppDef", "AppDef", -1, 0,
+        NULL, NULL, NULL, NULL
+    };
+    PyObject* appdefModule = PyModule_Create(&AppDefDef);
+#else
+    PyObject* appdefModule = Py_InitModule3("AppDef", 0, "AppDef");
+#endif
+    Py_INCREF(appdefModule);
+    PyModule_AddObject(partModule, "AppDef", appdefModule);
+    Base::Interpreter().addType(&Part::AppDef_MultiLinePy::Type,appdefModule,"MultiLine");
+    Base::Interpreter().addType(&Part::AppDef_MultiPointConstraintPy::Type,appdefModule,"MultiPointConstraint");
 
     // Geom2d package
 #if PY_MAJOR_VERSION >= 3
