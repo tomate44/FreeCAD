@@ -298,10 +298,6 @@ SET(Python_SRCS
     TopoShapeWirePyImp.cpp
     BRepOffsetAPI_MakePipeShellPy.xml
     BRepOffsetAPI_MakePipeShellPyImp.cpp
-#     AppDef_MultiLinePy.xml
-#     AppDef_MultiLinePyImp.cpp
-#     AppDef_MultiPointConstraintPy.xml
-#     AppDef_MultiPointConstraintPyImp.cpp
     PartPyCXX.cpp
     PartPyCXX.h
 )

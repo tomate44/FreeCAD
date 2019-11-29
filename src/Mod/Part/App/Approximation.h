@@ -23,6 +23,8 @@
 #ifndef PART_APPROXIMATION_H
 #define PART_APPROXIMATION_H
 
+#include <AppParCurves_MultiPoint.hxx>
+#include <AppDef_MultiLine.hxx>
 // #include <Geom2d_CartesianPoint.hxx>
 // #include <Geom2d_BezierCurve.hxx>
 // #include <Geom2d_BSplineCurve.hxx>
@@ -35,7 +37,7 @@
 // #include <Geom2d_TrimmedCurve.hxx>
 // #include <Geom_Surface.hxx>
 // #include <TopoDS_Shape.hxx>
-// #include <gp_Ax22d.hxx>
+#include <gp_Pnt.hxx>
 #include <list>
 #include <vector>
 #include <memory>
@@ -66,6 +68,63 @@ private:
     Approximation(const Approximation&);
     Approximation& operator = (const Approximation&);
 };
+
+class PartExport MultiPoint : public Approximation
+{
+    TYPESYSTEM_HEADER();
+public:
+    MultiPoint();
+    MultiPoint(const Standard_Integer, const Standard_Integer);
+    MultiPoint(const AppParCurves_MultiPoint &);
+    MultiPoint(const std::vector<gp_Pnt>&);
+    virtual ~MultiPoint();
+    virtual Approximation *clone(void) const;
+//     virtual TopoDS_Shape toShape() const;
+
+   // Persistence implementer ---------------------
+    virtual unsigned int getMemSize(void) const;
+    virtual void Save(Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+//     virtual PyObject *getPyObject(void);
+// 
+//     const Handle(Geom2d_Geometry)& handle() const;
+// 
+//     Base::Vector2d getPoint(void)const;
+//     void setPoint(const Base::Vector2d&);
+
+private:
+    AppParCurves_MultiPoint* myPoint;
+};
+
+class PartExport MultiLine : public Approximation
+{
+    TYPESYSTEM_HEADER();
+public:
+    MultiLine();
+    MultiLine(const Standard_Integer);
+    MultiLine(const AppDef_MultiLine &);
+    MultiLine(const std::vector<gp_Pnt>&);
+    virtual ~MultiLine();
+    virtual Approximation *clone(void) const;
+//     virtual TopoDS_Shape toShape() const;
+
+   // Persistence implementer ---------------------
+    virtual unsigned int getMemSize(void) const;
+    virtual void Save(Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+//     virtual PyObject *getPyObject(void);
+// 
+//     const Handle(Geom2d_Geometry)& handle() const;
+// 
+//     Base::Vector2d getPoint(void)const;
+//     void setPoint(const Base::Vector2d&);
+
+private:
+    AppDef_MultiLine* myLine;
+};
+
 }
 
 

@@ -381,21 +381,6 @@ PyMOD_INIT_FUNC(Part)
     PyModule_AddObject(partModule, "BRepOffsetAPI", brepModule);
     Base::Interpreter().addType(&Part::BRepOffsetAPI_MakePipeShellPy::Type,brepModule,"MakePipeShell");
 
-// #if PY_MAJOR_VERSION >= 3
-//     static struct PyModuleDef AppDefDef = {
-//         PyModuleDef_HEAD_INIT,
-//         "AppDef", "AppDef", -1, 0,
-//         NULL, NULL, NULL, NULL
-//     };
-//     PyObject* appdefModule = PyModule_Create(&AppDefDef);
-// #else
-//     PyObject* appdefModule = Py_InitModule3("AppDef", 0, "AppDef");
-// #endif
-//     Py_INCREF(appdefModule);
-//     PyModule_AddObject(partModule, "AppDef", appdefModule);
-//     Base::Interpreter().addType(&Part::AppDef_MultiLinePy::Type,appdefModule,"MultiLine");
-//     Base::Interpreter().addType(&Part::AppDef_MultiPointConstraintPy::Type,appdefModule,"MultiPointConstraint");
-
     // Geom2d package
 #if PY_MAJOR_VERSION >= 3
     static struct PyModuleDef geom2dDef = {
@@ -426,6 +411,21 @@ PyMOD_INIT_FUNC(Part)
     Base::Interpreter().addType(&Part::Line2dSegmentPy::Type,geom2dModule,"Line2dSegment");
     Base::Interpreter().addType(&Part::Line2dPy::Type,geom2dModule,"Line2d");
     Base::Interpreter().addType(&Part::OffsetCurve2dPy::Type,geom2dModule,"OffsetCurve2d");
+
+//     // Approximation package
+// #if PY_MAJOR_VERSION >= 3
+//     static struct PyModuleDef approxDef = {
+//         PyModuleDef_HEAD_INIT,
+//         "Approximation", "Approximation", -1, 0,
+//         NULL, NULL, NULL, NULL
+//     };
+//     PyObject* approxModule = PyModule_Create(&approxDef);
+// #else
+//      PyObject* approxModule = Py_InitModule3("Approximation", 0, "Approximation");
+// #endif
+//     Py_INCREF(approxModule);
+//     PyModule_AddObject(partModule, "Approximation", approxModule);
+//     Base::Interpreter().addType(&Part::ApproximationPy::Type,approxModule,"Approximation");
 
     Part::TopoShape             ::init();
     Part::PropertyPartShape     ::init();

@@ -23,6 +23,9 @@
 #include "PreCompiled.h"
 #ifndef _PreComp_
 #include <AppParCurves_MultiPoint.hxx>
+#include <AppDef_MultiLine.hxx>
+#include <TColgp_Array1OfPnt.hxx>
+#include <TColgp_Array1OfPnt2d.hxx>
 // # include <BRepBuilderAPI_MakeEdge2d.hxx>
 // # include <BRepBuilderAPI_MakeVertex.hxx>
 // # include <Geom2dConvert_CompCurveToBSplineCurve.hxx>
@@ -127,16 +130,41 @@ MultiPoint::MultiPoint(const Standard_Integer NbPoints, const Standard_Integer N
     this->myPoint = new AppParCurves_MultiPoint(NbPoints, NbPoints2d);
 }
 
+MultiPoint::MultiPoint(const AppParCurves_MultiPoint &mp)
+{
+    int nbp3d = mp.NbPoints();
+    int nbp2d = mp.NbPoints2d();
+    AppParCurves_MultiPoint* mymp = new AppParCurves_MultiPoint(nbp3d, nbp2d);
+    for (int it1 = 0; it1 != nbp3d; ++it1) {
+        mymp->SetPoint(it1, mp.Point(it1));
+    }
+    for (int it2 = 0; it2 != nbp2d; ++it2) {
+        mymp->SetPoint2d(it2, mp.Point2d(it2));
+    }
+    this->myPoint = mymp;
+}
+
+MultiPoint::MultiPoint(const std::vector<gp_Pnt>& p)
+{
+    if (p.size() < 1)
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    for (std::size_t i=0; i<p.size(); i++) {
+        pts->SetValue(i+1, p[i]);
+    }
+    this->myPoint = new AppParCurves_MultiPoint(*pts);
+}
+
 MultiPoint::~MultiPoint()
 {
 }
 
-// Approximation *MultiPoint::clone(void) const
-// {
-//     MultiPoint *newPoint = new MultiPoint(myPoint);
-//     return newPoint;
-// }
-// 
+Approximation *MultiPoint::clone(void) const
+{
+    MultiPoint *newPoint = new MultiPoint(*myPoint);
+    return newPoint;
+}
+
 // Base::Vector2d MultiPoint::getPoint(void)const
 // {
 //     return Base::Vector2d(myPoint->X(),myPoint->Y());
@@ -152,17 +180,100 @@ unsigned int MultiPoint::getMemSize (void) const
     throw Base::NotImplementedError("MultiPoint::getMemSize");
 }
 
-void MultiPoint::Save(Base::Writer &writer) const
+void MultiPoint::Save(Base::Writer &/*writer*/) const
 {
     throw Base::NotImplementedError("MultiPoint::Save");
 }
 
-void MultiPoint::Restore(Base::XMLReader &reader)
+void MultiPoint::Restore(Base::XMLReader &/*reader*/)
 {
     throw Base::NotImplementedError("MultiPoint::Restore");
 }
 
 // PyObject *MultiPoint::getPyObject(void)
+// {
+//     Handle(Geom2d_CartesianPoint) c = Handle(Geom2d_CartesianPoint)::DownCast(handle());
+//     gp_Pnt2d xy = c->Pnt2d();
+// 
+//     Py::Tuple tuple(2);
+//     tuple.setItem(0, Py::Float(xy.X()));
+//     tuple.setItem(1, Py::Float(xy.Y()));
+//     return Py::new_reference_to(tuple);
+// }
+
+// -------------------------------------------------
+
+// -------------------------------------------------
+
+TYPESYSTEM_SOURCE(Part::MultiLine, Part::Approximation)
+
+MultiLine::MultiLine()
+{
+    this->myLine = new AppDef_MultiLine();
+}
+
+MultiLine::MultiLine(const Standard_Integer NbMult)
+{
+    this->myLine = new AppDef_MultiLine(NbMult);
+}
+
+MultiLine::MultiLine(const AppDef_MultiLine &ml)
+{
+    int nbmpc = ml.NbMultiPoints();
+    AppDef_MultiLine* myml = new AppDef_MultiLine(nbmpc);
+    for (int it1 = 0; it1 != nbmpc; ++it1) {
+        myml->SetValue(it1, ml.Value(it1));
+    }
+    this->myLine = myml;
+}
+
+MultiLine::MultiLine(const std::vector<gp_Pnt>& p)
+{
+    if (p.size() < 1)
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    for (std::size_t i=0; i<p.size(); i++) {
+        pts->SetValue(i+1, p[i]);
+    }
+    this->myLine = new AppDef_MultiLine(*pts);
+}
+
+MultiLine::~MultiLine()
+{
+}
+
+Approximation *MultiLine::clone(void) const
+{
+    MultiLine *newLine = new MultiLine(*myLine);
+    return newLine;
+}
+
+// Base::Vector2d MultiLine::getPoint(void)const
+// {
+//     return Base::Vector2d(myLine->X(),myLine->Y());
+// }
+// 
+// void MultiLine::setPoint(const Base::Vector2d& p)
+// {
+//     this->myLine->SetCoord(p.x,p.y);
+// }
+
+unsigned int MultiLine::getMemSize (void) const
+{
+    throw Base::NotImplementedError("MultiLine::getMemSize");
+}
+
+void MultiLine::Save(Base::Writer &/*writer*/) const
+{
+    throw Base::NotImplementedError("MultiLine::Save");
+}
+
+void MultiLine::Restore(Base::XMLReader &/*reader*/)
+{
+    throw Base::NotImplementedError("MultiLine::Restore");
+}
+
+// PyObject *MultiLine::getPyObject(void)
 // {
 //     Handle(Geom2d_CartesianPoint) c = Handle(Geom2d_CartesianPoint)::DownCast(handle());
 //     gp_Pnt2d xy = c->Pnt2d();
