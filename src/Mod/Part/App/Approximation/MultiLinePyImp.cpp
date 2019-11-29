@@ -98,8 +98,8 @@ PyObject* AppDef_MultiLinePy::setValue(PyObject *args)
         return 0;
 
     try {
-        // AppDef_MultiPointConstraint mpc(obj->getAppDef_MultiPointConstraintPtr());
-        this->getAppDef_MultiLinePtr()->SetValue(idx, obj->getAppDef_MultiPointConstraintPtr());
+        AppDef_MultiPointConstraint *mpc = static_cast<Part::AppDef_MultiPointConstraintPy*>(obj)->getAppDef_MultiPointConstraintPtr();
+        this->getAppDef_MultiLinePtr()->SetValue(idx, *mpc);
         Py_Return;
     }
     catch (Standard_Failure& e) {
