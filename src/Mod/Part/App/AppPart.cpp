@@ -106,8 +106,6 @@
 #include "Mod/Part/App/BRepOffsetAPI_MakePipeShellPy.h"
 #include "Mod/Part/App/PartFeaturePy.h"
 #include "Mod/Part/App/AttachEnginePy.h"
-// #include "Mod/Part/App/AppDef_MultiLinePy.h"
-// #include "Mod/Part/App/AppDef_MultiPointConstraintPy.h"
 #include <Mod/Part/App/Geom2d/ArcOfCircle2dPy.h>
 #include <Mod/Part/App/Geom2d/ArcOfConic2dPy.h>
 #include <Mod/Part/App/Geom2d/ArcOfEllipse2dPy.h>
@@ -125,6 +123,11 @@
 #include <Mod/Part/App/Geom2d/Line2dPy.h>
 #include <Mod/Part/App/Geom2d/OffsetCurve2dPy.h>
 #include <Mod/Part/App/Geom2d/Parabola2dPy.h>
+
+#include <Mod/Part/App/Approximation/ApproximationPy.h>
+#include <Mod/Part/App/Approximation/MultiLinePy.h>
+#include <Mod/Part/App/Approximation/MultiPointPy.h>
+
 #include "PropertyGeometryList.h"
 #include "DatumFeature.h"
 #include "Attacher.h"
@@ -412,20 +415,22 @@ PyMOD_INIT_FUNC(Part)
     Base::Interpreter().addType(&Part::Line2dPy::Type,geom2dModule,"Line2d");
     Base::Interpreter().addType(&Part::OffsetCurve2dPy::Type,geom2dModule,"OffsetCurve2d");
 
-//     // Approximation package
-// #if PY_MAJOR_VERSION >= 3
-//     static struct PyModuleDef approxDef = {
-//         PyModuleDef_HEAD_INIT,
-//         "Approximation", "Approximation", -1, 0,
-//         NULL, NULL, NULL, NULL
-//     };
-//     PyObject* approxModule = PyModule_Create(&approxDef);
-// #else
-//      PyObject* approxModule = Py_InitModule3("Approximation", 0, "Approximation");
-// #endif
-//     Py_INCREF(approxModule);
-//     PyModule_AddObject(partModule, "Approximation", approxModule);
-//     Base::Interpreter().addType(&Part::ApproximationPy::Type,approxModule,"Approximation");
+    // Approximation package
+#if PY_MAJOR_VERSION >= 3
+    static struct PyModuleDef approxDef = {
+        PyModuleDef_HEAD_INIT,
+        "Approximation", "Approximation", -1, 0,
+        NULL, NULL, NULL, NULL
+    };
+    PyObject* approxModule = PyModule_Create(&approxDef);
+#else
+     PyObject* approxModule = Py_InitModule3("Approximation", 0, "Approximation");
+#endif
+    Py_INCREF(approxModule);
+    PyModule_AddObject(partModule, "Approximation", approxModule);
+    Base::Interpreter().addType(&Part::ApproximationPy::Type,approxModule,"Approximation");
+    Base::Interpreter().addType(&Part::MultiLinePy::Type,approxModule,"MultiLine");
+    Base::Interpreter().addType(&Part::MultiPointPy::Type,approxModule,"MultiPoint");
 
     Part::TopoShape             ::init();
     Part::PropertyPartShape     ::init();
@@ -570,6 +575,8 @@ PyMOD_INIT_FUNC(Part)
 
     // Approximation types
     Part::Approximation           ::init();
+    Part::MultiPoint              ::init();
+    Part::MultiLine               ::init();
 
     IGESControl_Controller::Init();
     STEPControl_Controller::Init();

@@ -25,6 +25,9 @@
 
 #include <AppParCurves_MultiPoint.hxx>
 #include <AppDef_MultiLine.hxx>
+#include <AppDef_MultiPointConstraint.hxx>
+#include <TColgp_Array1OfPnt.hxx>
+#include <AppDef_BSplineCompute.hxx>
 // #include <Geom2d_CartesianPoint.hxx>
 // #include <Geom2d_BezierCurve.hxx>
 // #include <Geom2d_BSplineCurve.hxx>
@@ -42,7 +45,8 @@
 #include <vector>
 #include <memory>
 #include <Base/Persistence.h>
-// #include <Base/Tools2D.h>
+#include <Base/Vector3D.h>
+#include <Base/Tools2D.h>
 
 namespace Part {
 
@@ -69,17 +73,25 @@ private:
     Approximation& operator = (const Approximation&);
 };
 
+// ------------------------------------------------
+
 class PartExport MultiPoint : public Approximation
 {
     TYPESYSTEM_HEADER();
 public:
     MultiPoint();
-    MultiPoint(const Standard_Integer, const Standard_Integer);
+    MultiPoint(const int, const int);
     MultiPoint(const AppParCurves_MultiPoint &);
     MultiPoint(const std::vector<gp_Pnt>&);
     virtual ~MultiPoint();
     virtual Approximation *clone(void) const;
 //     virtual TopoDS_Shape toShape() const;
+    int NbPoints(void) const;
+    int NbPoints2d(void) const;
+    Base::Vector3d Point(const int idx);
+    Base::Vector2d Point2d(const int idx);
+    void setPoint(const int idx, Base::Vector3d &p);
+    void setPoint2d(const int idx, Base::Vector2d &p);
 
    // Persistence implementer ---------------------
     virtual unsigned int getMemSize(void) const;
@@ -88,7 +100,7 @@ public:
     // Base implementer ----------------------------
 //     virtual PyObject *getPyObject(void);
 // 
-//     const Handle(Geom2d_Geometry)& handle() const;
+    const AppParCurves_MultiPoint* handle() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
@@ -96,6 +108,8 @@ public:
 private:
     AppParCurves_MultiPoint* myPoint;
 };
+
+// ------------------------------------------------
 
 class PartExport MultiLine : public Approximation
 {
@@ -105,18 +119,23 @@ public:
     MultiLine(const Standard_Integer);
     MultiLine(const AppDef_MultiLine &);
     MultiLine(const std::vector<gp_Pnt>&);
+    MultiLine(const TColgp_Array1OfPnt&);
     virtual ~MultiLine();
     virtual Approximation *clone(void) const;
 //     virtual TopoDS_Shape toShape() const;
+    int NbPoints(void) const;
+    int NbMultiPoints(void) const;
+    AppDef_MultiPointConstraint Value(const Standard_Integer idx);
+    void setParameter(const Standard_Integer idx, const Standard_Real u);
 
    // Persistence implementer ---------------------
     virtual unsigned int getMemSize(void) const;
     virtual void Save(Base::Writer &/*writer*/) const;
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
-//     virtual PyObject *getPyObject(void);
+    virtual PyObject *getPyObject(void);
 // 
-//     const Handle(Geom2d_Geometry)& handle() const;
+    const AppDef_MultiLine* handle() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
@@ -125,8 +144,36 @@ private:
     AppDef_MultiLine* myLine;
 };
 
+// ------------------------------------------------
+
+class PartExport BSplineCompute : public Approximation
+{
+    TYPESYSTEM_HEADER();
+public:
+    BSplineCompute();
+    BSplineCompute(const AppDef_BSplineCompute &);
+    virtual ~BSplineCompute();
+    virtual Approximation *clone(void) const;
+//     virtual TopoDS_Shape toShape() const;
+    void Perform(const AppDef_MultiLine &);
+// OR
+//    void Perform (const MultiLine &); ??????????
+
+   // Persistence implementer ---------------------
+    virtual unsigned int getMemSize(void) const;
+    virtual void Save(Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+//     virtual PyObject *getPyObject(void);
+// 
+//     const AppDef_MultiLine* handle() const;
+// 
+//     Base::Vector2d getPoint(void)const;
+//     void setPoint(const Base::Vector2d&);
+
+private:
+    AppDef_BSplineCompute* myBsCompute;
+};
+
 }
-
-
-
 #endif // PART_APPROXIMATION_H

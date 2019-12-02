@@ -1,0 +1,247 @@
+/***************************************************************************
+ *   Copyright (c) 2019 Christophe Grellier <cg[at]grellier.fr>            *
+ *                                                                         *
+ *   This file is part of the FreeCAD CAx development system.              *
+ *                                                                         *
+ *   This library is free software; you can redistribute it and/or         *
+ *   modify it under the terms of the GNU Library General Public           *
+ *   License as published by the Free Software Foundation; either          *
+ *   version 2 of the License, or (at your option) any later version.      *
+ *                                                                         *
+ *   This library  is distributed in the hope that it will be useful,      *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU Library General Public License for more details.                  *
+ *                                                                         *
+ *   You should have received a copy of the GNU Library General Public     *
+ *   License along with this library; see the file COPYING.LIB. If not,    *
+ *   write to the Free Software Foundation, Inc., 59 Temple Place,         *
+ *   Suite 330, Boston, MA  02111-1307, USA                                *
+ *                                                                         *
+ ***************************************************************************/
+
+
+#include "PreCompiled.h"
+#ifndef _PreComp_
+// # include <gp_Ax2.hxx>
+// # include <gp_Dir.hxx>
+# include <gp_Pnt.hxx>
+// # include <TopoDS.hxx>
+// # include <TopoDS_Wire.hxx>
+# include <TColgp_Array1OfPnt.hxx>
+// # include <AppDef_MultiPointConstraint.hxx>
+// # include <AppDef_Array1OfMultiPointConstraint.hxx>
+# include <AppParCurves_MultiPoint.hxx>
+# include <Standard_Version.hxx>
+// # include <TopTools_ListIteratorOfListOfShape.hxx>
+#endif
+
+// #include "TopoShapePy.h"
+// #include "TopoShapeVertexPy.h"
+#include "Mod/Part/App/Approximation/ApproximationPy.h"
+// #include "AppDef_MultiPointConstraintPy.cpp"
+#include "Mod/Part/App/Approximation.h"
+#include "Mod/Part/App/Approximation/MultiPointPy.h"
+#include "Mod/Part/App/Approximation/MultiPointPy.cpp"
+#include "Tools.h"
+#include "OCCError.h"
+#include <Base/VectorPy.h>
+#include <Base/GeometryPyCXX.h>
+
+using namespace Part;
+
+PyObject *MultiPointPy::PyMake(struct _typeobject *, PyObject *args, PyObject *)  // Python wrapper
+{
+    // create a new instance of AppDef_MultiPointPy and the Twin object
+    int nb3d, nb2d;
+    if (PyArg_ParseTuple(args, "ii", &nb3d, &nb2d)) {
+        return new MultiPointPy(new MultiPoint(nb3d, nb2d));
+    }
+    PyErr_Clear();
+    PyObject *obj1, *obj2;
+    if (PyArg_ParseTuple(args, "OO", &obj1, &obj2)) {
+        try {
+            Py::Sequence list1(obj1);
+            Py::Sequence list2(obj2);
+            MultiPoint* mymp = new MultiPoint(list1.size(), list2.size());
+            int idx = 1;
+            for (Py::Sequence::iterator it1 = list1.begin(); it1 != list1.end(); ++it1) {
+                Py::Vector v(*it1);
+                Base::Vector3d point = v.toVector();
+                mymp->setPoint(idx, point);
+                idx++;
+            }
+            idx = 1;
+            for (Py::Sequence::iterator it2 = list2.begin(); it2 != list2.end(); ++it2) {
+                Base::Vector2d point = Py::toVector2d(*it2);
+                mymp->setPoint2d(idx, point);
+                idx++;
+            }
+            return new MultiPointPy(mymp);
+        }
+        catch (Standard_Failure& e) {
+            PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+            return 0;
+        }
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to create MultiPoint");
+    return 0;
+}
+
+// constructor method
+int MultiPointPy::PyInit(PyObject* /*args*/, PyObject* /*kwd*/)
+{
+    return 0;
+}
+
+// returns a string which represents the object e.g. when printed in python
+std::string MultiPointPy::representation(void) const
+{
+    return std::string("<MultiPoint object>");
+}
+
+Py::Long MultiPointPy::getNbPoints(void) const
+{
+    return Py::Long(this->getMultiPointPtr()->NbPoints()); 
+}
+
+Py::Long MultiPointPy::getNbPoints2d(void) const
+{
+    return Py::Long(this->getMultiPointPtr()->NbPoints2d()); 
+}
+
+PyObject *MultiPointPy::getPoint(PyObject * args)
+{
+    int index;
+    if (!PyArg_ParseTuple(args, "i", &index))
+        return 0;
+    try {
+        Standard_OutOfRange_Raise_if
+            (index < 1 || index > this->getMultiPointPtr()->NbPoints(), "Pole index out of range");
+        Base::Vector3d pnt = this->getMultiPointPtr()->Point(index);
+        Base::VectorPy* vec = new Base::VectorPy(pnt);
+        return vec;
+    }
+    catch (Standard_Failure& e) {
+
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject *MultiPointPy::getPoint2d(PyObject * args)
+{
+    int index;
+    if (!PyArg_ParseTuple(args, "i", &index))
+        return 0;
+    try {
+        Standard_OutOfRange_Raise_if
+            (index < 1 || index > this->getMultiPointPtr()->NbPoints2d(), "Pole index out of range");
+        Base::Vector2d pnt = this->getMultiPointPtr()->Point2d(index);
+
+        Py::Module module("__FreeCADBase__");
+        Py::Callable method(module.getAttr("Vector2d"));
+        Py::Tuple arg(2);
+        arg.setItem(0, Py::Float(pnt.x));
+        arg.setItem(1, Py::Float(pnt.y));
+        return Py::new_reference_to(method.apply(arg));
+    }
+    catch (Standard_Failure& e) {
+
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject *MultiPointPy::setPoint(PyObject * args)
+{
+    int index;
+    PyObject* p;
+    if (!PyArg_ParseTuple(args, "iO!", &index, &(Base::VectorPy::Type), &p))
+        return 0;
+    Base::Vector3d vec = static_cast<Base::VectorPy*>(p)->value();
+    try {
+        Standard_OutOfRange_Raise_if
+            (index < 1 || index > this->getMultiPointPtr()->NbPoints(), "Pole index out of range");
+        this->getMultiPointPtr()->setPoint(index, vec);
+        Py_Return;
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject *MultiPointPy::setPoint2d(PyObject * args)
+{
+    int index;
+    PyObject* p;
+    if (!PyArg_ParseTuple(args, "iO!", &index, Base::Vector2dPy::type_object(), &p))
+        return 0;
+    Base::Vector2d vec = Py::toVector2d(p);
+    try {
+        Standard_OutOfRange_Raise_if
+            (index < 1 || index > this->getMultiPointPtr()->NbPoints2d(), "Pole index out of range");
+        this->getMultiPointPtr()->setPoint2d(index, vec);
+        Py_Return;
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject *MultiPointPy::getPoints(PyObject * args)
+{
+    if (!PyArg_ParseTuple(args, ""))
+        return 0;
+    try {
+        Py::List pts;
+        for (Standard_Integer i=1; i<=this->getMultiPointPtr()->NbPoints(); i++) {
+            Base::Vector3d pnt = this->getMultiPointPtr()->Point(i);
+            Base::VectorPy* vec = new Base::VectorPy(pnt);
+            pts.append(Py::asObject(vec));
+        }
+        return Py::new_reference_to(pts);
+    }
+    catch (Standard_Failure& e) {
+
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject *MultiPointPy::getPoints2d(PyObject * args)
+{
+    if (!PyArg_ParseTuple(args, ""))
+        return 0;
+    try {
+        Py::List pts;
+        Py::Module module("__FreeCADBase__");
+        Py::Callable method(module.getAttr("Vector2d"));
+        Py::Tuple vec2(2);
+        for (Standard_Integer i=1; i<=this->getMultiPointPtr()->NbPoints2d(); i++) {
+            Base::Vector2d pnt = this->getMultiPointPtr()->Point2d(i);
+            vec2.setItem(0, Py::Float(pnt.x));
+            vec2.setItem(1, Py::Float(pnt.y));
+            pts.append(method.apply(vec2));
+        }
+        return Py::new_reference_to(pts);
+    }
+    catch (Standard_Failure& e) {
+
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject *MultiPointPy::getCustomAttributes(const char* ) const
+{
+    return 0;
+}
+
+int MultiPointPy::setCustomAttributes(const char* , PyObject *)
+{
+    return 0; 
+}

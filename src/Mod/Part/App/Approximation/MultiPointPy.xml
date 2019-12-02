@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+      Father="PyObjectBase"
+      Name="MultiPointPy"
+      PythonName="Part.Approximation.MultiPoint"
+      Twin="MultiPoint"
+      TwinPointer="MultiPoint"
+      Include="Mod/Part/App/Approximation.h"
+      Namespace="Part"
+      FatherInclude="Mod/Part/App/Approximation/ApproximationPy.h"
+      FatherNamespace="Base"
+      Constructor="true">
+		<Documentation>
+			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+			<UserDocu>Describes a MultiPoint used in a Multiline.</UserDocu>
+		</Documentation>
+		<Attribute Name="NbPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of 3D points of this MultiPoint</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints" Type="Long"/>
+		</Attribute>
+		<Attribute Name="NbPoints2d" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of 2D points of this MultiPoint</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints2d" Type="Long"/>
+		</Attribute>
+		<Methode Name="getPoint" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Point(idx)
+					Returns the 3D point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoint2d" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Point2d(idx)
+					Returns the 2D point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setPoint">
+			<Documentation>
+				<UserDocu>
+					SetPoint(idx, pt)
+					Sets the 3D point of index idx to pt.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setPoint2d">
+			<Documentation>
+				<UserDocu>
+					SetPoint2d(idx, pt)
+					Sets the 2D point of index idx to pt.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Returns the list of 3D points.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoints2d" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Returns the list of 2D points.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+	</PythonExport>
+</GenerateModel>

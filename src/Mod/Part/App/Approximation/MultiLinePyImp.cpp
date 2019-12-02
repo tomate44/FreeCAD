@@ -25,9 +25,10 @@
 #ifndef _PreComp_
 // # include <gp_Ax2.hxx>
 // # include <gp_Dir.hxx>
-// # include <gp_Pnt.hxx>
+# include <gp_Pnt.hxx>
 // # include <TopoDS.hxx>
 // # include <TopoDS_Wire.hxx>
+# include <TColgp_Array1OfPnt.hxx>
 # include <AppDef_MultiPointConstraint.hxx>
 # include <AppDef_Array1OfMultiPointConstraint.hxx>
 # include <AppDef_MultiLine.hxx>
@@ -37,10 +38,11 @@
 
 // #include "TopoShapePy.h"
 // #include "TopoShapeVertexPy.h"
-#include "AppDef_MultiPointConstraintPy.h"
+#include "Mod/Part/App/Approximation/ApproximationPy.h"
 // #include "AppDef_MultiPointConstraintPy.cpp"
-#include "AppDef_MultiLinePy.h"
-#include "AppDef_MultiLinePy.cpp"
+#include "Mod/Part/App/Approximation.h"
+#include "Mod/Part/App/Approximation/MultiLinePy.h"
+#include "Mod/Part/App/Approximation/MultiLinePy.cpp"
 #include "Tools.h"
 #include "OCCError.h"
 #include <Base/VectorPy.h>
@@ -48,59 +50,74 @@
 
 using namespace Part;
 
-PyObject *AppDef_MultiLinePy::PyMake(struct _typeobject *, PyObject *args, PyObject *)  // Python wrapper
+PyObject *MultiLinePy::PyMake(struct _typeobject *, PyObject *args, PyObject *)  // Python wrapper
 {
-    // create a new instance of AppDef_MultiLinePy and the Twin object 
+    // create a new instance of AppDef_MultiLinePy and the Twin object
     int nb;
-    if (PyArg_ParseTuple(args, "d", &nb))
-        if (nb > 1)
-            return new AppDef_MultiLinePy(new AppDef_MultiLine(nb));
-    
-//     PyObject* obj;
-//     if (PyArg_ParseTuple(args, "O", &obj)) {
-//         try {
-//             Py::Sequence list(obj);
-//             Standard_Integer len = list.size();
-//             AppDef_Array1OfMultiPointConstraint arraympc(1, len);
-//             Standard_Integer idx = 0;
-//             for (Py::Sequence::iterator it1 = list.begin(); it1 != list.end(); ++it1) {
-//                 idx++;
-//                 Py::Object pyo(*it1);
-//                 AppDef_MultiPointConstraint mympc(mpc.getAppDef_MultiPointConstraintPtr());
-//                 arraympc.SetValue(idx, mympc);
-//             }
-//         
-//             return new AppDef_MultiLinePy(new AppDef_MultiLine(arraympc));
-//         }
-//     }
-
-    PyErr_SetString(PartExceptionOCCError, "Failed to create MultiLine");
+    if (PyArg_ParseTuple(args, "i", &nb)) {
+        if (nb > 1) {
+            return new MultiLinePy(new MultiLine(nb));
+        }
+    }
+    PyErr_Clear();
+    PyObject* obj;
+    if (PyArg_ParseTuple(args, "O", &obj)) {
+        try {
+            Py::Sequence list(obj);
+            TColgp_Array1OfPnt pts(1, list.size());
+            int idx = pts.Lower();
+            for (Py::Sequence::iterator it = list.begin(); it != list.end(); ++it) {
+                Py::Vector v(*it);
+                Base::Vector3d point = v.toVector();
+                pts.SetValue(idx++, gp_Pnt(point.x,point.y,point.z));
+            }
+            return new MultiLinePy(new MultiLine(pts));
+        }
+        catch (Standard_Failure& e) {
+            PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+            return 0;
+        }
+    }
+    PyErr_Clear();
+    if (PyArg_ParseTuple(args, "")) {
+        return new MultiLinePy(new MultiLine);
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to create MultiLine");
     return 0;
 }
 
 // constructor method
-int AppDef_MultiLinePy::PyInit(PyObject* /*args*/, PyObject* /*kwd*/)
+int MultiLinePy::PyInit(PyObject* /*args*/, PyObject* /*kwd*/)
 {
     return 0;
 }
 
 // returns a string which represents the object e.g. when printed in python
-std::string AppDef_MultiLinePy::representation(void) const
+std::string MultiLinePy::representation(void) const
 {
-    return std::string("<AppDef_MultiLine object>");
+    return std::string("<MultiLine object>");
 }
 
-PyObject* AppDef_MultiLinePy::setValue(PyObject *args)
+Py::Long MultiLinePy::getNbPoints(void) const
+{
+    return Py::Long(this->getMultiLinePtr()->NbPoints()); 
+}
+
+Py::Long MultiLinePy::getNbMultiPoints(void) const
+{
+    return Py::Long(this->getMultiLinePtr()->NbMultiPoints()); 
+}
+
+PyObject* MultiLinePy::setParameter(PyObject *args)
 {
     int idx;
-    PyObject *obj;
-    if (!PyArg_ParseTuple(args, "iO!", &idx, &Part::AppDef_MultiPointConstraintPy::Type, &obj))
+    double par;
+    if (!PyArg_ParseTuple(args, "id", &idx, &par))
         return 0;
-
     try {
-        AppDef_MultiPointConstraint *mpc = static_cast<Part::AppDef_MultiPointConstraintPy*>(obj)->getAppDef_MultiPointConstraintPtr();
-        this->getAppDef_MultiLinePtr()->SetValue(idx, *mpc);
-        Py_Return;
+        this->getMultiLinePtr()->setParameter(idx, par);
+        return 0;
     }
     catch (Standard_Failure& e) {
         PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
@@ -108,12 +125,12 @@ PyObject* AppDef_MultiLinePy::setValue(PyObject *args)
     }
 }
 
-PyObject *AppDef_MultiLinePy::getCustomAttributes(const char* ) const
+PyObject *MultiLinePy::getCustomAttributes(const char* ) const
 {
     return 0;
 }
 
-int AppDef_MultiLinePy::setCustomAttributes(const char* , PyObject *)
+int MultiLinePy::setCustomAttributes(const char* , PyObject *)
 {
     return 0; 
 }

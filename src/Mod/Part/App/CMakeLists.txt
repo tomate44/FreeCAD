@@ -91,8 +91,6 @@ generate_from_xml(TopoShapeSolidPy)
 generate_from_xml(TopoShapeVertexPy)
 generate_from_xml(TopoShapeWirePy)
 generate_from_xml(BRepOffsetAPI_MakePipeShellPy)
-# generate_from_xml(AppDef_MultiLinePy)
-# generate_from_xml(AppDef_MultiPointConstraintPy)
 
 # make sure to create the directory at configure time
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Geom2d)
@@ -114,6 +112,12 @@ generate_from_xml(Geom2d/Line2dSegmentPy)
 generate_from_xml(Geom2d/Line2dPy)
 generate_from_xml(Geom2d/OffsetCurve2dPy)
 generate_from_xml(Geom2d/Parabola2dPy)
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Approximation)
+
+generate_from_xml(Approximation/ApproximationPy)
+generate_from_xml(Approximation/MultiLinePy)
+generate_from_xml(Approximation/MultiPointPy)
 
 SET(Features_SRCS
     FeaturePartBoolean.cpp
@@ -343,11 +347,23 @@ SET(Geom2dPy_SRCS
 
 SOURCE_GROUP("Geom2d" FILES ${Geom2dPy_SRCS})
 
+# Approximation wrappers
+SET(ApproxPy_SRCS
+    Approximation/ApproximationPy.xml
+    Approximation/ApproximationPyImp.cpp
+    Approximation/MultiLinePy.xml
+    Approximation/MultiLinePyImp.cpp
+    Approximation/MultiPointPy.xml
+    Approximation/MultiPointPyImp.cpp
+)
+SOURCE_GROUP("Approx" FILES ${ApproxPy_SRCS})
+
 SET(Part_SRCS
     ${Features_SRCS}
     ${Properties_SRCS}
     ${Python_SRCS}
     ${Geom2dPy_SRCS}
+    ${ApproxPy_SRCS}
     Approximation.cpp
     Approximation.h
     Attacher.cpp

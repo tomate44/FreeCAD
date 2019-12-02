@@ -26,6 +26,7 @@
 #include <AppDef_MultiLine.hxx>
 #include <TColgp_Array1OfPnt.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
+#include <AppDef_MultiPointConstraint.hxx>
 // # include <BRepBuilderAPI_MakeEdge2d.hxx>
 // # include <BRepBuilderAPI_MakeVertex.hxx>
 // # include <Geom2dConvert_CompCurveToBSplineCurve.hxx>
@@ -63,6 +64,8 @@
 # include <Precision.hxx>
 #endif
 
+#include <Base/Vector3D.h>
+#include <Base/Tools2D.h>
 #include <Base/VectorPy.h>
 
 #include <Base/Exception.h>
@@ -71,7 +74,8 @@
 #include <Base/Tools.h>
 
 #include "Approximation.h"
-// #include <Mod/Part/App/Geom2d/Circle2dPy.h>
+#include <Mod/Part/App/Approximation/ApproximationPy.h>
+#include <Mod/Part/App/Approximation/MultiLinePy.h>
 // #include <Mod/Part/App/Geom2d/Ellipse2dPy.h>
 // #include <Mod/Part/App/Geom2d/Hyperbola2dPy.h>
 // #include <Mod/Part/App/Geom2d/Parabola2dPy.h>
@@ -125,7 +129,7 @@ MultiPoint::MultiPoint()
     this->myPoint = new AppParCurves_MultiPoint();
 }
 
-MultiPoint::MultiPoint(const Standard_Integer NbPoints, const Standard_Integer NbPoints2d)
+MultiPoint::MultiPoint(const int NbPoints, const int NbPoints2d)
 {
     this->myPoint = new AppParCurves_MultiPoint(NbPoints, NbPoints2d);
 }
@@ -165,15 +169,45 @@ Approximation *MultiPoint::clone(void) const
     return newPoint;
 }
 
-// Base::Vector2d MultiPoint::getPoint(void)const
-// {
-//     return Base::Vector2d(myPoint->X(),myPoint->Y());
-// }
-// 
-// void MultiPoint::setPoint(const Base::Vector2d& p)
-// {
-//     this->myPoint->SetCoord(p.x,p.y);
-// }
+const AppParCurves_MultiPoint* MultiPoint::handle() const
+{
+    return myPoint;
+}
+
+int MultiPoint::NbPoints(void) const
+{
+    return this->myPoint->NbPoints();
+}
+
+int MultiPoint::NbPoints2d(void) const
+{
+    return this->myPoint->NbPoints2d();
+}
+
+Base::Vector3d MultiPoint::Point(const int idx)
+{
+    gp_Pnt gp = this->myPoint->Point(idx);
+    Base::Vector3d p(gp.X(), gp.Y(), gp.Z());
+    return p;
+}
+Base::Vector2d MultiPoint::Point2d(const int idx)
+{
+    gp_Pnt2d gp = this->myPoint->Point2d(idx);
+    Base::Vector2d p(gp.X(), gp.Y());
+    return p;
+}
+void MultiPoint::setPoint(const int idx, Base::Vector3d &p)
+{
+    gp_Pnt gp(p.x, p.y, p.z);
+    this->myPoint->SetPoint(idx, gp);
+    return;
+}
+void MultiPoint::setPoint2d(const int idx, Base::Vector2d &p)
+{
+    gp_Pnt2d gp(p.x, p.y);
+    this->myPoint->SetPoint2d(idx, gp);
+    return;
+}
 
 unsigned int MultiPoint::getMemSize (void) const
 {
@@ -189,19 +223,6 @@ void MultiPoint::Restore(Base::XMLReader &/*reader*/)
 {
     throw Base::NotImplementedError("MultiPoint::Restore");
 }
-
-// PyObject *MultiPoint::getPyObject(void)
-// {
-//     Handle(Geom2d_CartesianPoint) c = Handle(Geom2d_CartesianPoint)::DownCast(handle());
-//     gp_Pnt2d xy = c->Pnt2d();
-// 
-//     Py::Tuple tuple(2);
-//     tuple.setItem(0, Py::Float(xy.X()));
-//     tuple.setItem(1, Py::Float(xy.Y()));
-//     return Py::new_reference_to(tuple);
-// }
-
-// -------------------------------------------------
 
 // -------------------------------------------------
 
@@ -219,23 +240,32 @@ MultiLine::MultiLine(const Standard_Integer NbMult)
 
 MultiLine::MultiLine(const AppDef_MultiLine &ml)
 {
-    int nbmpc = ml.NbMultiPoints();
-    AppDef_MultiLine* myml = new AppDef_MultiLine(nbmpc);
-    for (int it1 = 0; it1 != nbmpc; ++it1) {
-        myml->SetValue(it1, ml.Value(it1));
+    Standard_Integer nbmpc = ml.NbMultiPoints();
+    if (nbmpc > 0) {
+        AppDef_MultiLine* myml = new AppDef_MultiLine(nbmpc);
+        for (int it1 = 0; it1 != nbmpc; ++it1) {
+            myml->SetValue(it1, ml.Value(it1));
+        }
+        this->myLine = myml;
     }
-    this->myLine = myml;
 }
 
 MultiLine::MultiLine(const std::vector<gp_Pnt>& p)
 {
     if (p.size() < 1)
         Standard_ConstructionError::Raise();
-    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    TColgp_Array1OfPnt pts(1, p.size());
     for (std::size_t i=0; i<p.size(); i++) {
-        pts->SetValue(i+1, p[i]);
+        pts.SetValue(i+1, p[i]);
     }
-    this->myLine = new AppDef_MultiLine(*pts);
+    this->myLine = new AppDef_MultiLine(pts);
+}
+
+MultiLine::MultiLine(const TColgp_Array1OfPnt& p)
+{
+    if (p.Size() < 1)
+        Standard_ConstructionError::Raise();
+    this->myLine = new AppDef_MultiLine(p);
 }
 
 MultiLine::~MultiLine()
@@ -248,15 +278,44 @@ Approximation *MultiLine::clone(void) const
     return newLine;
 }
 
-// Base::Vector2d MultiLine::getPoint(void)const
-// {
-//     return Base::Vector2d(myLine->X(),myLine->Y());
-// }
-// 
-// void MultiLine::setPoint(const Base::Vector2d& p)
-// {
-//     this->myLine->SetCoord(p.x,p.y);
-// }
+const AppDef_MultiLine* MultiLine::handle() const
+{
+    return myLine;
+}
+
+int MultiLine::NbPoints(void) const
+{
+    return this->myLine->NbPoints();
+}
+
+int MultiLine::NbMultiPoints(void) const
+{
+    return this->myLine->NbMultiPoints();
+}
+
+AppDef_MultiPointConstraint MultiLine::Value(int idx)
+{
+    try {
+        Standard_OutOfRange_Raise_if
+            (idx < 1 || idx > this->myLine->NbMultiPoints(), "MultiPoint index out of range");
+        return this->myLine->Value(idx);
+    }
+    catch (Standard_Failure& e) {
+        THROWM(Base::CADKernelError,e.GetMessageString())
+    }
+}
+
+void MultiLine::setParameter(const Standard_Integer idx, const Standard_Real u)
+{
+    try {
+        Standard_OutOfRange_Raise_if
+            (idx < 1 || idx > this->myLine->NbMultiPoints(), "MultiPoint index out of range");
+//         this->myLine->SetParameter(idx, u);
+    }
+    catch (Standard_Failure& e) {
+        THROWM(Base::CADKernelError,e.GetMessageString())
+    }
+}
 
 unsigned int MultiLine::getMemSize (void) const
 {
@@ -273,16 +332,58 @@ void MultiLine::Restore(Base::XMLReader &/*reader*/)
     throw Base::NotImplementedError("MultiLine::Restore");
 }
 
-// PyObject *MultiLine::getPyObject(void)
-// {
-//     Handle(Geom2d_CartesianPoint) c = Handle(Geom2d_CartesianPoint)::DownCast(handle());
-//     gp_Pnt2d xy = c->Pnt2d();
-// 
-//     Py::Tuple tuple(2);
-//     tuple.setItem(0, Py::Float(xy.X()));
-//     tuple.setItem(1, Py::Float(xy.Y()));
-//     return Py::new_reference_to(tuple);
-// }
+PyObject *MultiLine::getPyObject(void)
+{
+    return new MultiLinePy(static_cast<MultiLine*>(this->clone()));
+}
 
 // -------------------------------------------------
+
+TYPESYSTEM_SOURCE(Part::BSplineCompute, Part::Approximation)
+
+BSplineCompute::BSplineCompute()
+{
+    this->myBsCompute = new AppDef_BSplineCompute();
+}
+
+BSplineCompute::BSplineCompute(const AppDef_BSplineCompute &bsc)
+{
+    // TODO : create a real copy funcion
+    this->myBsCompute = new AppDef_BSplineCompute();
+}
+
+BSplineCompute::~BSplineCompute()
+{
+}
+
+Approximation *BSplineCompute::clone(void) const
+{
+    BSplineCompute *newComp = new BSplineCompute(*myBsCompute);
+    return newComp;
+}
+
+void BSplineCompute::Perform (const AppDef_MultiLine &line)
+{
+    this->myBsCompute->Perform(line);
+}
+
+// const AppDef_BSplineCompute* BSplineCompute::handle() const
+// {
+//     return myBsCompute;
+// }
+
+unsigned int BSplineCompute::getMemSize (void) const
+{
+    throw Base::NotImplementedError("BSplineCompute::getMemSize");
+}
+
+void BSplineCompute::Save(Base::Writer &/*writer*/) const
+{
+    throw Base::NotImplementedError("BSplineCompute::Save");
+}
+
+void BSplineCompute::Restore(Base::XMLReader &/*reader*/)
+{
+    throw Base::NotImplementedError("BSplineCompute::Restore");
+}
 
