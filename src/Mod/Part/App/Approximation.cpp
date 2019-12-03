@@ -23,6 +23,8 @@
 #include "PreCompiled.h"
 #ifndef _PreComp_
 #include <AppParCurves_MultiPoint.hxx>
+#include <AppParCurves_MultiCurve.hxx>
+#include <AppParCurves_MultiBSpCurve.hxx>
 #include <AppDef_MultiLine.hxx>
 #include <TColgp_Array1OfPnt.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
@@ -367,6 +369,16 @@ void BSplineCompute::Perform (const AppDef_MultiLine &line)
     this->myBsCompute->Perform(line);
 }
 
+void BSplineCompute::Interpol (const AppDef_MultiLine &line)
+{
+    this->myBsCompute->Interpol(line);
+}
+
+AppParCurves_MultiBSpCurve BSplineCompute::Value() const
+{
+    return this->myBsCompute->Value();
+}
+
 // const AppDef_BSplineCompute* BSplineCompute::handle() const
 // {
 //     return myBsCompute;
@@ -385,5 +397,87 @@ void BSplineCompute::Save(Base::Writer &/*writer*/) const
 void BSplineCompute::Restore(Base::XMLReader &/*reader*/)
 {
     throw Base::NotImplementedError("BSplineCompute::Restore");
+}
+
+// -------------------------------------------------
+
+TYPESYSTEM_SOURCE(Part::MultiCurve, Part::Approximation)
+
+MultiCurve::MultiCurve()
+{
+    this->myCurve = new AppParCurves_MultiCurve();
+}
+
+MultiCurve::MultiCurve(const AppParCurves_MultiCurve &)
+{
+    // TODO : create a real copy funcion
+    this->myCurve = new AppParCurves_MultiCurve();
+}
+
+MultiCurve::~MultiCurve()
+{
+}
+
+Approximation *MultiCurve::clone(void) const
+{
+    MultiCurve *newComp = new MultiCurve(*myCurve);
+    return newComp;
+}
+
+unsigned int MultiCurve::getMemSize (void) const
+{
+    throw Base::NotImplementedError("MultiCurve::getMemSize");
+}
+
+void MultiCurve::Save(Base::Writer &/*writer*/) const
+{
+    throw Base::NotImplementedError("MultiCurve::Save");
+}
+
+void MultiCurve::Restore(Base::XMLReader &/*reader*/)
+{
+    throw Base::NotImplementedError("MultiCurve::Restore");
+}
+
+// -------------------------------------------------
+
+TYPESYSTEM_SOURCE(Part::MultiBSpCurve, Part::MultiCurve)
+
+MultiBSpCurve::MultiBSpCurve()
+{
+    this->myCurve = new AppParCurves_MultiBSpCurve();
+}
+
+MultiBSpCurve::MultiBSpCurve(const AppParCurves_MultiCurve &)
+{
+    // TODO : create a real copy funcion
+    this->myCurve = new AppParCurves_MultiCurve();
+}
+
+MultiBSpCurve::~MultiBSpCurve()
+{
+}
+
+Approximation *MultiBSpCurve::clone(void) const
+{
+    MultiBSpCurve *newComp = new MultiBSpCurve(*myCurve);
+    return newComp;
+}
+
+
+
+unsigned int MultiBSpCurve::getMemSize (void) const
+{
+    throw Base::NotImplementedError("MultiBSpCurve::getMemSize");
+}
+
+void MultiBSpCurve::Save(Base::Writer &/*writer*/) const
+{
+    throw Base::NotImplementedError("MultiBSpCurve::Save");
+}
+
+void MultiBSpCurve::Restore(Base::XMLReader &/*reader*/)
+{
+    throw Base::NotImplementedError("MultiBSpCurve::Restore");
 }
 

@@ -24,6 +24,8 @@
 #define PART_APPROXIMATION_H
 
 #include <AppParCurves_MultiPoint.hxx>
+#include <AppParCurves_MultiCurve.hxx>
+#include <AppParCurves_MultiBSpCurve.hxx>
 #include <AppDef_MultiLine.hxx>
 #include <AppDef_MultiPointConstraint.hxx>
 #include <TColgp_Array1OfPnt.hxx>
@@ -158,6 +160,8 @@ public:
     void Perform(const AppDef_MultiLine &);
 // OR
 //    void Perform (const MultiLine &); ??????????
+    void Interpol(const AppDef_MultiLine &);
+    AppParCurves_MultiBSpCurve Value() const;
 
    // Persistence implementer ---------------------
     virtual unsigned int getMemSize(void) const;
@@ -174,6 +178,64 @@ public:
 private:
     AppDef_BSplineCompute* myBsCompute;
 };
+
+// ------------------------------------------------
+
+class PartExport MultiCurve : public Approximation
+{
+    TYPESYSTEM_HEADER();
+public:
+    MultiCurve();
+    MultiCurve(const AppParCurves_MultiCurve &);
+    virtual ~MultiCurve();
+    virtual Approximation *clone(void) const;
+//     virtual TopoDS_Shape toShape() const;
+
+   // Persistence implementer ---------------------
+    virtual unsigned int getMemSize(void) const;
+    virtual void Save(Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+//     virtual PyObject *getPyObject(void);
+// 
+//     const AppDef_MultiLine* handle() const;
+// 
+//     Base::Vector2d getPoint(void)const;
+//     void setPoint(const Base::Vector2d&);
+
+private:
+    AppParCurves_MultiCurve* myCurve;
+};
+
+// ------------------------------------------------
+
+class PartExport MultiBSpCurve : public MultiCurve
+{
+    TYPESYSTEM_HEADER();
+public:
+    MultiBSpCurve();
+    MultiBSpCurve(const AppParCurves_MultiCurve &);
+//     MultiBSpCurve(const AppParCurves_MultiBSpCurve &);
+    virtual ~MultiBSpCurve();
+    virtual Approximation *clone(void) const;
+//     virtual TopoDS_Shape toShape() const;
+
+   // Persistence implementer ---------------------
+    virtual unsigned int getMemSize(void) const;
+    virtual void Save(Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+//     virtual PyObject *getPyObject(void);
+// 
+//     const AppDef_MultiLine* handle() const;
+// 
+//     Base::Vector2d getPoint(void)const;
+//     void setPoint(const Base::Vector2d&);
+
+private:
+    AppParCurves_MultiCurve* myCurve;
+};
+
 
 }
 #endif // PART_APPROXIMATION_H
