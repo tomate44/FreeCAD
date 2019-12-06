@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+      Father="ApproximationPy"
+      Name="BSplineComputePy"
+      PythonName="Part.Approximation.BSplineCompute"
+      Twin="BSplineCompute"
+      TwinPointer="BSplineCompute"
+      Include="Mod/Part/App/Approximation.h"
+      Namespace="Part"
+      FatherInclude="Mod/Part/App/Approximation/ApproximationPy.h"
+      FatherNamespace="Part"
+      Constructor="true">
+		<Documentation>
+			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+			<UserDocu>Approximates a MultiLine with a MultiBSpCurve until tolerances are reached.</UserDocu>
+		</Documentation>
+<!--		<Attribute Name="NbPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of Points from MultiPoints composing the MultiLine.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints" Type="Long"/>
+		</Attribute>
+		<Attribute Name="NbMultiPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of MultiPointConstraints of the MultiLine.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbMultiPoints" Type="Long"/>
+		</Attribute>
+		<Methode Name="setParameter">
+			<Documentation>
+				<UserDocu>
+					setParameter(idx, u)
+					Sets the parameter u for the MultiPointConstraint at position idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>-->
+		<Methode Name="Interpol">
+			<Documentation>
+				<UserDocu>
+					Interpol(ml)
+					Constructs an interpolation of the MultiLine ml. The result will be a C2 curve of degree 3.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="Perform">
+			<Documentation>
+				<UserDocu>
+					Perform(ml)
+					Runs the approximation algorithm on MultiLine ml.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+	</PythonExport>
+</GenerateModel>

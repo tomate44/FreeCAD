@@ -29,6 +29,7 @@
 #include <TColgp_Array1OfPnt.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
 #include <AppDef_MultiPointConstraint.hxx>
+#include <AppDef_BSplineCompute.hxx>
 // # include <BRepBuilderAPI_MakeEdge2d.hxx>
 // # include <BRepBuilderAPI_MakeVertex.hxx>
 // # include <Geom2dConvert_CompCurveToBSplineCurve.hxx>
@@ -77,19 +78,12 @@
 
 #include "Approximation.h"
 #include <Mod/Part/App/Approximation/ApproximationPy.h>
+#include <Mod/Part/App/Approximation/MultiPointPy.h>
 #include <Mod/Part/App/Approximation/MultiLinePy.h>
-// #include <Mod/Part/App/Geom2d/Ellipse2dPy.h>
-// #include <Mod/Part/App/Geom2d/Hyperbola2dPy.h>
-// #include <Mod/Part/App/Geom2d/Parabola2dPy.h>
-// #include <Mod/Part/App/Geom2d/ArcOfCircle2dPy.h>
-// #include <Mod/Part/App/Geom2d/ArcOfEllipse2dPy.h>
-// #include <Mod/Part/App/Geom2d/ArcOfHyperbola2dPy.h>
-// #include <Mod/Part/App/Geom2d/ArcOfParabola2dPy.h>
-// #include <Mod/Part/App/Geom2d/BezierCurve2dPy.h>
-// #include <Mod/Part/App/Geom2d/BSplineCurve2dPy.h>
-// #include <Mod/Part/App/Geom2d/Line2dSegmentPy.h>
-// #include <Mod/Part/App/Geom2d/Line2dPy.h>
-// #include <Mod/Part/App/Geom2d/OffsetCurve2dPy.h>
+#include <Mod/Part/App/Approximation/BSplineComputePy.h>
+// #include <Mod/Part/App/Approximation/MultiCurvePy.h>
+// #include <Mod/Part/App/Approximation/MultiBSpCurvePy.h>
+
 
 using namespace Part;
 using namespace std;
@@ -171,7 +165,7 @@ Approximation *MultiPoint::clone(void) const
     return newPoint;
 }
 
-const AppParCurves_MultiPoint* MultiPoint::handle() const
+const AppParCurves_MultiPoint* MultiPoint::occObj() const
 {
     return myPoint;
 }
@@ -280,7 +274,7 @@ Approximation *MultiLine::clone(void) const
     return newLine;
 }
 
-const AppDef_MultiLine* MultiLine::handle() const
+const AppDef_MultiLine* MultiLine::occObj() const
 {
     return myLine;
 }
@@ -379,10 +373,10 @@ AppParCurves_MultiBSpCurve BSplineCompute::Value() const
     return this->myBsCompute->Value();
 }
 
-// const AppDef_BSplineCompute* BSplineCompute::handle() const
-// {
-//     return myBsCompute;
-// }
+const AppDef_BSplineCompute* BSplineCompute::occObj() const
+{
+    return myBsCompute;
+}
 
 unsigned int BSplineCompute::getMemSize (void) const
 {
@@ -397,6 +391,11 @@ void BSplineCompute::Save(Base::Writer &/*writer*/) const
 void BSplineCompute::Restore(Base::XMLReader &/*reader*/)
 {
     throw Base::NotImplementedError("BSplineCompute::Restore");
+}
+
+PyObject *BSplineCompute::getPyObject(void)
+{
+    return new BSplineComputePy(static_cast<BSplineCompute*>(this->clone()));
 }
 
 // -------------------------------------------------
@@ -422,6 +421,11 @@ Approximation *MultiCurve::clone(void) const
 {
     MultiCurve *newComp = new MultiCurve(*myCurve);
     return newComp;
+}
+
+const AppParCurves_MultiCurve* MultiCurve::occObj() const
+{
+    return myCurve;
 }
 
 unsigned int MultiCurve::getMemSize (void) const
@@ -451,7 +455,7 @@ MultiBSpCurve::MultiBSpCurve()
 MultiBSpCurve::MultiBSpCurve(const AppParCurves_MultiCurve &)
 {
     // TODO : create a real copy funcion
-    this->myCurve = new AppParCurves_MultiCurve();
+    this->myCurve = new AppParCurves_MultiBSpCurve();
 }
 
 MultiBSpCurve::~MultiBSpCurve()
@@ -464,7 +468,10 @@ Approximation *MultiBSpCurve::clone(void) const
     return newComp;
 }
 
-
+const AppParCurves_MultiBSpCurve *MultiBSpCurve::occObj(void) const
+{
+    return myCurve;
+}
 
 unsigned int MultiBSpCurve::getMemSize (void) const
 {
@@ -480,4 +487,9 @@ void MultiBSpCurve::Restore(Base::XMLReader &/*reader*/)
 {
     throw Base::NotImplementedError("MultiBSpCurve::Restore");
 }
+
+// PyObject *MultiBSpCurve::getPyObject(void)
+// {
+//     return new MultiBSpCurvePy(static_cast<MultiBSpCurve*>(this->clone()));
+// }
 

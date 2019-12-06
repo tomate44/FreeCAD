@@ -125,8 +125,11 @@
 #include <Mod/Part/App/Geom2d/Parabola2dPy.h>
 
 #include <Mod/Part/App/Approximation/ApproximationPy.h>
-#include <Mod/Part/App/Approximation/MultiLinePy.h>
 #include <Mod/Part/App/Approximation/MultiPointPy.h>
+#include <Mod/Part/App/Approximation/MultiLinePy.h>
+#include <Mod/Part/App/Approximation/BSplineComputePy.h>
+// #include <Mod/Part/App/Approximation/MultiCurvePy.h>
+// #include <Mod/Part/App/Approximation/MultiBSpCurvePy.h>
 
 #include "PropertyGeometryList.h"
 #include "DatumFeature.h"
@@ -431,6 +434,7 @@ PyMOD_INIT_FUNC(Part)
     Base::Interpreter().addType(&Part::ApproximationPy::Type,approxModule,"Approximation");
     Base::Interpreter().addType(&Part::MultiLinePy::Type,approxModule,"MultiLine");
     Base::Interpreter().addType(&Part::MultiPointPy::Type,approxModule,"MultiPoint");
+    Base::Interpreter().addType(&Part::BSplineComputePy::Type,approxModule,"BSplineCompute");
 
     Part::TopoShape             ::init();
     Part::PropertyPartShape     ::init();
@@ -577,6 +581,7 @@ PyMOD_INIT_FUNC(Part)
     Part::Approximation           ::init();
     Part::MultiPoint              ::init();
     Part::MultiLine               ::init();
+    Part::BSplineCompute          ::init();
 
     IGESControl_Controller::Init();
     STEPControl_Controller::Init();

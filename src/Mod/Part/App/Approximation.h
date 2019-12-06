@@ -102,7 +102,7 @@ public:
     // Base implementer ----------------------------
 //     virtual PyObject *getPyObject(void);
 // 
-    const AppParCurves_MultiPoint* handle() const;
+    const AppParCurves_MultiPoint* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
@@ -137,7 +137,7 @@ public:
     // Base implementer ----------------------------
     virtual PyObject *getPyObject(void);
 // 
-    const AppDef_MultiLine* handle() const;
+    const AppDef_MultiLine* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
@@ -168,9 +168,9 @@ public:
     virtual void Save(Base::Writer &/*writer*/) const;
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
-//     virtual PyObject *getPyObject(void);
+    virtual PyObject *getPyObject(void);
 // 
-//     const AppDef_MultiLine* handle() const;
+    const AppDef_BSplineCompute* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
@@ -198,7 +198,7 @@ public:
     // Base implementer ----------------------------
 //     virtual PyObject *getPyObject(void);
 // 
-//     const AppDef_MultiLine* handle() const;
+    const AppParCurves_MultiCurve* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
@@ -227,13 +227,13 @@ public:
     // Base implementer ----------------------------
 //     virtual PyObject *getPyObject(void);
 // 
-//     const AppDef_MultiLine* handle() const;
+    const AppParCurves_MultiBSpCurve* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
 //     void setPoint(const Base::Vector2d&);
 
 private:
-    AppParCurves_MultiCurve* myCurve;
+    AppParCurves_MultiBSpCurve* myCurve;
 };
 
 

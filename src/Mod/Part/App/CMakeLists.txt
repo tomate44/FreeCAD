@@ -118,6 +118,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Approximation)
 generate_from_xml(Approximation/ApproximationPy)
 generate_from_xml(Approximation/MultiLinePy)
 generate_from_xml(Approximation/MultiPointPy)
+generate_from_xml(Approximation/BSplineComputePy)
 
 SET(Features_SRCS
     FeaturePartBoolean.cpp
@@ -355,6 +356,8 @@ SET(ApproxPy_SRCS
     Approximation/MultiLinePyImp.cpp
     Approximation/MultiPointPy.xml
     Approximation/MultiPointPyImp.cpp
+    Approximation/BSplineComputePy.xml
+    Approximation/BSplineComputePyImp.cpp
 )
 SOURCE_GROUP("Approx" FILES ${ApproxPy_SRCS})
 
