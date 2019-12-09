@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+      Father="ApproximationPy"
+      Name="MultiCurvePy"
+      PythonName="Part.Approximation.MultiCurve"
+      Twin="MultiCurve"
+      TwinPointer="MultiCurve"
+      Include="Mod/Part/App/Approximation.h"
+      Namespace="Part"
+      FatherInclude="Mod/Part/App/Approximation/ApproximationPy.h"
+      FatherNamespace="Part"
+      Constructor="true">
+		<Documentation>
+			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+			<UserDocu>Describes a MultiCurve (a set of N Bezier curves) approximating a Multiline (made of N lines).</UserDocu>
+		</Documentation>
+		<Attribute Name="NbCurves" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of curves of the MultiCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbCurves" Type="Long"/>
+		</Attribute>
+		<Attribute Name="Degree" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the degree of curves of the MultiCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="Degree" Type="Long"/>
+		</Attribute>
+		<Attribute Name="NbPoles">
+			<Documentation>
+				<UserDocu>Get or set the number of poles of the curves of this MultiCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="Degree" Type="Long"/>
+		</Attribute>
+<!--		<Methode Name="setParameter">
+			<Documentation>
+				<UserDocu>
+					setParameter(idx, u)
+					Sets the parameter u for the MultiPointConstraint at position idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>-->
+	</PythonExport>
+</GenerateModel>

@@ -20,22 +20,27 @@
 				<UserDocu>Returns the number of Points from MultiPoints composing the MultiLine.</UserDocu>
 			</Documentation>
 			<Parameter Name="NbPoints" Type="Long"/>
-		</Attribute>
-		<Attribute Name="NbMultiPoints" ReadOnly="true">
+        </Attribute>-->
+<!--		<Attribute Name="NbPoles">
 			<Documentation>
-				<UserDocu>Returns the number of MultiPointConstraints of the MultiLine.</UserDocu>
+				<UserDocu>The number of poles of the MultiBSpCurve.</UserDocu>
 			</Documentation>
-			<Parameter Name="NbMultiPoints" Type="Long"/>
+			<Parameter Name="NbPoles" Type="Long"/>
 		</Attribute>
-		<Methode Name="setParameter">
+		<Attribute Name="Degree" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the degree of the MultiBSpCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="Degree" Type="Long"/>
+		</Attribute>-->
+		<Methode Name="value">
 			<Documentation>
 				<UserDocu>
-					setParameter(idx, u)
-					Sets the parameter u for the MultiPointConstraint at position idx.
+					returns the result of the approximation, as a MultiBSpCurve.
 				</UserDocu>
 			</Documentation>
-		</Methode>-->
-		<Methode Name="Interpol">
+		</Methode>
+		<Methode Name="interpol">
 			<Documentation>
 				<UserDocu>
 					Interpol(ml)
@@ -43,11 +48,35 @@
 				</UserDocu>
 			</Documentation>
 		</Methode>
-		<Methode Name="Perform">
+		<Methode Name="perform">
 			<Documentation>
 				<UserDocu>
 					Perform(ml)
 					Runs the approximation algorithm on MultiLine ml.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setDegrees">
+			<Documentation>
+				<UserDocu>
+					setDegrees(degMin, degMax)
+					Sets the Min and Max degrees of the approximation.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setContinuity">
+			<Documentation>
+				<UserDocu>
+					setContinuity(C)
+					Sets the continuity of the spline. if C = 2, the spline will be C2.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setTolerances">
+			<Documentation>
+				<UserDocu>
+					setTolerances(tol3d, tol2d)
+					Sets the tolerances of the approximation.
 				</UserDocu>
 			</Documentation>
 		</Methode>

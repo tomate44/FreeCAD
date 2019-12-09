@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
 	<PythonExport
-      Father="PyObjectBase"
+      Father="ApproximationPy"
       Name="MultiPointPy"
       PythonName="Part.Approximation.MultiPoint"
       Twin="MultiPoint"
@@ -9,7 +9,7 @@
       Include="Mod/Part/App/Approximation.h"
       Namespace="Part"
       FatherInclude="Mod/Part/App/Approximation/ApproximationPy.h"
-      FatherNamespace="Base"
+      FatherNamespace="Part"
       Constructor="true">
 		<Documentation>
 			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />

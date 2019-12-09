@@ -26,6 +26,7 @@
 // # include <gp_Ax2.hxx>
 // # include <gp_Dir.hxx>
 # include <gp_Pnt.hxx>
+# include <gp_Pnt2d.hxx>
 // # include <TopoDS.hxx>
 // # include <TopoDS_Wire.hxx>
 # include <TColgp_Array1OfPnt.hxx>
@@ -71,11 +72,11 @@ PyObject *MultiPointPy::PyMake(struct _typeobject *, PyObject *args, PyObject *)
                 mymp->setPoint(idx, point);
                 idx++;
             }
-            idx = 1;
+            int idx2 = 0;
             for (Py::Sequence::iterator it2 = list2.begin(); it2 != list2.end(); ++it2) {
                 Base::Vector2d point = Py::toVector2d(*it2);
-                mymp->setPoint2d(idx, point);
-                idx++;
+                mymp->setPoint2d(idx + idx2, point);
+                idx2++;
             }
             return new MultiPointPy(mymp);
         }
@@ -136,8 +137,10 @@ PyObject *MultiPointPy::getPoint2d(PyObject * args)
     if (!PyArg_ParseTuple(args, "i", &index))
         return 0;
     try {
+        int nb3d = this->getMultiPointPtr()->NbPoints();
+        int nb2d = this->getMultiPointPtr()->NbPoints2d();
         Standard_OutOfRange_Raise_if
-            (index < 1 || index > this->getMultiPointPtr()->NbPoints2d(), "Pole index out of range");
+            (index < (nb3d + 1) || index > (nb3d + nb2d), "Pole index out of range");
         Base::Vector2d pnt = this->getMultiPointPtr()->Point2d(index);
 
         Py::Module module("__FreeCADBase__");
@@ -179,10 +182,12 @@ PyObject *MultiPointPy::setPoint2d(PyObject * args)
     PyObject* p;
     if (!PyArg_ParseTuple(args, "iO!", &index, Base::Vector2dPy::type_object(), &p))
         return 0;
-    Base::Vector2d vec = Py::toVector2d(p);
     try {
+        int nb3d = this->getMultiPointPtr()->NbPoints();
+        int nb2d = this->getMultiPointPtr()->NbPoints2d();
         Standard_OutOfRange_Raise_if
-            (index < 1 || index > this->getMultiPointPtr()->NbPoints2d(), "Pole index out of range");
+            (index < (nb3d + 1) || index > (nb3d + nb2d), "Pole index out of range");
+        Base::Vector2d vec = Py::toVector2d(p);
         this->getMultiPointPtr()->setPoint2d(index, vec);
         Py_Return;
     }
@@ -217,11 +222,13 @@ PyObject *MultiPointPy::getPoints2d(PyObject * args)
     if (!PyArg_ParseTuple(args, ""))
         return 0;
     try {
+        int nb3d = this->getMultiPointPtr()->NbPoints();
+        int nb2d = this->getMultiPointPtr()->NbPoints2d();
         Py::List pts;
         Py::Module module("__FreeCADBase__");
         Py::Callable method(module.getAttr("Vector2d"));
         Py::Tuple vec2(2);
-        for (Standard_Integer i=1; i<=this->getMultiPointPtr()->NbPoints2d(); i++) {
+        for (Standard_Integer i=(nb3d + 1); i<=(nb3d + nb2d); i++) {
             Base::Vector2d pnt = this->getMultiPointPtr()->Point2d(i);
             vec2.setItem(0, Py::Float(pnt.x));
             vec2.setItem(1, Py::Float(pnt.y));

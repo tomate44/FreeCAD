@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+      Father="MultiCurvePy"
+      Name="MultiBSpCurvePy"
+      PythonName="Part.Approximation.MultiBSpCurve"
+      Twin="MultiBSpCurve"
+      TwinPointer="MultiBSpCurve"
+      Include="Mod/Part/App/Approximation.h"
+      Namespace="Part"
+      FatherInclude="Mod/Part/App/Approximation/MultiCurvePy.h"
+      FatherNamespace="Part"
+      Constructor="true">
+		<Documentation>
+			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+			<UserDocu>Describes a MultiBSpCurve (a set of N Bspline curves) approximating a Multiline (made of N lines).</UserDocu>
+		</Documentation>
+<!--		<Attribute Name="NbPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of Points from MultiPoints composing the MultiLine.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints" Type="Long"/>
+		</Attribute>
+		<Attribute Name="NbMultiPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of MultiPointConstraints of the MultiLine.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbMultiPoints" Type="Long"/>
+		</Attribute>
+		<Methode Name="setParameter">
+			<Documentation>
+				<UserDocu>
+					setParameter(idx, u)
+					Sets the parameter u for the MultiPointConstraint at position idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>-->
+	</PythonExport>
+</GenerateModel>

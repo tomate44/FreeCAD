@@ -43,6 +43,7 @@
 // #include "AppDef_MultiPointConstraintPy.cpp"
 #include "Mod/Part/App/Approximation.h"
 #include "Mod/Part/App/Approximation/MultiLinePy.h"
+#include "Mod/Part/App/Approximation/MultiBSpCurvePy.h"
 #include "Mod/Part/App/Approximation/BSplineComputePy.h"
 #include "Mod/Part/App/Approximation/BSplineComputePy.cpp"
 #include "Tools.h"
@@ -52,9 +53,9 @@
 
 using namespace Part;
 
-PyObject *BSplineComputePy::PyMake(struct _typeobject *, PyObject *args, PyObject *)  // Python wrapper
+PyObject *BSplineComputePy::PyMake(struct _typeobject *, PyObject* /*args*/, PyObject *)  // Python wrapper
 {
-    // create a new instance of AppDef_MultiLinePy and the Twin object
+    // create a new instance of BSplineComputePy and the Twin object
     return new BSplineComputePy(new BSplineCompute());
 }
 
@@ -70,46 +71,85 @@ std::string BSplineComputePy::representation(void) const
     return std::string("<BSplineCompute object>");
 }
 
-PyObject* BSplineComputePy::Interpol(PyObject *args)
+PyObject* BSplineComputePy::interpol(PyObject *args)
 {
     PyObject *ml;
     if (PyArg_ParseTuple(args, "O!", &(MultiLinePy::Type), &ml)) {
-        AppDef_MultiLine myml = ml->getMultiLinePtr()->myLine;
-        this->getBSplineComputePtr()->Interpol(myml);
-        return 0;
+        MultiLine* myml = static_cast<Part::MultiLinePy*>(ml)->getMultiLinePtr();
+        this->getBSplineComputePtr()->Interpol(*myml->occObj());
+        Py_Return;
     }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to create interpolation");
+    return 0;
 }
 
-PyObject* BSplineComputePy::Perform(PyObject *args)
+PyObject* BSplineComputePy::perform(PyObject *args)
 {
-    return 0; 
+    PyObject *ml;
+    if (PyArg_ParseTuple(args, "O!", &(MultiLinePy::Type), &ml)) {
+        MultiLine* myml = static_cast<Part::MultiLinePy*>(ml)->getMultiLinePtr();
+        this->getBSplineComputePtr()->Perform(*myml->occObj());
+        Py_Return;
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to create approximation");
+    return 0;
 }
 
-// Py::Long BSplineComputePy::getNbPoints(void) const
-// {
-//     return Py::Long(this->getMultiLinePtr()->NbPoints()); 
-// }
-// 
-// Py::Long BSplineComputePy::getNbMultiPoints(void) const
-// {
-//     return Py::Long(this->getMultiLinePtr()->NbMultiPoints()); 
-// }
-// 
-// PyObject* BSplineComputePy::setParameter(PyObject *args)
-// {
-//     int idx;
-//     double par;
-//     if (!PyArg_ParseTuple(args, "id", &idx, &par))
-//         return 0;
-//     try {
-//         this->getMultiLinePtr()->setParameter(idx, par);
-//         return 0;
-//     }
-//     catch (Standard_Failure& e) {
-//         PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
-//         return 0;
-//     }
-// }
+PyObject* BSplineComputePy::value(PyObject *args)
+{
+    if (PyArg_ParseTuple(args, "")) {
+//         MultiBSpCurve* mybsc = new MultiBSpCurve(this->getBSplineComputePtr()->Value()); // works
+        // or
+        AppParCurves_MultiBSpCurve mybsc = this->getBSplineComputePtr()->Value();
+//         PyErr_SetString(PyExc_RuntimeError,
+//         "returning value of approximation");
+        return new MultiBSpCurvePy(new MultiBSpCurve(mybsc));
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to return approximation");
+    return 0;
+}
+
+PyObject* BSplineComputePy::setDegrees(PyObject *args)
+{
+    int degMin, degMax;
+    if (PyArg_ParseTuple(args, "ii", &degMin, &degMax))
+    {
+        this->getBSplineComputePtr()->setDegrees(degMin, degMax);
+        Py_Return;
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to set degrees");
+    return 0;
+}
+
+PyObject* BSplineComputePy::setContinuity(PyObject *args)
+{
+    int cont;
+    if (PyArg_ParseTuple(args, "i", &cont))
+    {
+        this->getBSplineComputePtr()->setContinuity(cont);
+        Py_Return;
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to set continuity");
+    return 0;
+}
+
+PyObject* BSplineComputePy::setTolerances(PyObject *args)
+{
+    double tol3d, tol2d;
+    if (PyArg_ParseTuple(args, "dd", &tol3d, &tol2d))
+    {
+        this->getBSplineComputePtr()->setTolerances(tol3d, tol2d);
+        Py_Return;
+    }
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to set tolerances");
+    return 0;
+}
 
 PyObject *BSplineComputePy::getCustomAttributes(const char* ) const
 {

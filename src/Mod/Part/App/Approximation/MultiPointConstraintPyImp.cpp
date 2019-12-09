@@ -25,11 +25,13 @@
 #ifndef _PreComp_
 // # include <gp_Ax2.hxx>
 // # include <gp_Dir.hxx>
-// # include <gp_Pnt.hxx>
+# include <gp_Pnt.hxx>
+# include <gp_Pnt2d.hxx>
 // # include <TopoDS.hxx>
 // # include <TopoDS_Wire.hxx>
 # include <TColgp_Array1OfPnt.hxx>
-# include <TColgp_Array1OfVec.hxx>
+// # include <AppDef_Array1OfMultiPointConstraint.hxx>
+# include <AppParCurves_MultiPoint.hxx>
 # include <AppDef_MultiPointConstraint.hxx>
 # include <Standard_Version.hxx>
 // # include <TopTools_ListIteratorOfListOfShape.hxx>
@@ -37,8 +39,10 @@
 
 // #include "TopoShapePy.h"
 // #include "TopoShapeVertexPy.h"
-#include "AppDef_MultiPointConstraintPy.h"
-#include "AppDef_MultiPointConstraintPy.cpp"
+#include "Mod/Part/App/Approximation/MultiPointPy.h"
+#include "Mod/Part/App/Approximation.h"
+#include "Mod/Part/App/Approximation/MultiPointConstraintPy.h"
+#include "Mod/Part/App/Approximation/MultiPointConstraintPy.cpp"
 #include "Tools.h"
 #include "OCCError.h"
 #include <Base/VectorPy.h>
@@ -46,107 +50,75 @@
 
 using namespace Part;
 
-PyObject *AppDef_MultiPointConstraintPy::PyMake(struct _typeobject *, PyObject *args, PyObject *)  // Python wrapper
+PyObject *MultiPointConstraintPy::PyMake(struct _typeobject *, PyObject *args, PyObject *)  // Python wrapper
 {
-    // create a new instance of AppDef_MultiPointConstraintPy and the Twin object 
-    PyObject* obj;
-    if (PyArg_ParseTuple(args, "O", &obj)) {
+    // create a new instance of AppDef_MultiPointPy and the Twin object
+    int nb3d, nb2d;
+    if (PyArg_ParseTuple(args, "ii", &nb3d, &nb2d)) {
+        return new MultiPointConstraintPy(new MultiPointConstraint(nb3d, nb2d));
+    }
+    PyErr_Clear();
+    PyObject *obj1, *obj2;
+    if (PyArg_ParseTuple(args, "OO", &obj1, &obj2)) {
         try {
-            Py::Sequence list(obj);
-            Standard_Integer len = list.size();
-            TColgp_Array1OfPnt pts(1, len);
-            Standard_Integer idx = 0;
-            for (Py::Sequence::iterator it1 = list.begin(); it1 != list.end(); ++it1) {
-                idx++;
+            Py::Sequence list1(obj1);
+            Py::Sequence list2(obj2);
+            MultiPointConstraint* mymp = new MultiPointConstraint(list1.size(), list2.size());
+            int idx = 0;
+            for (Py::Sequence::iterator it1 = list1.begin(); it1 != list1.end(); ++it1) {
                 Py::Vector v(*it1);
-                Base::Vector3d pnt = v.toVector();
-                gp_Pnt newPoint(pnt.x,pnt.y,pnt.z);
-                pts.SetValue(idx, newPoint);
+                Base::Vector3d point = v.toVector();
+                mymp->setPoint(idx, point);
+                idx++;
             }
-            return new AppDef_MultiPointConstraintPy(new AppDef_MultiPointConstraint(pts));
+            int idx2 = 0;
+            for (Py::Sequence::iterator it2 = list2.begin(); it2 != list2.end(); ++it2) {
+                Base::Vector2d point = Py::toVector2d(*it2);
+                mymp->setPoint2d(list1.size() + idx2, point);
+                idx2++;
+            }
+            return new MultiPointConstraintPy(mymp);
         }
         catch (Standard_Failure& e) {
             PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
             return 0;
         }
     }
-
-    PyErr_Clear();
-
-
-    PyErr_SetString(PartExceptionOCCError,
-      "Argument list signature is incorrect.\n\nSupported signatures:\n"
-      "(list_of_points)\n"
-      "(list_of_points, list_of_tangent_vectors)\n"
-      "(list_of_points, list_of_tangent_vectors, list_of_curvature_vectors)\n");
+    PyErr_SetString(PyExc_RuntimeError,
+        "Failed to create MultiPointConstraint");
     return 0;
 }
 
 // constructor method
-int AppDef_MultiPointConstraintPy::PyInit(PyObject* /*args*/, PyObject* /*kwd*/)
+int MultiPointConstraintPy::PyInit(PyObject* /*args*/, PyObject* /*kwd*/)
 {
     return 0;
 }
 
 // returns a string which represents the object e.g. when printed in python
-std::string AppDef_MultiPointConstraintPy::representation(void) const
+std::string MultiPointConstraintPy::representation(void) const
 {
-    return std::string("<AppDef_MultiPointConstraint object>");
+    return std::string("<MultiPointConstraint object>");
 }
 
-Py::Long AppDef_MultiPointConstraintPy::getNbPoints(void) const
+PyObject* MultiPointConstraintPy::isTangencyPoint(PyObject*)
 {
-//     if (!PyArg_ParseTuple(args, "")
-//         return 0;
-
-    try {
-        int n = this->getAppDef_MultiPointConstraintPtr()->NbPoints();
-        return Py::Long(n);
-    }
-    catch (Standard_Failure& e) {
-        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
-        return Py::Long(0);
-    }
+    Standard_Boolean istan = this->getMultiPointConstraintPtr()->isTangencyPoint();
+    return PyBool_FromLong(istan ? 1 : 0);
 }
 
-PyObject* AppDef_MultiPointConstraintPy::Dimension(PyObject * args)
+PyObject* MultiPointConstraintPy::isCurvaturePoint(PyObject*)
 {
-    int index;
-    if (!PyArg_ParseTuple(args, "i", &index))
-        return 0;
-    try {
-        int dim = this->getAppDef_MultiPointConstraintPtr()->Dimension(index);
-        return Py_BuildValue("i", dim);
-    }
-    catch (Standard_Failure& e) {
-        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
-        return 0;
-    }
+    Standard_Boolean iscur = this->getMultiPointConstraintPtr()->isCurvaturePoint();
+    return PyBool_FromLong(iscur ? 1 : 0);
 }
 
-PyObject* AppDef_MultiPointConstraintPy::Point(PyObject * args)
-{
-    int index;
-    if (!PyArg_ParseTuple(args, "i", &index))
-        return 0;
-    try {
-        gp_Pnt pnt = this->getAppDef_MultiPointConstraintPtr()->Point(index);
-        Base::VectorPy* vec = new Base::VectorPy(Base::Vector3d(
-            pnt.X(), pnt.Y(), pnt.Z()));
-        return vec;
-    }
-    catch (Standard_Failure& e) {
-        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
-        return 0;
-    }
-}
-
-PyObject *AppDef_MultiPointConstraintPy::getCustomAttributes(const char* ) const
+PyObject *MultiPointConstraintPy::getCustomAttributes(const char* ) const
 {
     return 0;
 }
 
-int AppDef_MultiPointConstraintPy::setCustomAttributes(const char* , PyObject *)
+int MultiPointConstraintPy::setCustomAttributes(const char* , PyObject *)
 {
     return 0; 
 }

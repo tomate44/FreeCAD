@@ -81,8 +81,8 @@
 #include <Mod/Part/App/Approximation/MultiPointPy.h>
 #include <Mod/Part/App/Approximation/MultiLinePy.h>
 #include <Mod/Part/App/Approximation/BSplineComputePy.h>
-// #include <Mod/Part/App/Approximation/MultiCurvePy.h>
-// #include <Mod/Part/App/Approximation/MultiBSpCurvePy.h>
+#include <Mod/Part/App/Approximation/MultiCurvePy.h>
+#include <Mod/Part/App/Approximation/MultiBSpCurvePy.h>
 
 
 using namespace Part;
@@ -139,7 +139,7 @@ MultiPoint::MultiPoint(const AppParCurves_MultiPoint &mp)
         mymp->SetPoint(it1, mp.Point(it1));
     }
     for (int it2 = 0; it2 != nbp2d; ++it2) {
-        mymp->SetPoint2d(it2, mp.Point2d(it2));
+        mymp->SetPoint2d(nbp3d + it2, mp.Point2d(nbp3d + it2));
     }
     this->myPoint = mymp;
 }
@@ -149,6 +149,17 @@ MultiPoint::MultiPoint(const std::vector<gp_Pnt>& p)
     if (p.size() < 1)
         Standard_ConstructionError::Raise();
     TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    for (std::size_t i=0; i<p.size(); i++) {
+        pts->SetValue(i+1, p[i]);
+    }
+    this->myPoint = new AppParCurves_MultiPoint(*pts);
+}
+
+MultiPoint::MultiPoint(const std::vector<gp_Pnt2d>& p)
+{
+    if (p.size() < 1)
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt2d* pts = new TColgp_Array1OfPnt2d(1, p.size());
     for (std::size_t i=0; i<p.size(); i++) {
         pts->SetValue(i+1, p[i]);
     }
@@ -205,6 +216,11 @@ void MultiPoint::setPoint2d(const int idx, Base::Vector2d &p)
     return;
 }
 
+PyObject *MultiPoint::getPyObject(void)
+{
+    return new MultiPointPy(static_cast<MultiPoint*>(this->clone()));
+}
+
 unsigned int MultiPoint::getMemSize (void) const
 {
     throw Base::NotImplementedError("MultiPoint::getMemSize");
@@ -219,6 +235,152 @@ void MultiPoint::Restore(Base::XMLReader &/*reader*/)
 {
     throw Base::NotImplementedError("MultiPoint::Restore");
 }
+
+// -------------------------------------------------
+
+TYPESYSTEM_SOURCE(Part::MultiPointConstraint, Part::MultiPoint)
+
+MultiPointConstraint::MultiPointConstraint()
+{
+    this->myPoint = new AppDef_MultiPointConstraint();
+}
+
+MultiPointConstraint::MultiPointConstraint(const AppDef_MultiPointConstraint &mp)
+{
+    int nbp3d = mp.NbPoints();
+    int nbp2d = mp.NbPoints2d();
+    AppDef_MultiPointConstraint* mymp = new AppDef_MultiPointConstraint(nbp3d, nbp2d);
+    for (int it1 = 0; it1 != nbp3d; ++it1) {
+        mymp->SetPoint(it1, mp.Point(it1));
+    }
+    for (int it2 = 0; it2 != nbp2d; ++it2) {
+        mymp->SetPoint2d(it2, mp.Point2d(it2));
+    }
+    this->myPoint = mymp;
+}
+
+MultiPointConstraint::MultiPointConstraint(const int NbPoints, const int NbPoints2d)
+{
+    this->myPoint = new AppDef_MultiPointConstraint(NbPoints, NbPoints2d);
+}
+
+MultiPointConstraint::MultiPointConstraint(const std::vector<gp_Pnt>& p)
+{
+    if (p.size() < 1)
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    for (std::size_t i=0; i<p.size(); i++) {
+        pts->SetValue(i+1, p[i]);
+    }
+    this->myPoint = new AppDef_MultiPointConstraint(*pts);
+}
+
+MultiPointConstraint::MultiPointConstraint(const std::vector<gp_Pnt2d>& p)
+{
+    if (p.size() < 1)
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt2d* pts = new TColgp_Array1OfPnt2d(1, p.size());
+    for (std::size_t i=0; i<p.size(); i++) {
+        pts->SetValue(i+1, p[i]);
+    }
+    this->myPoint = new AppDef_MultiPointConstraint(*pts);
+}
+
+MultiPointConstraint::MultiPointConstraint(const std::vector<gp_Pnt>& p1, const std::vector<gp_Pnt2d>& p2)
+{
+    if ((p1.size() < 1) || (p2.size() < 1))
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt* pts1 = new TColgp_Array1OfPnt(1, p1.size());
+    for (std::size_t i=0; i<p1.size(); i++) {
+        pts1->SetValue(i+1, p1[i]);
+    }
+    TColgp_Array1OfPnt2d* pts2 = new TColgp_Array1OfPnt2d(1, p2.size());
+    for (std::size_t i=0; i<p2.size(); i++) {
+        pts2->SetValue(i+1, p2[i]);
+    }
+    this->myPoint = new AppDef_MultiPointConstraint(*pts1, *pts2);
+}
+MultiPointConstraint::~MultiPointConstraint()
+{
+}
+
+Approximation *MultiPointConstraint::clone(void) const
+{
+    MultiPointConstraint *newPoint = new MultiPointConstraint(*myPoint);
+    return newPoint;
+}
+
+const AppDef_MultiPointConstraint* MultiPointConstraint::occObj() const
+{
+    return myPoint;
+}
+
+bool MultiPointConstraint::isTangencyPoint(void) const
+{
+    return this->myPoint->IsTangencyPoint();
+}
+
+bool MultiPointConstraint::isCurvaturePoint(void) const
+{
+    return this->myPoint->IsCurvaturePoint();
+}
+
+/*
+int MultiPointConstraint::NbPoints(void) const
+{
+    return this->myPoint->NbPoints();
+}
+
+int MultiPointConstraint::NbPoints2d(void) const
+{
+    return this->myPoint->NbPoints2d();
+}
+
+Base::Vector3d MultiPoint::Point(const int idx)
+{
+    gp_Pnt gp = this->myPoint->Point(idx);
+    Base::Vector3d p(gp.X(), gp.Y(), gp.Z());
+    return p;
+}
+Base::Vector2d MultiPoint::Point2d(const int idx)
+{
+    gp_Pnt2d gp = this->myPoint->Point2d(idx);
+    Base::Vector2d p(gp.X(), gp.Y());
+    return p;
+}
+void MultiPoint::setPoint(const int idx, Base::Vector3d &p)
+{
+    gp_Pnt gp(p.x, p.y, p.z);
+    this->myPoint->SetPoint(idx, gp);
+    return;
+}
+void MultiPoint::setPoint2d(const int idx, Base::Vector2d &p)
+{
+    gp_Pnt2d gp(p.x, p.y);
+    this->myPoint->SetPoint2d(idx, gp);
+    return;
+}
+
+PyObject *MultiPointConstraint::getPyObject(void)
+{
+    return new MultiPointConstraintPy(static_cast<MultiPointConstraint*>(this->clone()));
+}*/
+
+unsigned int MultiPointConstraint::getMemSize (void) const
+{
+    throw Base::NotImplementedError("MultiPointConstraint::getMemSize");
+}
+
+void MultiPointConstraint::Save(Base::Writer &/*writer*/) const
+{
+    throw Base::NotImplementedError("MultiPointConstraint::Save");
+}
+
+void MultiPointConstraint::Restore(Base::XMLReader &/*reader*/)
+{
+    throw Base::NotImplementedError("MultiPointConstraint::Restore");
+}
+
 
 // -------------------------------------------------
 
@@ -373,6 +535,21 @@ AppParCurves_MultiBSpCurve BSplineCompute::Value() const
     return this->myBsCompute->Value();
 }
 
+void BSplineCompute::setDegrees(const int degMin, const int degMax)
+{
+    this->myBsCompute->SetDegrees(degMin, degMax);
+}
+
+void BSplineCompute::setContinuity(const int cont)
+{
+    this->myBsCompute->SetContinuity(cont);
+}
+
+void BSplineCompute::setTolerances(const double tol3d, const double tol2d)
+{
+    this->myBsCompute->SetTolerances(tol3d, tol2d);
+}
+
 const AppDef_BSplineCompute* BSplineCompute::occObj() const
 {
     return myBsCompute;
@@ -407,10 +584,14 @@ MultiCurve::MultiCurve()
     this->myCurve = new AppParCurves_MultiCurve();
 }
 
-MultiCurve::MultiCurve(const AppParCurves_MultiCurve &)
+MultiCurve::MultiCurve(const AppParCurves_MultiCurve &mc)
 {
-    // TODO : create a real copy funcion
-    this->myCurve = new AppParCurves_MultiCurve();
+    int degree = mc.Degree();
+    AppParCurves_Array1OfMultiPoint* mparray = new AppParCurves_Array1OfMultiPoint(1,degree+1);
+    for (int it = 1; it != degree+2; ++it) {
+        mparray->SetValue(it, mc.Value(it));
+    }
+    this->myCurve = new AppParCurves_MultiCurve(*mparray);
 }
 
 MultiCurve::~MultiCurve()
@@ -419,13 +600,18 @@ MultiCurve::~MultiCurve()
 
 Approximation *MultiCurve::clone(void) const
 {
-    MultiCurve *newComp = new MultiCurve(*myCurve);
-    return newComp;
+    MultiCurve *newCurve = new MultiCurve(*myCurve);
+    return newCurve;
 }
 
 const AppParCurves_MultiCurve* MultiCurve::occObj() const
 {
     return myCurve;
+}
+
+void MultiCurve::setNbPoles(int nb)
+{
+    this->myCurve->SetNbPoles(nb);
 }
 
 unsigned int MultiCurve::getMemSize (void) const
@@ -443,6 +629,11 @@ void MultiCurve::Restore(Base::XMLReader &/*reader*/)
     throw Base::NotImplementedError("MultiCurve::Restore");
 }
 
+PyObject *MultiCurve::getPyObject(void)
+{
+    return new MultiCurvePy(static_cast<MultiCurve*>(this->clone()));
+}
+
 // -------------------------------------------------
 
 TYPESYSTEM_SOURCE(Part::MultiBSpCurve, Part::MultiCurve)
@@ -452,10 +643,15 @@ MultiBSpCurve::MultiBSpCurve()
     this->myCurve = new AppParCurves_MultiBSpCurve();
 }
 
-MultiBSpCurve::MultiBSpCurve(const AppParCurves_MultiCurve &)
+MultiBSpCurve::MultiBSpCurve(const AppParCurves_MultiBSpCurve &mc)
 {
-    // TODO : create a real copy funcion
-    this->myCurve = new AppParCurves_MultiBSpCurve();
+    int degree = mc.Degree();
+    AppParCurves_MultiCurve pmc = static_cast<AppParCurves_MultiCurve>(mc);
+    AppParCurves_Array1OfMultiPoint* mparray = new AppParCurves_Array1OfMultiPoint(1,degree+1);
+    for (int it = 1; it != degree+2; ++it) {
+        mparray->SetValue(it, pmc.Value(it));
+    }
+    this->myCurve = new AppParCurves_MultiBSpCurve(*mparray, mc.Knots(), mc.Multiplicities());
 }
 
 MultiBSpCurve::~MultiBSpCurve()
@@ -464,8 +660,8 @@ MultiBSpCurve::~MultiBSpCurve()
 
 Approximation *MultiBSpCurve::clone(void) const
 {
-    MultiBSpCurve *newComp = new MultiBSpCurve(*myCurve);
-    return newComp;
+    MultiBSpCurve *newCurve = new MultiBSpCurve(*myCurve);
+    return newCurve;
 }
 
 const AppParCurves_MultiBSpCurve *MultiBSpCurve::occObj(void) const
@@ -488,8 +684,8 @@ void MultiBSpCurve::Restore(Base::XMLReader &/*reader*/)
     throw Base::NotImplementedError("MultiBSpCurve::Restore");
 }
 
-// PyObject *MultiBSpCurve::getPyObject(void)
-// {
-//     return new MultiBSpCurvePy(static_cast<MultiBSpCurve*>(this->clone()));
-// }
+PyObject *MultiBSpCurve::getPyObject(void)
+{
+    return new MultiBSpCurvePy(static_cast<MultiBSpCurve*>(this->clone()));
+}
 

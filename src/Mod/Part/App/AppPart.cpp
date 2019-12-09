@@ -126,10 +126,11 @@
 
 #include <Mod/Part/App/Approximation/ApproximationPy.h>
 #include <Mod/Part/App/Approximation/MultiPointPy.h>
+#include <Mod/Part/App/Approximation/MultiPointConstraintPy.h>
 #include <Mod/Part/App/Approximation/MultiLinePy.h>
 #include <Mod/Part/App/Approximation/BSplineComputePy.h>
-// #include <Mod/Part/App/Approximation/MultiCurvePy.h>
-// #include <Mod/Part/App/Approximation/MultiBSpCurvePy.h>
+#include <Mod/Part/App/Approximation/MultiCurvePy.h>
+#include <Mod/Part/App/Approximation/MultiBSpCurvePy.h>
 
 #include "PropertyGeometryList.h"
 #include "DatumFeature.h"
@@ -432,9 +433,12 @@ PyMOD_INIT_FUNC(Part)
     Py_INCREF(approxModule);
     PyModule_AddObject(partModule, "Approximation", approxModule);
     Base::Interpreter().addType(&Part::ApproximationPy::Type,approxModule,"Approximation");
-    Base::Interpreter().addType(&Part::MultiLinePy::Type,approxModule,"MultiLine");
     Base::Interpreter().addType(&Part::MultiPointPy::Type,approxModule,"MultiPoint");
+    Base::Interpreter().addType(&Part::MultiPointConstraintPy::Type,approxModule,"MultiPointConstraint");
+    Base::Interpreter().addType(&Part::MultiLinePy::Type,approxModule,"MultiLine");
     Base::Interpreter().addType(&Part::BSplineComputePy::Type,approxModule,"BSplineCompute");
+    Base::Interpreter().addType(&Part::MultiCurvePy::Type,approxModule,"MultiCurve");
+    Base::Interpreter().addType(&Part::MultiBSpCurvePy::Type,approxModule,"MultiBSpCurve");
 
     Part::TopoShape             ::init();
     Part::PropertyPartShape     ::init();
@@ -580,8 +584,11 @@ PyMOD_INIT_FUNC(Part)
     // Approximation types
     Part::Approximation           ::init();
     Part::MultiPoint              ::init();
+    Part::MultiPointConstraint    ::init();
     Part::MultiLine               ::init();
     Part::BSplineCompute          ::init();
+    Part::MultiCurve              ::init();
+    Part::MultiBSpCurve           ::init();
 
     IGESControl_Controller::Init();
     STEPControl_Controller::Init();

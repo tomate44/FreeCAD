@@ -43,6 +43,7 @@
 // #include <Geom_Surface.hxx>
 // #include <TopoDS_Shape.hxx>
 #include <gp_Pnt.hxx>
+#include <gp_Pnt2d.hxx>
 #include <list>
 #include <vector>
 #include <memory>
@@ -85,6 +86,7 @@ public:
     MultiPoint(const int, const int);
     MultiPoint(const AppParCurves_MultiPoint &);
     MultiPoint(const std::vector<gp_Pnt>&);
+    MultiPoint(const std::vector<gp_Pnt2d>&);
     virtual ~MultiPoint();
     virtual Approximation *clone(void) const;
 //     virtual TopoDS_Shape toShape() const;
@@ -100,7 +102,7 @@ public:
     virtual void Save(Base::Writer &/*writer*/) const;
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
-//     virtual PyObject *getPyObject(void);
+    virtual PyObject *getPyObject(void);
 // 
     const AppParCurves_MultiPoint* occObj() const;
 // 
@@ -109,6 +111,40 @@ public:
 
 private:
     AppParCurves_MultiPoint* myPoint;
+};
+
+// ------------------------------------------------
+
+class PartExport MultiPointConstraint : public MultiPoint
+{
+    TYPESYSTEM_HEADER();
+public:
+    MultiPointConstraint();
+    MultiPointConstraint(const AppDef_MultiPointConstraint &);
+    MultiPointConstraint(const int, const int);
+    MultiPointConstraint(const std::vector<gp_Pnt>&);
+    MultiPointConstraint(const std::vector<gp_Pnt2d>&);
+    MultiPointConstraint(const std::vector<gp_Pnt>&, const std::vector<gp_Pnt2d>&);
+    virtual ~MultiPointConstraint();
+    virtual Approximation *clone(void) const;
+
+    bool isTangencyPoint(void) const;
+    bool isCurvaturePoint(void) const;
+
+   // Persistence implementer ---------------------
+    virtual unsigned int getMemSize(void) const;
+    virtual void Save(Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+//     virtual PyObject *getPyObject(void);
+// 
+    const AppDef_MultiPointConstraint* occObj() const;
+// 
+//     Base::Vector2d getPoint(void)const;
+//     void setPoint(const Base::Vector2d&);
+
+private:
+    AppDef_MultiPointConstraint* myPoint;
 };
 
 // ------------------------------------------------
@@ -162,6 +198,9 @@ public:
 //    void Perform (const MultiLine &); ??????????
     void Interpol(const AppDef_MultiLine &);
     AppParCurves_MultiBSpCurve Value() const;
+    void setDegrees(const int, const int);
+    void setContinuity(const int);
+    void setTolerances(const double, const double);
 
    // Persistence implementer ---------------------
     virtual unsigned int getMemSize(void) const;
@@ -196,8 +235,8 @@ public:
     virtual void Save(Base::Writer &/*writer*/) const;
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
-//     virtual PyObject *getPyObject(void);
-// 
+    virtual PyObject *getPyObject(void);
+    void setNbPoles(int);
     const AppParCurves_MultiCurve* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
@@ -214,8 +253,8 @@ class PartExport MultiBSpCurve : public MultiCurve
     TYPESYSTEM_HEADER();
 public:
     MultiBSpCurve();
-    MultiBSpCurve(const AppParCurves_MultiCurve &);
-//     MultiBSpCurve(const AppParCurves_MultiBSpCurve &);
+//     MultiBSpCurve(const AppParCurves_MultiCurve &);
+    MultiBSpCurve(const AppParCurves_MultiBSpCurve &);
     virtual ~MultiBSpCurve();
     virtual Approximation *clone(void) const;
 //     virtual TopoDS_Shape toShape() const;
@@ -225,7 +264,7 @@ public:
     virtual void Save(Base::Writer &/*writer*/) const;
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
-//     virtual PyObject *getPyObject(void);
+    virtual PyObject *getPyObject(void);
 // 
     const AppParCurves_MultiBSpCurve* occObj() const;
 // 

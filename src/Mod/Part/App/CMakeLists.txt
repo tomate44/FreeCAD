@@ -116,9 +116,12 @@ generate_from_xml(Geom2d/Parabola2dPy)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Approximation)
 
 generate_from_xml(Approximation/ApproximationPy)
-generate_from_xml(Approximation/MultiLinePy)
 generate_from_xml(Approximation/MultiPointPy)
+generate_from_xml(Approximation/MultiPointConstraintPy)
+generate_from_xml(Approximation/MultiLinePy)
 generate_from_xml(Approximation/BSplineComputePy)
+generate_from_xml(Approximation/MultiCurvePy)
+generate_from_xml(Approximation/MultiBSpCurvePy)
 
 SET(Features_SRCS
     FeaturePartBoolean.cpp
@@ -352,12 +355,18 @@ SOURCE_GROUP("Geom2d" FILES ${Geom2dPy_SRCS})
 SET(ApproxPy_SRCS
     Approximation/ApproximationPy.xml
     Approximation/ApproximationPyImp.cpp
-    Approximation/MultiLinePy.xml
-    Approximation/MultiLinePyImp.cpp
     Approximation/MultiPointPy.xml
     Approximation/MultiPointPyImp.cpp
+    Approximation/MultiPointConstraintPy.xml
+    Approximation/MultiPointConstraintPyImp.cpp
+    Approximation/MultiLinePy.xml
+    Approximation/MultiLinePyImp.cpp
     Approximation/BSplineComputePy.xml
     Approximation/BSplineComputePyImp.cpp
+    Approximation/MultiCurvePy.xml
+    Approximation/MultiCurvePyImp.cpp
+    Approximation/MultiBSpCurvePy.xml
+    Approximation/MultiBSpCurvePyImp.cpp
 )
 SOURCE_GROUP("Approx" FILES ${ApproxPy_SRCS})
 
