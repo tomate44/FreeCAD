@@ -43,6 +43,7 @@
 #include "Mod/Part/App/Approximation.h"
 #include "Mod/Part/App/Approximation/MultiLinePy.h"
 #include "Mod/Part/App/Approximation/MultiLinePy.cpp"
+#include "Mod/Part/App/Approximation/MultiPointConstraintPy.h"
 #include "Tools.h"
 #include "OCCError.h"
 #include <Base/VectorPy.h>
@@ -118,6 +119,39 @@ PyObject* MultiLinePy::setParameter(PyObject *args)
     try {
         this->getMultiLinePtr()->setParameter(idx, par);
         return 0;
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject* MultiLinePy::value(PyObject *args)
+{
+    int idx;
+    if (!PyArg_ParseTuple(args, "i", &idx))
+        return 0;
+    try {
+        AppDef_MultiPointConstraint mpc = this->getMultiLinePtr()->Value(idx);
+        return new MultiPointConstraintPy(new MultiPointConstraint(mpc));
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+PyObject* MultiLinePy::setValue(PyObject *args)
+{
+    int idx;
+    PyObject* mpc;
+    if (!PyArg_ParseTuple(args, "iO!", &idx, &(MultiPointConstraintPy::Type), &mpc))
+        return 0;
+    try {
+        MultiPointConstraint* mympc = static_cast<Part::MultiPointConstraintPy*>(mpc)->getMultiPointConstraintPtr();
+//             AppDef_MultiPointConstraint* admpc = mympc->occObj();
+        this->getMultiLinePtr()->setValue(idx, *mympc->occObj());
+        Py_Return;
     }
     catch (Standard_Failure& e) {
         PyErr_SetString(PartExceptionOCCError, e.GetMessageString());

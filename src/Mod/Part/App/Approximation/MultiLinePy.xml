@@ -35,5 +35,21 @@
 				</UserDocu>
 			</Documentation>
 		</Methode>
+        <Methode Name="value">
+			<Documentation>
+				<UserDocu>
+					value(idx)
+					Get the MultiPointConstraint at position idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setValue">
+			<Documentation>
+				<UserDocu>
+					setValue(idx, mpc)
+					Sets the MultiPointConstraint mpc at position idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
 	</PythonExport>
 </GenerateModel>

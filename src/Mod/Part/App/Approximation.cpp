@@ -79,6 +79,7 @@
 #include "Approximation.h"
 #include <Mod/Part/App/Approximation/ApproximationPy.h>
 #include <Mod/Part/App/Approximation/MultiPointPy.h>
+#include <Mod/Part/App/Approximation/MultiPointConstraintPy.h>
 #include <Mod/Part/App/Approximation/MultiLinePy.h>
 #include <Mod/Part/App/Approximation/BSplineComputePy.h>
 #include <Mod/Part/App/Approximation/MultiCurvePy.h>
@@ -135,10 +136,10 @@ MultiPoint::MultiPoint(const AppParCurves_MultiPoint &mp)
     int nbp3d = mp.NbPoints();
     int nbp2d = mp.NbPoints2d();
     AppParCurves_MultiPoint* mymp = new AppParCurves_MultiPoint(nbp3d, nbp2d);
-    for (int it1 = 0; it1 != nbp3d; ++it1) {
+    for (int it1 = 0; it1 != nbp3d; it1++) {
         mymp->SetPoint(it1, mp.Point(it1));
     }
-    for (int it2 = 0; it2 != nbp2d; ++it2) {
+    for (int it2 = 0; it2 != nbp2d; it2++) {
         mymp->SetPoint2d(nbp3d + it2, mp.Point2d(nbp3d + it2));
     }
     this->myPoint = mymp;
@@ -148,9 +149,9 @@ MultiPoint::MultiPoint(const std::vector<gp_Pnt>& p)
 {
     if (p.size() < 1)
         Standard_ConstructionError::Raise();
-    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(0, p.size()-1);
     for (std::size_t i=0; i<p.size(); i++) {
-        pts->SetValue(i+1, p[i]);
+        pts->SetValue(i, p[i]);
     }
     this->myPoint = new AppParCurves_MultiPoint(*pts);
 }
@@ -159,11 +160,26 @@ MultiPoint::MultiPoint(const std::vector<gp_Pnt2d>& p)
 {
     if (p.size() < 1)
         Standard_ConstructionError::Raise();
-    TColgp_Array1OfPnt2d* pts = new TColgp_Array1OfPnt2d(1, p.size());
+    TColgp_Array1OfPnt2d* pts = new TColgp_Array1OfPnt2d(0, p.size()-1);
     for (std::size_t i=0; i<p.size(); i++) {
-        pts->SetValue(i+1, p[i]);
+        pts->SetValue(i, p[i]);
     }
     this->myPoint = new AppParCurves_MultiPoint(*pts);
+}
+
+MultiPoint::MultiPoint(const std::vector<gp_Pnt>& p1, const std::vector<gp_Pnt2d>& p2)
+{
+    if ((p1.size() < 1) || (p2.size() < 1))
+        Standard_ConstructionError::Raise();
+    TColgp_Array1OfPnt* pts1 = new TColgp_Array1OfPnt(0, p1.size()-1);
+    for (std::size_t i=0; i<p1.size(); i++) {
+        pts1->SetValue(i, p1[i]);
+    }
+    TColgp_Array1OfPnt2d* pts2 = new TColgp_Array1OfPnt2d(0, p2.size()-1);
+    for (std::size_t i=0; i<p2.size(); i++) {
+        pts2->SetValue(p1.size()+i, p2[i]);
+    }
+    this->myPoint = new AppParCurves_MultiPoint(*pts1, *pts2);
 }
 
 MultiPoint::~MultiPoint()
@@ -245,32 +261,32 @@ MultiPointConstraint::MultiPointConstraint()
     this->myPoint = new AppDef_MultiPointConstraint();
 }
 
+MultiPointConstraint::MultiPointConstraint(const int NbPoints, const int NbPoints2d)
+{
+    this->myPoint = new AppDef_MultiPointConstraint(NbPoints, NbPoints2d);
+}
+
 MultiPointConstraint::MultiPointConstraint(const AppDef_MultiPointConstraint &mp)
 {
     int nbp3d = mp.NbPoints();
     int nbp2d = mp.NbPoints2d();
     AppDef_MultiPointConstraint* mymp = new AppDef_MultiPointConstraint(nbp3d, nbp2d);
-    for (int it1 = 0; it1 != nbp3d; ++it1) {
+    for (int it1 = 0; it1 != nbp3d; it1++) {
         mymp->SetPoint(it1, mp.Point(it1));
     }
-    for (int it2 = 0; it2 != nbp2d; ++it2) {
-        mymp->SetPoint2d(it2, mp.Point2d(it2));
+    for (int it2 = 0; it2 != nbp2d; it2++) {
+        mymp->SetPoint2d(nbp3d + it2, mp.Point2d(nbp3d + it2));
     }
     this->myPoint = mymp;
-}
-
-MultiPointConstraint::MultiPointConstraint(const int NbPoints, const int NbPoints2d)
-{
-    this->myPoint = new AppDef_MultiPointConstraint(NbPoints, NbPoints2d);
 }
 
 MultiPointConstraint::MultiPointConstraint(const std::vector<gp_Pnt>& p)
 {
     if (p.size() < 1)
         Standard_ConstructionError::Raise();
-    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(1, p.size());
+    TColgp_Array1OfPnt* pts = new TColgp_Array1OfPnt(0, p.size()-1);
     for (std::size_t i=0; i<p.size(); i++) {
-        pts->SetValue(i+1, p[i]);
+        pts->SetValue(i, p[i]);
     }
     this->myPoint = new AppDef_MultiPointConstraint(*pts);
 }
@@ -279,9 +295,9 @@ MultiPointConstraint::MultiPointConstraint(const std::vector<gp_Pnt2d>& p)
 {
     if (p.size() < 1)
         Standard_ConstructionError::Raise();
-    TColgp_Array1OfPnt2d* pts = new TColgp_Array1OfPnt2d(1, p.size());
+    TColgp_Array1OfPnt2d* pts = new TColgp_Array1OfPnt2d(0, p.size()-1);
     for (std::size_t i=0; i<p.size(); i++) {
-        pts->SetValue(i+1, p[i]);
+        pts->SetValue(i, p[i]);
     }
     this->myPoint = new AppDef_MultiPointConstraint(*pts);
 }
@@ -290,16 +306,17 @@ MultiPointConstraint::MultiPointConstraint(const std::vector<gp_Pnt>& p1, const 
 {
     if ((p1.size() < 1) || (p2.size() < 1))
         Standard_ConstructionError::Raise();
-    TColgp_Array1OfPnt* pts1 = new TColgp_Array1OfPnt(1, p1.size());
+    TColgp_Array1OfPnt* pts1 = new TColgp_Array1OfPnt(0, p1.size()-1);
     for (std::size_t i=0; i<p1.size(); i++) {
-        pts1->SetValue(i+1, p1[i]);
+        pts1->SetValue(i, p1[i]);
     }
-    TColgp_Array1OfPnt2d* pts2 = new TColgp_Array1OfPnt2d(1, p2.size());
+    TColgp_Array1OfPnt2d* pts2 = new TColgp_Array1OfPnt2d(0, p2.size()-1);
     for (std::size_t i=0; i<p2.size(); i++) {
-        pts2->SetValue(i+1, p2[i]);
+        pts2->SetValue(p1.size()+i, p2[i]);
     }
     this->myPoint = new AppDef_MultiPointConstraint(*pts1, *pts2);
 }
+
 MultiPointConstraint::~MultiPointConstraint()
 {
 }
@@ -313,6 +330,41 @@ Approximation *MultiPointConstraint::clone(void) const
 const AppDef_MultiPointConstraint* MultiPointConstraint::occObj() const
 {
     return myPoint;
+}
+
+int MultiPointConstraint::NbPoints(void) const
+{
+    return this->myPoint->NbPoints();
+}
+
+int MultiPointConstraint::NbPoints2d(void) const
+{
+    return this->myPoint->NbPoints2d();
+}
+
+Base::Vector3d MultiPointConstraint::Point(const int idx)
+{
+    gp_Pnt gp = this->myPoint->Point(idx);
+    Base::Vector3d p(gp.X(), gp.Y(), gp.Z());
+    return p;
+}
+Base::Vector2d MultiPointConstraint::Point2d(const int idx)
+{
+    gp_Pnt2d gp = this->myPoint->Point2d(idx);
+    Base::Vector2d p(gp.X(), gp.Y());
+    return p;
+}
+void MultiPointConstraint::setPoint(const int idx, Base::Vector3d &p)
+{
+    gp_Pnt gp(p.x, p.y, p.z);
+    this->myPoint->SetPoint(idx, gp);
+    return;
+}
+void MultiPointConstraint::setPoint2d(const int idx, Base::Vector2d &p)
+{
+    gp_Pnt2d gp(p.x, p.y);
+    this->myPoint->SetPoint2d(idx, gp);
+    return;
 }
 
 bool MultiPointConstraint::isTangencyPoint(void) const
@@ -360,11 +412,11 @@ void MultiPoint::setPoint2d(const int idx, Base::Vector2d &p)
     this->myPoint->SetPoint2d(idx, gp);
     return;
 }
-
+*/
 PyObject *MultiPointConstraint::getPyObject(void)
 {
     return new MultiPointConstraintPy(static_cast<MultiPointConstraint*>(this->clone()));
-}*/
+}
 
 unsigned int MultiPointConstraint::getMemSize (void) const
 {
@@ -457,6 +509,18 @@ AppDef_MultiPointConstraint MultiLine::Value(int idx)
         Standard_OutOfRange_Raise_if
             (idx < 1 || idx > this->myLine->NbMultiPoints(), "MultiPoint index out of range");
         return this->myLine->Value(idx);
+    }
+    catch (Standard_Failure& e) {
+        THROWM(Base::CADKernelError,e.GetMessageString())
+    }
+}
+
+void MultiLine::setValue(int idx, const AppDef_MultiPointConstraint &mpc)
+{
+    try {
+        Standard_OutOfRange_Raise_if
+            (idx < 1 || idx > this->myLine->NbMultiPoints(), "MultiPoint index out of range");
+        this->myLine->SetValue(idx, mpc);
     }
     catch (Standard_Failure& e) {
         THROWM(Base::CADKernelError,e.GetMessageString())

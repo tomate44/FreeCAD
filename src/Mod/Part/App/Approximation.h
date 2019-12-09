@@ -87,6 +87,7 @@ public:
     MultiPoint(const AppParCurves_MultiPoint &);
     MultiPoint(const std::vector<gp_Pnt>&);
     MultiPoint(const std::vector<gp_Pnt2d>&);
+    MultiPoint(const std::vector<gp_Pnt>&, const std::vector<gp_Pnt2d>&);
     virtual ~MultiPoint();
     virtual Approximation *clone(void) const;
 //     virtual TopoDS_Shape toShape() const;
@@ -128,6 +129,13 @@ public:
     virtual ~MultiPointConstraint();
     virtual Approximation *clone(void) const;
 
+    int NbPoints(void) const;
+    int NbPoints2d(void) const;
+    Base::Vector3d Point(const int idx);
+    Base::Vector2d Point2d(const int idx);
+    void setPoint(const int idx, Base::Vector3d &p);
+    void setPoint2d(const int idx, Base::Vector2d &p);
+    
     bool isTangencyPoint(void) const;
     bool isCurvaturePoint(void) const;
 
@@ -136,7 +144,7 @@ public:
     virtual void Save(Base::Writer &/*writer*/) const;
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
-//     virtual PyObject *getPyObject(void);
+    virtual PyObject *getPyObject(void);
 // 
     const AppDef_MultiPointConstraint* occObj() const;
 // 
@@ -163,8 +171,9 @@ public:
 //     virtual TopoDS_Shape toShape() const;
     int NbPoints(void) const;
     int NbMultiPoints(void) const;
-    AppDef_MultiPointConstraint Value(const Standard_Integer idx);
-    void setParameter(const Standard_Integer idx, const Standard_Real u);
+    AppDef_MultiPointConstraint Value(const Standard_Integer);
+    void setValue(int, const AppDef_MultiPointConstraint &);
+    void setParameter(const Standard_Integer, const Standard_Real);
 
    // Persistence implementer ---------------------
     virtual unsigned int getMemSize(void) const;

@@ -17,6 +17,64 @@
 			MultiPointConstraints are composed of several two or three-dimensional points.
 			The purpose is to define the corresponding points that share a common constraint in order to compute the approximation of several lines in parallel.</UserDocu>
 		</Documentation>
+		<Attribute Name="NbPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of 3D points of this MultiPoint</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints" Type="Long"/>
+		</Attribute>
+		<Attribute Name="NbPoints2d" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of 2D points of this MultiPoint</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoints2d" Type="Long"/>
+		</Attribute>
+		<Methode Name="getPoint" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Point(idx)
+					Returns the 3D point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoint2d" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Point2d(idx)
+					Returns the 2D point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setPoint">
+			<Documentation>
+				<UserDocu>
+					SetPoint(idx, pt)
+					Sets the 3D point of index idx to pt.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setPoint2d">
+			<Documentation>
+				<UserDocu>
+					SetPoint2d(idx, pt)
+					Sets the 2D point of index idx to pt.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoints" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Returns the list of 3D points.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoints2d" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					Returns the list of 2D points.
+				</UserDocu>
+			</Documentation>
+		</Methode>
 		<Methode Name="isTangencyPoint" ReadOnly="true">
 			<Documentation>
 				<UserDocu>
