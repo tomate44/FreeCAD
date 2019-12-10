@@ -15,6 +15,24 @@
 			<Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
 			<UserDocu>Describes a MultiBSpCurve (a set of N Bspline curves) approximating a Multiline (made of N lines).</UserDocu>
 		</Documentation>
+		<Attribute Name="NbCurves" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the number of curves of the MultiCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbCurves" Type="Long"/>
+		</Attribute>
+		<Attribute Name="Degree" ReadOnly="true">
+			<Documentation>
+				<UserDocu>Returns the degree of curves of the MultiCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="Degree" Type="Long"/>
+		</Attribute>
+		<Attribute Name="NbPoles">
+			<Documentation>
+				<UserDocu>Get or set the number of poles of the curves of this MultiCurve.</UserDocu>
+			</Documentation>
+			<Parameter Name="NbPoles" Type="Long"/>
+		</Attribute>
 <!--		<Attribute Name="NbPoints" ReadOnly="true">
 			<Documentation>
 				<UserDocu>Returns the number of Points from MultiPoints composing the MultiLine.</UserDocu>

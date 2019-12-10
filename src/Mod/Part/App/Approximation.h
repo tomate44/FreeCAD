@@ -245,7 +245,7 @@ public:
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
     virtual PyObject *getPyObject(void);
-    void setNbPoles(int);
+    virtual void setNbPoles(int);
     const AppParCurves_MultiCurve* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;

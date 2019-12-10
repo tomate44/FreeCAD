@@ -31,7 +31,7 @@
 			<Documentation>
 				<UserDocu>Get or set the number of poles of the curves of this MultiCurve.</UserDocu>
 			</Documentation>
-			<Parameter Name="Degree" Type="Long"/>
+			<Parameter Name="NbPoles" Type="Long"/>
 		</Attribute>
 <!--		<Methode Name="setParameter">
 			<Documentation>

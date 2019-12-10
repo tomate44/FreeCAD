@@ -68,6 +68,27 @@ std::string MultiBSpCurvePy::representation(void) const
     return std::string("<MultiBSpCurve object>");
 }
 
+
+Py::Long MultiBSpCurvePy::getNbCurves(void) const
+{
+    return Py::Long(this->getMultiBSpCurvePtr()->occObj()->NbCurves()); 
+}
+
+Py::Long MultiBSpCurvePy::getDegree(void) const
+{
+    return Py::Long(this->getMultiBSpCurvePtr()->occObj()->Degree()); 
+}
+
+Py::Long MultiBSpCurvePy::getNbPoles(void) const
+{
+    return Py::Long(this->getMultiBSpCurvePtr()->occObj()->NbPoles()); 
+}
+
+void MultiBSpCurvePy::setNbPoles(Py::Long nb)
+{
+    this->getMultiBSpCurvePtr()->setNbPoles((int)nb); 
+}
+
 PyObject *MultiBSpCurvePy::getCustomAttributes(const char* ) const
 {
     return 0;
