@@ -678,6 +678,21 @@ void MultiCurve::setNbPoles(int nb)
     this->myCurve->SetNbPoles(nb);
 }
 
+int MultiCurve::getNbPoles(void)
+{
+    return this->myCurve->NbPoles();
+}
+
+int MultiCurve::getNbCurves(void)
+{
+    return this->myCurve->NbCurves();
+}
+
+int MultiCurve::getDegree(void)
+{
+    return this->myCurve->Degree();
+}
+
 unsigned int MultiCurve::getMemSize (void) const
 {
     throw Base::NotImplementedError("MultiCurve::getMemSize");
@@ -709,13 +724,14 @@ MultiBSpCurve::MultiBSpCurve()
 
 MultiBSpCurve::MultiBSpCurve(const AppParCurves_MultiBSpCurve &mc)
 {
-    int degree = mc.Degree();
+//     int degree = mc.Degree();
     AppParCurves_MultiCurve pmc = static_cast<AppParCurves_MultiCurve>(mc);
-    AppParCurves_Array1OfMultiPoint* mparray = new AppParCurves_Array1OfMultiPoint(1,degree+1);
-    for (int it = 1; it != degree+2; ++it) {
-        mparray->SetValue(it, pmc.Value(it));
-    }
-    this->myCurve = new AppParCurves_MultiBSpCurve(*mparray, mc.Knots(), mc.Multiplicities());
+//     AppParCurves_Array1OfMultiPoint* mparray = new AppParCurves_Array1OfMultiPoint(1,degree+1);
+//     for (int it = 1; it != degree+2; ++it) {
+//         mparray->SetValue(it, pmc.Value(it));
+//     }
+//     this->myCurve = new AppParCurves_MultiBSpCurve(*mparray, mc.Knots(), mc.Multiplicities());
+    this->myCurve = new AppParCurves_MultiBSpCurve(pmc, mc.Knots(), mc.Multiplicities());
 }
 
 MultiBSpCurve::~MultiBSpCurve()
@@ -726,6 +742,26 @@ Approximation *MultiBSpCurve::clone(void) const
 {
     MultiBSpCurve *newCurve = new MultiBSpCurve(*myCurve);
     return newCurve;
+}
+
+void MultiBSpCurve::setNbPoles(int nb)
+{
+    this->myCurve->SetNbPoles(nb);
+}
+
+int MultiBSpCurve::getNbPoles(void)
+{
+    return this->myCurve->NbPoles();
+}
+
+int MultiBSpCurve::getNbCurves(void)
+{
+    return this->myCurve->NbCurves();
+}
+
+int MultiBSpCurve::getDegree(void)
+{
+    return this->myCurve->Degree();
 }
 
 const AppParCurves_MultiBSpCurve *MultiBSpCurve::occObj(void) const

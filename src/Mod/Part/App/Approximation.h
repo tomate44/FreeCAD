@@ -246,6 +246,9 @@ public:
     // Base implementer ----------------------------
     virtual PyObject *getPyObject(void);
     virtual void setNbPoles(int);
+    virtual int getNbPoles(void);
+    int getNbCurves(void);
+    virtual int getDegree(void);
     const AppParCurves_MultiCurve* occObj() const;
 // 
 //     Base::Vector2d getPoint(void)const;
@@ -274,6 +277,10 @@ public:
     virtual void Restore(Base::XMLReader &/*reader*/);
     // Base implementer ----------------------------
     virtual PyObject *getPyObject(void);
+    virtual void setNbPoles(int);
+    virtual int getNbPoles(void);
+    int getNbCurves(void);
+    virtual int getDegree(void);
 // 
     const AppParCurves_MultiBSpCurve* occObj() const;
 // 

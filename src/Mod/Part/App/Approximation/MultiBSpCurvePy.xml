@@ -33,6 +33,28 @@
 			</Documentation>
 			<Parameter Name="NbPoles" Type="Long"/>
 		</Attribute>
+		<Methode Name="getKnots">
+			<Documentation>
+				<UserDocu>
+					Returns the knots of this Multi BSpline curve.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getMultiplicities">
+			<Documentation>
+				<UserDocu>
+					Returns the multiplicities of this Multi BSpline curve.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getPoles">
+			<Documentation>
+				<UserDocu>
+					poles = this.getPoles(i)
+					Returns the poles of curve[i] of this Multi BSpline curve.
+				</UserDocu>
+			</Documentation>
+		</Methode>
 <!--		<Attribute Name="NbPoints" ReadOnly="true">
 			<Documentation>
 				<UserDocu>Returns the number of Points from MultiPoints composing the MultiLine.</UserDocu>

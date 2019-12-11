@@ -29,6 +29,9 @@
 // # include <TopoDS.hxx>
 // # include <TopoDS_Wire.hxx>
 # include <TColgp_Array1OfPnt.hxx>
+# include <Standard_Real.hxx>
+# include <Standard_Integer.hxx>
+# include <NCollection_Array1.hxx>
 # include <AppDef_MultiPointConstraint.hxx>
 # include <AppDef_Array1OfMultiPointConstraint.hxx>
 # include <AppParCurves_MultiBSpCurve.hxx>
@@ -71,23 +74,81 @@ std::string MultiBSpCurvePy::representation(void) const
 
 Py::Long MultiBSpCurvePy::getNbCurves(void) const
 {
-    return Py::Long(this->getMultiBSpCurvePtr()->occObj()->NbCurves()); 
+    return Py::Long(this->getMultiBSpCurvePtr()->getNbCurves()); 
 }
 
 Py::Long MultiBSpCurvePy::getDegree(void) const
 {
-    return Py::Long(this->getMultiBSpCurvePtr()->occObj()->Degree()); 
+    return Py::Long(this->getMultiBSpCurvePtr()->getDegree()); 
 }
 
 Py::Long MultiBSpCurvePy::getNbPoles(void) const
 {
-    return Py::Long(this->getMultiBSpCurvePtr()->occObj()->NbPoles()); 
+    return Py::Long(this->getMultiBSpCurvePtr()->getNbPoles()); 
 }
 
 void MultiBSpCurvePy::setNbPoles(Py::Long nb)
 {
     this->getMultiBSpCurvePtr()->setNbPoles((int)nb); 
 }
+
+PyObject * MultiBSpCurvePy::getKnots(PyObject *)
+{
+    TColStd_Array1OfReal array = this->getMultiBSpCurvePtr()->occObj()->Knots();
+    Py::Tuple ktlist(array.Size());
+    int idx = 0;
+    for (int i=array.Lower(); i<=array.Upper(); i++)
+    {
+        ktlist.setItem(idx, Py::Float(array(i)));
+        idx++;
+    }
+    return Py::new_reference_to(ktlist);
+}
+
+PyObject * MultiBSpCurvePy::getMultiplicities(PyObject *)
+{
+    TColStd_Array1OfInteger array = this->getMultiBSpCurvePtr()->occObj()->Multiplicities();
+    Py::Tuple mullist(array.Size());
+    int idx = 0;
+    for (int i=array.Lower(); i<=array.Upper(); i++)
+    {
+        mullist.setItem(idx, Py::Long(array(i)));
+        idx++;
+    }
+    return Py::new_reference_to(mullist);
+}
+
+PyObject * MultiBSpCurvePy::getPoles(PyObject *args)
+{
+    int index;
+//     PyObject* p;
+    if (!PyArg_ParseTuple(args, "i", &index))
+        return 0;
+    try
+    {
+        int nb = this->getMultiBSpCurvePtr()->getNbPoles();
+        TColgp_Array1OfPnt Poles(1,nb);
+        this->getMultiBSpCurvePtr()->occObj()->Curve(index, Poles);
+        Py::List plist(nb);
+//     TColStd_Array1OfInteger array = this->getMultiBSpCurvePtr()->occObj()->Multiplicities();
+//     Py::Tuple plist(array.Size());
+        for (int i=Poles.Lower(); i<=Poles.Upper(); i++)
+        {
+            gp_Pnt pnt = this->getMultiBSpCurvePtr()->occObj()->Pole(index, i);
+            Base::Vector3d p(pnt.X(), pnt.Y(), pnt.Z());
+//             Base::Vector3d p(Poles(i).X(), Poles(i).Y(), Poles(i).Z());
+            Base::VectorPy* vec = new Base::VectorPy(p);
+            plist.append(Py::asObject(vec));
+        }
+        return Py::new_reference_to(plist);
+    }
+    catch (Standard_Failure& e) {
+
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
 
 PyObject *MultiBSpCurvePy::getCustomAttributes(const char* ) const
 {
