@@ -26,9 +26,11 @@
 // # include <gp_Ax2.hxx>
 // # include <gp_Dir.hxx>
 # include <gp_Pnt.hxx>
+# include <gp_Pnt2d.hxx>
 // # include <TopoDS.hxx>
 // # include <TopoDS_Wire.hxx>
 # include <TColgp_Array1OfPnt.hxx>
+# include <TColgp_Array1OfPnt2d.hxx>
 # include <Standard_Real.hxx>
 # include <Standard_Integer.hxx>
 # include <NCollection_Array1.hxx>
@@ -121,26 +123,43 @@ PyObject * MultiBSpCurvePy::getMultiplicities(PyObject *)
 PyObject * MultiBSpCurvePy::getPoles(PyObject *args)
 {
     int index;
-//     PyObject* p;
     if (!PyArg_ParseTuple(args, "i", &index))
         return 0;
     try
     {
         int nb = this->getMultiBSpCurvePtr()->getNbPoles();
-        TColgp_Array1OfPnt Poles(1,nb);
-        this->getMultiBSpCurvePtr()->occObj()->Curve(index, Poles);
-        Py::List plist(nb);
-//     TColStd_Array1OfInteger array = this->getMultiBSpCurvePtr()->occObj()->Multiplicities();
-//     Py::Tuple plist(array.Size());
-        for (int i=Poles.Lower(); i<=Poles.Upper(); i++)
+        int dim = this->getMultiBSpCurvePtr()->occObj()->Dimension(index);
+        if (dim == 3)
         {
-            gp_Pnt pnt = this->getMultiBSpCurvePtr()->occObj()->Pole(index, i);
-            Base::Vector3d p(pnt.X(), pnt.Y(), pnt.Z());
-//             Base::Vector3d p(Poles(i).X(), Poles(i).Y(), Poles(i).Z());
-            Base::VectorPy* vec = new Base::VectorPy(p);
-            plist.append(Py::asObject(vec));
+            TColgp_Array1OfPnt Poles(1,nb);
+            this->getMultiBSpCurvePtr()->occObj()->Curve(index, Poles);
+            Py::List plist(nb);
+            for (int i=Poles.Lower(); i<=Poles.Upper(); i++)
+            {
+                gp_Pnt pnt = this->getMultiBSpCurvePtr()->occObj()->Pole(index, i);
+                Base::Vector3d p(pnt.X(), pnt.Y(), pnt.Z());
+                Base::VectorPy* vec = new Base::VectorPy(p);
+                plist.append(Py::asObject(vec));
+            }
+            return Py::new_reference_to(plist);
         }
-        return Py::new_reference_to(plist);
+        else if (dim == 2)
+        {
+            TColgp_Array1OfPnt2d Poles(1,nb);
+            this->getMultiBSpCurvePtr()->occObj()->Curve(index, Poles);
+            Py::List plist(nb);
+            for (int i=Poles.Lower(); i<=Poles.Upper(); i++)
+            {
+                gp_Pnt2d  pnt = this->getMultiBSpCurvePtr()->occObj()->Pole2d(index, i);
+                Py::Module module("__FreeCADBase__");
+                Py::Callable method(module.getAttr("Vector2d"));
+                Py::Tuple vec(2);
+                vec.setItem(0, Py::Float(pnt.X()));
+                vec.setItem(1, Py::Float(pnt.Y()));
+                plist.append(method.apply(vec));
+            }
+            return Py::new_reference_to(plist);
+        }
     }
     catch (Standard_Failure& e) {
 
