@@ -22,6 +22,8 @@
 
 #include "PreCompiled.h"
 #ifndef _PreComp_
+#include <gp_Vec.hxx>
+#include <gp_Vec2d.hxx>
 #include <AppParCurves_MultiPoint.hxx>
 #include <AppParCurves_MultiCurve.hxx>
 #include <AppParCurves_MultiBSpCurve.hxx>
@@ -375,6 +377,18 @@ bool MultiPointConstraint::isTangencyPoint(void) const
 bool MultiPointConstraint::isCurvaturePoint(void) const
 {
     return this->myPoint->IsCurvaturePoint();
+}
+void MultiPointConstraint::setTang(const int idx, Base::Vector3d &p)
+{
+    gp_Vec gp(p.x, p.y, p.z);
+    this->myPoint->SetTang(idx, gp);
+    return;
+}
+void MultiPointConstraint::setTang2d(const int idx, Base::Vector2d &p)
+{
+    gp_Vec2d gp(p.x, p.y);
+    this->myPoint->SetTang2d(idx, gp);
+    return;
 }
 
 /*

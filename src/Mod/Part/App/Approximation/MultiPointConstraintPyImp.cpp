@@ -27,6 +27,8 @@
 // # include <gp_Dir.hxx>
 # include <gp_Pnt.hxx>
 # include <gp_Pnt2d.hxx>
+# include <gp_Vec.hxx>
+# include <gp_Vec2d.hxx>
 // # include <TopoDS.hxx>
 // # include <TopoDS_Wire.hxx>
 # include <TColgp_Array1OfPnt.hxx>
@@ -252,6 +254,89 @@ PyObject* MultiPointConstraintPy::isCurvaturePoint(PyObject*)
 {
     Standard_Boolean iscur = this->getMultiPointConstraintPtr()->isCurvaturePoint();
     return PyBool_FromLong(iscur ? 1 : 0);
+}
+
+PyObject *MultiPointConstraintPy::getTang(PyObject * args)
+{
+    int index;
+    if (!PyArg_ParseTuple(args, "i", &index))
+        return 0;
+    if (!this->getMultiPointConstraintPtr()->isTangencyPoint())
+    {
+        PyErr_SetString(PyExc_RuntimeError,
+        "This point has no tangent");
+    return 0;
+    }
+    try {
+        int nb3d = this->getMultiPointConstraintPtr()->NbPoints();
+        int nb2d = this->getMultiPointConstraintPtr()->NbPoints2d();
+        Standard_OutOfRange_Raise_if
+            (index < 1 || index > (nb3d + nb2d), "index out of range");
+        int dim = this->getMultiPointConstraintPtr()->occObj()->Dimension(index);
+        if (dim == 3)
+        {
+            gp_Vec vec = this->getMultiPointConstraintPtr()->occObj()->Tang(index);
+            Base::Vector3d pnt(vec.X(),vec.Y(),vec.Z());
+            Base::VectorPy* vector = new Base::VectorPy(pnt);
+            return vector;
+        }
+        else if (dim == 2)
+        {
+            Py::Module module("__FreeCADBase__");
+            Py::Callable method(module.getAttr("Vector2d"));
+            Py::Tuple vec2(2);
+            gp_Vec2d vec = this->getMultiPointConstraintPtr()->occObj()->Tang2d(index);
+            vec2.setItem(0, Py::Float(vec.X()));
+            vec2.setItem(1, Py::Float(vec.Y()));
+            return Py::new_reference_to(method.apply(vec2));
+//             Base::VectorPy* vector = new Base::VectorPy(pnt);
+//             return vector;
+        }
+    }
+    catch (Standard_Failure& e) {
+
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
+
+PyObject *MultiPointConstraintPy::setTang(PyObject * args)
+{
+    int index;
+    PyObject* p;
+    int nb3d = this->getMultiPointConstraintPtr()->NbPoints();
+    int nb2d = this->getMultiPointConstraintPtr()->NbPoints2d();
+    if (PyArg_ParseTuple(args, "iO!", &index, &(Base::VectorPy::Type), &p))
+    {
+        try
+        {
+            Base::Vector3d vec = static_cast<Base::VectorPy*>(p)->value();
+            Standard_OutOfRange_Raise_if
+                (index < 1 || index > nb3d, "Pole index out of range");
+            this->getMultiPointConstraintPtr()->setTang(index, vec);
+            Py_Return;
+        }
+        catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+        }
+    }
+    if (PyArg_ParseTuple(args, "iO!", &index, Base::Vector2dPy::type_object(), &p))
+    {
+        try
+        {
+            Standard_OutOfRange_Raise_if
+                (index < 1 || index > nb3d, "Pole index out of range");
+            Base::Vector2d vec = Py::toVector2d(p);
+            this->getMultiPointConstraintPtr()->setTang2d(index, vec);
+            Py_Return;
+        }
+        catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+        }
+    }
 }
 
 PyObject *MultiPointConstraintPy::getCustomAttributes(const char* ) const

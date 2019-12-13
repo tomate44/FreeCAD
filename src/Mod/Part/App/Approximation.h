@@ -138,6 +138,9 @@ public:
     
     bool isTangencyPoint(void) const;
     bool isCurvaturePoint(void) const;
+    
+    void setTang(const int idx, Base::Vector3d &p);
+    void setTang2d(const int idx, Base::Vector2d &p);
 
    // Persistence implementer ---------------------
     virtual unsigned int getMemSize(void) const;

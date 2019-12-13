@@ -89,5 +89,21 @@
 				</UserDocu>
 			</Documentation>
 		</Methode>
+		<Methode Name="getTang" ReadOnly="true">
+			<Documentation>
+				<UserDocu>
+					getTang(idx)
+					Returns the tangent (3D or 2D) of point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setTang">
+			<Documentation>
+				<UserDocu>
+					setTang(idx, vec)
+					Set the tangent (3D or 2D) of point of index idx.
+				</UserDocu>
+			</Documentation>
+		</Methode>
 	</PythonExport>
 </GenerateModel>
