@@ -390,6 +390,18 @@ void MultiPointConstraint::setTang2d(const int idx, Base::Vector2d &p)
     this->myPoint->SetTang2d(idx, gp);
     return;
 }
+void MultiPointConstraint::setCurv(const int idx, Base::Vector3d &p)
+{
+    gp_Vec gp(p.x, p.y, p.z);
+    this->myPoint->SetCurv(idx, gp);
+    return;
+}
+void MultiPointConstraint::setCurv2d(const int idx, Base::Vector2d &p)
+{
+    gp_Vec2d gp(p.x, p.y);
+    this->myPoint->SetCurv2d(idx, gp);
+    return;
+}
 
 /*
 int MultiPointConstraint::NbPoints(void) const

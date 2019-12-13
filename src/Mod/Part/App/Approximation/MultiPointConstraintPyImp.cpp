@@ -339,6 +339,45 @@ PyObject *MultiPointConstraintPy::setTang(PyObject * args)
     }
 }
 
+PyObject *MultiPointConstraintPy::setCurv(PyObject * args)
+{
+    int index;
+    PyObject* p;
+    int nb3d = this->getMultiPointConstraintPtr()->NbPoints();
+    int nb2d = this->getMultiPointConstraintPtr()->NbPoints2d();
+    if (PyArg_ParseTuple(args, "iO!", &index, &(Base::VectorPy::Type), &p))
+    {
+        try
+        {
+            Base::Vector3d vec = static_cast<Base::VectorPy*>(p)->value();
+            Standard_OutOfRange_Raise_if
+                (index < 1 || index > nb3d, "Pole index out of range");
+            this->getMultiPointConstraintPtr()->setCurv(index, vec);
+            Py_Return;
+        }
+        catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+        }
+    }
+    if (PyArg_ParseTuple(args, "iO!", &index, Base::Vector2dPy::type_object(), &p))
+    {
+        try
+        {
+            Standard_OutOfRange_Raise_if
+                (index < 1 || index > nb3d, "Pole index out of range");
+            Base::Vector2d vec = Py::toVector2d(p);
+            this->getMultiPointConstraintPtr()->setCurv2d(index, vec);
+            Py_Return;
+        }
+        catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+        }
+    }
+}
+
+
 PyObject *MultiPointConstraintPy::getCustomAttributes(const char* ) const
 {
     return 0;

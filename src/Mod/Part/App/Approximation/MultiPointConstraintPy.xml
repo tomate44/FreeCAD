@@ -105,5 +105,14 @@
 				</UserDocu>
 			</Documentation>
 		</Methode>
+		<Methode Name="setCurv">
+			<Documentation>
+				<UserDocu>
+					setCurv(idx, vec)
+					Set the normal vector (3D or 2D) of point of index idx.
+					The length of the vector is the desired curvature value.
+				</UserDocu>
+			</Documentation>
+		</Methode>
 	</PythonExport>
 </GenerateModel>
