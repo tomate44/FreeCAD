@@ -31,6 +31,7 @@
 #include <TColgp_Array1OfPnt.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
 #include <AppDef_MultiPointConstraint.hxx>
+#include <Approx_ParametrizationType.hxx>
 #include <AppDef_BSplineCompute.hxx>
 // # include <BRepBuilderAPI_MakeEdge2d.hxx>
 // # include <BRepBuilderAPI_MakeVertex.hxx>
@@ -598,6 +599,26 @@ BSplineCompute::BSplineCompute(const AppDef_BSplineCompute &bsc)
 {
     // TODO : create a real copy funcion
     this->myBsCompute = new AppDef_BSplineCompute();
+}
+
+BSplineCompute::BSplineCompute(const int paramType, const int nbIter, const bool cutting, const bool squares)
+{
+    int nb = 5;
+    if (nbIter > 0)
+        nb = nbIter;
+    Approx_ParametrizationType par = Approx_ChordLength;
+    // GeomAbs_Shape c = GeomAbs_C2;
+    switch(paramType){
+//     case 0:
+//         c = Approx_ChordLength;
+//         break;
+    case 1:
+        par = Approx_Centripetal;
+        break;
+    case 2:
+        par = Approx_IsoParametric;
+    }
+    this->myBsCompute = new AppDef_BSplineCompute(4, 8, 1e-3, 1e-6, nb, cutting, par, squares);
 }
 
 BSplineCompute::~BSplineCompute()

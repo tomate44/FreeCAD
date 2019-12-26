@@ -53,10 +53,22 @@
 
 using namespace Part;
 
-PyObject *BSplineComputePy::PyMake(struct _typeobject *, PyObject* /*args*/, PyObject *)  // Python wrapper
+PyObject *BSplineComputePy::PyMake(struct _typeobject *, PyObject* args, PyObject *)  // Python wrapper
 {
-    // create a new instance of BSplineComputePy and the Twin object
-    return new BSplineComputePy(new BSplineCompute());
+    int paramType = 0;
+    int nbIter = 5;
+    PyObject* cutting = Py_True;
+    PyObject* squares = Py_False;
+    if (!PyArg_ParseTuple(args, "|iiO!O!", &paramType, &nbIter, &PyBool_Type, &cutting, &PyBool_Type, &squares))
+        return 0;
+    try {
+        // create a new instance of BSplineComputePy and the Twin object
+        return new BSplineComputePy(new BSplineCompute(paramType, nbIter, PyObject_IsTrue(cutting) ? Standard_True : Standard_False, PyObject_IsTrue(squares) ? Standard_True : Standard_False));
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
 }
 
 // constructor method

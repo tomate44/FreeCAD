@@ -204,6 +204,7 @@ class PartExport BSplineCompute : public Approximation
 public:
     BSplineCompute();
     BSplineCompute(const AppDef_BSplineCompute &);
+    BSplineCompute(const int, const int, const bool, const bool);
     virtual ~BSplineCompute();
     virtual Approximation *clone(void) const;
 //     virtual TopoDS_Shape toShape() const;
