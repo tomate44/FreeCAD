@@ -2614,6 +2614,100 @@ TopoDS_Shape TopoShape::makeLoft(const TopTools_ListOfShape& profiles,
     return aGenerator.Shape();
 }
 
+TopoDS_Shape TopoShape::makeSmoothLoft(const TopTools_ListOfShape &profiles,
+                                       Standard_Boolean isSolid,
+                                       Standard_Boolean isClosed,
+                                       Standard_Integer maxDegree,
+                                       Standard_Integer continuity,
+                                       Standard_Real w1, Standard_Real w2,
+                                       Standard_Real w3) const
+{
+    // http://opencascade.blogspot.com/2010/01/surface-modeling-part5.html
+    BRepOffsetAPI_ThruSections aGenerator (isSolid);
+    aGenerator.SetMaxDegree(maxDegree);
+
+    TopTools_ListIteratorOfListOfShape it;
+    int countShapes = 0;
+    for (it.Initialize(profiles); it.More(); it.Next()) {
+        const TopoDS_Shape& item = it.Value();
+        if (!item.IsNull() && item.ShapeType() == TopAbs_VERTEX) {
+            aGenerator.AddVertex(TopoDS::Vertex (item));
+            countShapes++;
+        }
+        else if (!item.IsNull() && item.ShapeType() == TopAbs_EDGE) {
+            BRepBuilderAPI_MakeWire mkWire(TopoDS::Edge(item));
+            aGenerator.AddWire(mkWire.Wire());
+            countShapes++;
+        }
+        else if (!item.IsNull() && item.ShapeType() == TopAbs_WIRE) {
+            aGenerator.AddWire(TopoDS::Wire (item));
+            countShapes++;
+        }
+    }
+
+    if (countShapes < 2) {
+        Standard_Failure::Raise("Need at least two vertices, edges or wires to create loft face");
+    }
+    else {
+        // close loft by duplicating initial profile as last profile.  not perfect.
+        if (isClosed) {
+        /* can only close loft in certain combinations of Vertex/Wire(Edge):
+            - V1-W1-W2-W3-V2  ==> V1-W1-W2-W3-V2-V1  invalid closed
+            - V1-W1-W2-W3     ==> V1-W1-W2-W3-V1     valid closed
+            - W1-W2-W3-V1     ==> W1-W2-W3-V1-W1     invalid closed
+            - W1-W2-W3        ==> W1-W2-W3-W1        valid closed*/
+            if (profiles.Last().ShapeType() == TopAbs_VERTEX) {
+                Base::Console().Message("TopoShape::makeLoft: can't close Loft with Vertex as last profile. 'Closed' ignored.\n");
+            }
+            else {
+                // repeat Add logic above for first profile
+                const TopoDS_Shape& firstProfile = profiles.First();
+                if (firstProfile.ShapeType() == TopAbs_VERTEX)  {
+                    aGenerator.AddVertex(TopoDS::Vertex (firstProfile));
+                    countShapes++;
+                }
+                else if (firstProfile.ShapeType() == TopAbs_EDGE)  {
+                    aGenerator.AddWire(TopoDS::Wire (firstProfile));
+                    countShapes++;
+                }
+                else if (firstProfile.ShapeType() == TopAbs_WIRE)  {
+                    aGenerator.AddWire(TopoDS::Wire (firstProfile));
+                    countShapes++;
+                }
+            }
+        }
+    }
+
+    if ((w1 > 0.0) && (w2 > 0.0) && (w3 > 0.0)) {
+        aGenerator.SetCriteriumWeight(w1, w2, w3);
+        aGenerator.SetSmoothing(Standard_True);
+    }
+    GeomAbs_Shape conti = GeomAbs_G2;
+    switch (continuity) {
+        case 0: {
+            conti = GeomAbs_C0;
+        }
+        case 1: {
+            conti = GeomAbs_G1;
+        }
+        case 2: {
+            conti = GeomAbs_G2;
+        }
+        case 3: {
+            conti = GeomAbs_C3;
+        }
+    }
+    aGenerator.SetContinuity(conti);
+    Standard_Boolean anIsCheck = Standard_True;
+    aGenerator.CheckCompatibility (anIsCheck);   // use BRepFill_CompatibleWires on profiles. force #edges, orientation, "origin" to match.
+    aGenerator.Build();
+    if (!aGenerator.IsDone())
+        Standard_Failure::Raise("Failed to create loft face");
+
+    //Base::Console().Message("DEBUG: TopoShape::makeLoft returns.\n");
+    return aGenerator.Shape();
+}
+
 TopoDS_Shape TopoShape::makePrism(const gp_Vec& vec) const
 {
     if (this->_Shape.IsNull()) Standard_Failure::Raise("cannot sweep empty shape");
