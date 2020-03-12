@@ -398,8 +398,12 @@ public:
         add_varargs_method("makeSweepSurface",&Module::makeSweepSurface,
             "makeSweepSurface(edge(path),edge(profile),[float]) -- Create a profile along a path."
         );
-        add_varargs_method("makeLoft",&Module::makeLoft,
-            "makeLoft(list of wires,[solid=False,ruled=False,closed=False,maxDegree=5]) -- Create a loft shape."
+        add_varargs_method("makeLoft", &Module::makeLoft,
+                           "makeLoft(list of "
+                           "wires,[solid=False,ruled=False,closed=False,"
+                           "maxDegree=5]) -- Create a loft shape.");
+        add_varargs_method("makeSmoothLoft",&Module::makeSmoothLoft,
+            "makeSmoothLoft(list of wires,[solid=False,closed=False,maxDegree=5;continuity=2,w1=1.0,w2=1.0,w3=1.0]) -- Create an approximated loft shape, using a smoothing algorithm."
         );
         add_varargs_method("makeWireString",&Module::makeWireString,
             "makeWireString(string,fontdir,fontfile,height,[track]) -- Make list of wires in the form of a string's characters."
@@ -1670,6 +1674,41 @@ private:
         TopoDS_Shape aResult = myShape.makeLoft(profiles, anIsSolid, anIsRuled, anIsClosed, degMax);
         return Py::asObject(new TopoShapePy(new TopoShape(aResult)));
 #endif
+    }
+        Py::Object makeSmoothLoft(const Py::Tuple& args)
+    {
+        PyObject *pcObj;
+        PyObject *psolid=Py_False;
+        PyObject *pclosed=Py_False;
+        int degMax = 5;
+        int continuity = 2;
+        double w1 = 1.0;
+        double w2 = 1.0;
+        double w3 = 1.0;
+        if (!PyArg_ParseTuple(args.ptr(), "O|O!O!O!iiddd", &pcObj,
+                                              &(PyBool_Type), &psolid,
+                                              &(PyBool_Type), &pclosed,
+                                              &degMax, &continuity,
+                                              &w1, &w2, &w3)) {
+            throw Py::Exception();
+        }
+
+        TopTools_ListOfShape profiles;
+        Py::Sequence list(pcObj);
+
+        for (Py::Sequence::iterator it = list.begin(); it != list.end(); ++it) {
+            if (PyObject_TypeCheck((*it).ptr(), &(Part::TopoShapePy::Type))) {
+                const TopoDS_Shape& sh = static_cast<TopoShapePy*>((*it).ptr())->
+                    getTopoShapePtr()->getShape();
+                profiles.Append(sh);
+            }
+        }
+
+        TopoShape myShape;
+        Standard_Boolean anIsSolid = PyObject_IsTrue(psolid) ? Standard_True : Standard_False;
+        Standard_Boolean anIsClosed = PyObject_IsTrue(pclosed) ? Standard_True : Standard_False;
+        TopoDS_Shape aResult = myShape.makeSmoothLoft(profiles, anIsSolid, anIsClosed, degMax, continuity, w1, w2, w3);
+        return Py::asObject(new TopoShapePy(new TopoShape(aResult)));
     }
     Py::Object makeSplitShape(const Py::Tuple& args)
     {
