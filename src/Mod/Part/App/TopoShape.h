@@ -266,6 +266,7 @@ public:
                                        Standard_Boolean isClosed,
                                        Standard_Integer maxDegree = 5,
                                        Standard_Integer continuity = 2,
+                                       Standard_Real tol = .001,
                                        Standard_Real w1 = 1.0, Standard_Real w2 = 1.0,
                                        Standard_Real w3 = 1.0) const;
     TopoDS_Shape makeOffsetShape(double offset, double tol,

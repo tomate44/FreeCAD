@@ -2479,11 +2479,12 @@ TopoDS_Shape TopoShape::makeSmoothLoft(const TopTools_ListOfShape &profiles,
                                        Standard_Boolean isClosed,
                                        Standard_Integer maxDegree,
                                        Standard_Integer continuity,
+                                       Standard_Real tol,
                                        Standard_Real w1, Standard_Real w2,
                                        Standard_Real w3) const
 {
     // http://opencascade.blogspot.com/2010/01/surface-modeling-part5.html
-    BRepOffsetAPI_ThruSections aGenerator (isSolid);
+    BRepOffsetAPI_ThruSections aGenerator (isSolid, Standard_False, tol);
     aGenerator.SetMaxDegree(maxDegree);
 
     TopTools_ListIteratorOfListOfShape it;
