@@ -310,8 +310,9 @@ public:
     App::PropertyLength Height;
     App::PropertyLength Radius;
     App::PropertyAngle Angle;
-    App::PropertyEnumeration     LocalCoord;
-    App::PropertyEnumeration     Style;
+    App::PropertyEnumeration LocalCoord;
+    App::PropertyEnumeration Style;
+    App::PropertyLength Length;
 
     /** @name methods override feature */
     //@{

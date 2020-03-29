@@ -58,6 +58,8 @@
 # include <TopoDS_Solid.hxx>
 # include <TopoDS_Vertex.hxx>
 # include <Standard_Version.hxx>
+# include <GProp_GProps.hxx>
+# include <BRepGProp.hxx>
 #endif
 
 #include "PrimitiveFeature.h"
@@ -807,6 +809,8 @@ Helix::Helix(void)
     LocalCoord.setEnums(LocalCSEnums);
     ADD_PROPERTY_TYPE(Style,(long(0)),"Helix style",App::Prop_Hidden,"Old style creates incorrect and new style create correct helices");
     Style.setEnums(StyleEnums);
+    ADD_PROPERTY_TYPE(Length,(0.0),"Info",App::Prop_None,"Length of the helix (read only)");
+    Length.setReadOnly(Standard_True);
 }
 
 void Helix::onChanged(const App::Property* prop)
@@ -822,6 +826,11 @@ void Helix::onChanged(const App::Property* prop)
             }
         }
     }
+//     if (isRestoring()){
+//         if(prop == &Length){
+//             Length.setReadOnly(Standard_True);
+//         }
+//     }
     Part::Primitive::onChanged(prop);
 }
 
@@ -855,7 +864,11 @@ App::DocumentObjectExecReturn *Helix::execute(void)
         // work around for OCC bug #23314 (FC #0954)
         // the exact conditions for failure are unknown.  building the helix 1 turn at a time
         // seems to always work.
-        this->Shape.setValue(helix.makeLongHelix(myPitch, myHeight, myRadius, myAngle, myLocalCS));
+        const TopoDS_Shape w = helix.makeLongHelix(myPitch, myHeight, myRadius, myAngle, myLocalCS);
+        this->Shape.setValue(w);
+        GProp_GProps prop;
+        BRepGProp::LinearProperties(w, prop);
+        this->Length.setValue(prop.Mass());
 //        if (myHeight / myPitch > 50.0)
 //            this->Shape.setValue(helix.makeLongHelix(myPitch, myHeight, myRadius, myAngle, myLocalCS));
 //        else

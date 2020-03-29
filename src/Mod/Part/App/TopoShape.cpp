@@ -2952,16 +2952,12 @@ TopoDS_Shape TopoShape::makeOffset2D(double offset, short joinType, bool fill, b
         bool haveFaces = false;
         for(TopoDS_Shape &sh : shapesToProcess){
             switch (sh.ShapeType()) {
-                case TopAbs_EDGE:
+                case TopAbs_EDGE:{
+                    sourceWires.push_back(BRepBuilderAPI_MakeWire(TopoDS::Edge(sh)).Wire());
+                    haveWires = true;
+                }break;
                 case TopAbs_WIRE:{
-                    //convert edge to a wire if necessary...
-                    TopoDS_Wire sourceWire;
-                    if (sh.ShapeType() == TopAbs_WIRE){
-                        sourceWire = TopoDS::Wire(sh);
-                    } else { //edge
-                        sourceWire = BRepBuilderAPI_MakeWire(TopoDS::Edge(sh)).Wire();
-                    }
-                    sourceWires.push_back(sourceWire);
+                    sourceWires.push_back(TopoDS::Wire(sh));
                     haveWires = true;
                 }break;
                 case TopAbs_FACE:{
