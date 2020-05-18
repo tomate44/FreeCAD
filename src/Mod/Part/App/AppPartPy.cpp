@@ -441,7 +441,7 @@ public:
             "getSortedClusters(list of edges) -- Helper method to sort and cluster a variety of edges"
         );
         add_varargs_method("__sortEdges__",&Module::sortEdges,
-            "__sortEdges__(list of edges) -- list of edges\n"
+            "__sortEdges__(list of edges, tol3d) -- list of edges\n"
             "Helper method to sort an unsorted list of edges so that afterwards\n"
             "the start and end vertex of two consecutive edges are geometrically coincident.\n"
             "It returns a single list of edges and the algorithm stops after the first set of\n"
@@ -2025,8 +2025,9 @@ private:
     }
     Py::Object sortEdges(const Py::Tuple& args)
     {
+        double tol3d=Precision::Confusion();
         PyObject *obj;
-        if (!PyArg_ParseTuple(args.ptr(), "O", &obj)) {
+        if (!PyArg_ParseTuple(args.ptr(), "O|d", &obj, &tol3d)) {
             throw Py::TypeError("list of edges expected");
         }
 
@@ -2047,7 +2048,7 @@ private:
             }
         }
 
-        std::list<TopoDS_Edge> sorted = sort_Edges(Precision::Confusion(), edges);
+        std::list<TopoDS_Edge> sorted = sort_Edges(tol3d, edges);
         Py::List sorted_list;
         for (std::list<TopoDS_Edge>::iterator it = sorted.begin(); it != sorted.end(); ++it) {
             sorted_list.append(Py::Object(new TopoShapeEdgePy(new TopoShape(*it)),true));
@@ -2057,8 +2058,9 @@ private:
     }
     Py::Object sortEdges2(const Py::Tuple& args)
     {
+        double tol3d=Precision::Confusion();
         PyObject *obj;
-        if (!PyArg_ParseTuple(args.ptr(), "O", &obj)) {
+        if (!PyArg_ParseTuple(args.ptr(), "O|d", &obj, &tol3d)) {
             throw Py::Exception(PartExceptionOCCError, "list of edges expected");
         }
 
@@ -2081,7 +2083,7 @@ private:
 
         Py::List root_list;
         while(edges.size()) {
-            std::list<TopoDS_Edge> sorted = sort_Edges(Precision::Confusion(), edges);
+            std::list<TopoDS_Edge> sorted = sort_Edges(tol3d, edges);
             Py::List sorted_list;
             for (std::list<TopoDS_Edge>::iterator it = sorted.begin(); it != sorted.end(); ++it) {
                 sorted_list.append(Py::Object(new TopoShapeEdgePy(new TopoShape(*it)),true));
