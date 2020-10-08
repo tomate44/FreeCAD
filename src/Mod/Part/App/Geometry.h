@@ -55,6 +55,7 @@
 #include <gp_Dir.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
+#include <math_Matrix.hxx>
 #include <list>
 #include <memory>
 #include <vector>
@@ -227,6 +228,38 @@ public:
     virtual Geometry *copy(void) const;
     std::vector<Base::Vector3d> getPoles() const;
     std::vector<double> getWeights() const;
+
+    // Persistence implementer ---------------------
+    virtual unsigned int getMemSize (void) const;
+    virtual void Save (Base::Writer &/*writer*/) const;
+    virtual void Restore(Base::XMLReader &/*reader*/);
+    // Base implementer ----------------------------
+    virtual PyObject *getPyObject(void);
+
+    void setHandle(const Handle(Geom_BezierCurve)&);
+    const Handle(Geom_Geometry)& handle() const;
+
+private:
+    Handle(Geom_BezierCurve) myCurve;
+};
+
+class PartExport ConstrainedBezierCurve : public GeomBezierCurve
+{
+    TYPESYSTEM_HEADER();
+public:
+    int start_continuity;
+    int end_continuity;
+    math_Matrix matrix;
+    ConstrainedBezierCurve();
+    ConstrainedBezierCurve(const Handle(Geom_BezierCurve)&);
+    ConstrainedBezierCurve(int s, int e);
+    ConstrainedBezierCurve(const std::vector<Base::Vector3d>&, const std::vector<Base::Vector3d>&);
+    virtual ~ConstrainedBezierCurve();
+    virtual Geometry *copy(void) const;
+    std::vector<Base::Vector3d> getPoles() const;
+    std::vector<double> getWeights() const;
+    void buildMatrix() const;
+    void solve(const std::vector<Base::Vector3d>&, const std::vector<Base::Vector3d>&) const;
 
     // Persistence implementer ---------------------
     virtual unsigned int getMemSize (void) const;

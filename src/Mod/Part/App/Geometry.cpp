@@ -101,6 +101,9 @@
 # include <GeomAPI_ExtremaCurveCurve.hxx>
 # include <ShapeConstruct_Curve.hxx>
 # include <LProp_NotDefined.hxx>
+# include <math_Matrix.hxx>
+# include <math_Gauss.hxx>
+# include <BSplCLib.hxx>
 
 # include <ctime>
 # include <cmath>
@@ -990,6 +993,269 @@ void GeomBezierCurve::Restore(Base::XMLReader& reader)
 PyObject *GeomBezierCurve::getPyObject(void)
 {
     return new BezierCurvePy(static_cast<GeomBezierCurve*>(this->clone()));
+}
+
+// -------------------------------------------------
+
+TYPESYSTEM_SOURCE(Part::ConstrainedBezierCurve,Part::GeomBezierCurve)
+
+ConstrainedBezierCurve::ConstrainedBezierCurve()
+{
+    std::vector<Base::Vector3d> c1;
+    c1.reserve(1);
+    c1.emplace_back(0.0, 0.0, 0.0);
+    std::vector<Base::Vector3d> c2;
+    c2.reserve(1);
+    c2.emplace_back(1.0, 0.0, 0.0);
+    this->start_continuity = 1;
+    this->end_continuity = 1;
+    ConstrainedBezierCurve::buildMatrix();
+    ConstrainedBezierCurve::solve(c1, c2);
+//     Handle(Geom_BezierCurve) b = new Geom_BezierCurve(poles);
+//     this->myCurve = b;
+}
+
+ConstrainedBezierCurve::ConstrainedBezierCurve(const Handle(Geom_BezierCurve)& b)
+{
+    setHandle(b);
+}
+
+ConstrainedBezierCurve::ConstrainedBezierCurve(int num_start, int num_end)
+{
+//     if ((start_constraints.size() == 0) || (end_constraints.size() == 0))
+//         throw Base::ValueError("Not enough constraints");
+// 
+//     TColgp_Array1OfPnt sc(1,start_constraints.size());
+//     for (std::size_t i = 1; i <= start_constraints.size(); i++) {
+//         sc.SetValue(i, gp_Pnt(start_constraints[i-1].x,start_constraints[i-1].y,start_constraints[i-1].z));
+//     TColgp_Array1OfPnt ec(1,end_constraints.size());
+//     for (std::size_t i = 1; i <= end_constraints.size(); i++) {
+//         ec.SetValue(i, gp_Pnt(end_constraints[i-1].x,end_constraints[i-1].y,end_constraints[i-1].z));
+//     }
+    this->start_continuity = num_start;
+    this->end_continuity = num_end;
+    ConstrainedBezierCurve::buildMatrix();
+//     ConstrainedBezierCurve::solve(start_constraints, end_constraints);
+//     Handle(Geom_BezierCurve) b = new Geom_BezierCurve(poles);
+//     this->myCurve = b;
+}
+
+ConstrainedBezierCurve::ConstrainedBezierCurve(const std::vector<Base::Vector3d>& start_constraints, const std::vector<double>& end_constraints)
+{
+//     if ((start_constraints.size() == 0) || (end_constraints.size() == 0))
+//         throw Base::ValueError("Not enough constraints");
+// 
+//     TColgp_Array1OfPnt sc(1,start_constraints.size());
+//     for (std::size_t i = 1; i <= start_constraints.size(); i++) {
+//         sc.SetValue(i, gp_Pnt(start_constraints[i-1].x,start_constraints[i-1].y,start_constraints[i-1].z));
+//     TColgp_Array1OfPnt ec(1,end_constraints.size());
+//     for (std::size_t i = 1; i <= end_constraints.size(); i++) {
+//         ec.SetValue(i, gp_Pnt(end_constraints[i-1].x,end_constraints[i-1].y,end_constraints[i-1].z));
+//     }
+    this->start_continuity = start_constraints.size();
+    this->end_continuity = end_constraints.size();
+    ConstrainedBezierCurve::buildMatrix();
+    ConstrainedBezierCurve::solve(start_constraints, end_constraints);
+//     Handle(Geom_BezierCurve) b = new Geom_BezierCurve(poles);
+//     this->myCurve = b;
+}
+
+ConstrainedBezierCurve::~ConstrainedBezierCurve()
+{
+}
+
+void ConstrainedBezierCurve::setHandle(const Handle(Geom_BezierCurve)& c)
+{
+    myCurve = Handle(Geom_BezierCurve)::DownCast(c->Copy());
+}
+
+const Handle(Geom_Geometry)& ConstrainedBezierCurve::handle() const
+{
+    return myCurve;
+}
+
+Geometry *ConstrainedBezierCurve::copy(void) const
+{
+    ConstrainedBezierCurve *newCurve = new ConstrainedBezierCurve(myCurve);
+    newCurve->Construction = this->Construction;
+    return newCurve;
+}
+
+std::vector<Base::Vector3d> ConstrainedBezierCurve::getPoles() const
+{
+    std::vector<Base::Vector3d> poles;
+    poles.reserve(myCurve->NbPoles());
+    TColgp_Array1OfPnt p(1,myCurve->NbPoles());
+    myCurve->Poles(p);
+
+    for (Standard_Integer i=p.Lower(); i<=p.Upper(); i++) {
+        const gp_Pnt& pnt = p(i);
+        poles.emplace_back(pnt.X(), pnt.Y(), pnt.Z());
+    }
+    return poles;
+}
+
+std::vector<double> ConstrainedBezierCurve::getWeights() const
+{
+    std::vector<double> weights;
+    weights.reserve(myCurve->NbPoles());
+    TColStd_Array1OfReal w(1,myCurve->NbPoles());
+    myCurve->Weights(w);
+
+    for (Standard_Integer i=w.Lower(); i<=w.Upper(); i++) {
+        const Standard_Real& real = w(i);
+        weights.push_back(real);
+    }
+    return weights;
+}
+
+void ConstrainedBezierCurve::buildMatrix() const
+{
+    int num_poles = start_continuity + end_continuity;
+    if (num_poles > myCurve->MaxDegree())
+        Standard_Failure::Raise("number of constraints exceeds bezier curve capacity");
+    // create a bezier-type knot sequence
+    TColStd_Array1OfReal knots(1, 2*num_poles);
+    for (int idx=1; idx<=num_poles; ++idx) {
+        knots(idx) = 0.0;
+        knots(num_poles+idx) = 1.0;
+    }
+    math_Matrix OCCmatrix(1, num_poles, 1, num_poles, 0.0);
+    int row_idx = 1;
+    math_Matrix bezier_eval(1, start_continuity, 1, num_poles, 0.0);
+    Standard_Integer first_non_zero;
+    Standard_Integer error_code = BSplCLib::EvalBsplineBasis(start_continuity, num_poles, knots, 0.0, first_non_zero, bezier_eval, Standard_False);
+    for (int idx=1; idx<=start_continuity+1; ++idx) {
+        OCCmatrix.SetRow(row_idx, bezier_eval.Row(idx));
+        row_idx++;
+    }
+    math_Matrix bezier_eval2(1, end_continuity, 1, num_poles, 0.0);
+    error_code = BSplCLib::EvalBsplineBasis(end_continuity, num_poles, knots, 1.0, first_non_zero, bezier_eval2, Standard_False);
+    for (int idx=1; idx<=end_continuity+1; ++idx) {
+        OCCmatrix.SetRow(row_idx, bezier_eval2.Row(idx));
+        row_idx++;
+    }
+    this->matrix = OCCmatrix;
+}
+
+void ConstrainedBezierCurve::solve(const std::vector<Base::Vector3d>& start_constraints, const std::vector<double>& end_constraints)
+{
+    int num_poles = start_continuity + end_continuity;
+    if ((start_constraints.size() == 0) || (end_constraints.size() == 0))
+        throw Base::ValueError("Not enough constraints");
+    if (num_poles != matrix.RowNumber())
+        throw Base::ValueError("Constraints and matrix mismatch");
+    math_Vector res_x(1, num_poles, 0.0);
+    math_Vector res_y(1, num_poles, 0.0);
+    math_Vector res_z(1, num_poles, 0.0);
+    TColgp_Array1OfPnt cons(1,start_constraints.size()+end_constraints.size());
+    for (std::size_t i = 1; i <= start_constraints.size(); i++) {
+        res_x(i) = start_constraints[i-1].x;
+        res_y(i) = start_constraints[i-1].y;
+        res_z(i) = start_constraints[i-1].z;
+    }
+    for (std::size_t i = 1; i <= end_constraints.size(); i++) {
+        res_x(start_constraints + i) = end_constraints[i-1].x;
+        res_y(start_constraints + i) = end_constraints[i-1].y;
+        res_z(start_constraints + i) = end_constraints[i-1].z;
+    }
+    math_Gauss gauss(matrix);
+    gauss.Solve(res_x);
+    gauss.Solve(res_y);
+    gauss.Solve(res_z);
+    if (!gauss.IsDone())
+        Standard_Failure::Raise("Failed to solve equations");
+
+    TColgp_Array1OfPnt poles(1,num_poles);
+    for (int idx=1; idx<=num_poles; ++idx) {
+        poles.SetValue(idx, gp_Pnt(res_x(idx),res_y(idx),res_z(idx)));
+    }
+
+    Handle(Geom_BezierCurve) b = new Geom_BezierCurve(poles);
+    this->myCurve = b;
+}
+
+// Persistence implementer
+unsigned int ConstrainedBezierCurve::getMemSize (void) const
+{
+    return sizeof(Geom_BezierCurve);
+}
+
+void ConstrainedBezierCurve::Save(Base::Writer& writer) const
+{
+    // save the attributes of the father class
+    GeomCurve::Save(writer);
+
+    std::vector<Base::Vector3d> poles   = this->getPoles();
+    std::vector<double> weights         = this->getWeights();
+
+    writer.Stream()
+         << writer.ind()
+             << "<BezierCurve "
+                << "PolesCount=\"" <<  poles.size() <<
+             "\">" << std::endl;
+
+    writer.incInd();
+
+    std::vector<Base::Vector3d>::const_iterator itp;
+    std::vector<double>::const_iterator itw;
+
+    for (itp = poles.begin(), itw = weights.begin(); itp != poles.end() && itw != weights.end(); ++itp, ++itw) {
+        writer.Stream()
+            << writer.ind()
+            << "<Pole "
+            << "X=\"" << (*itp).x <<
+            "\" Y=\"" << (*itp).y <<
+            "\" Z=\"" << (*itp).z <<
+            "\" Weight=\"" << (*itw) <<
+        "\"/>" << std::endl;
+    }
+
+    writer.decInd();
+    writer.Stream() << writer.ind() << "</BezierCurve>" << std::endl ;
+}
+
+void ConstrainedBezierCurve::Restore(Base::XMLReader& reader)
+{
+    // read the attributes of the father class
+    GeomCurve::Restore(reader);
+
+    reader.readElement("BezierCurve");
+    // get the value of my attribute
+    int polescount = reader.getAttributeAsInteger("PolesCount");
+
+    TColgp_Array1OfPnt p(1,polescount);
+    TColStd_Array1OfReal w(1,polescount);
+
+    for (int i = 1; i <= polescount; i++) {
+        reader.readElement("Pole");
+        double X = reader.getAttributeAsFloat("X");
+        double Y = reader.getAttributeAsFloat("Y");
+        double Z = reader.getAttributeAsFloat("Z");
+        double W = reader.getAttributeAsFloat("Weight");
+        p.SetValue(i, gp_Pnt(X,Y,Z));
+        w.SetValue(i, W);
+    }
+
+    reader.readEndElement("BezierCurve");
+
+    try {
+        Handle(Geom_BezierCurve) bezier = new Geom_BezierCurve(p, w);
+
+        if (!bezier.IsNull())
+            this->myCurve = bezier;
+        else
+            THROWM(Base::CADKernelError,"BezierCurve restore failed")
+    }
+    catch (Standard_Failure& e) {
+
+        THROWM(Base::CADKernelError,e.GetMessageString())
+    }
+}
+
+PyObject *ConstrainedBezierCurve::getPyObject(void)
+{
+    return new BezierCurvePy((ConstrainedBezierCurve*)this->clone());
 }
 
 // -------------------------------------------------
