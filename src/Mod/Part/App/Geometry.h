@@ -243,9 +243,6 @@ class PartExport ConstrainedBezierCurve : public GeomBezierCurve
 {
     TYPESYSTEM_HEADER();
 public:
-    int start_continuity;
-    int end_continuity;
-    math_Matrix matrix;
     ConstrainedBezierCurve();
     ConstrainedBezierCurve(const Handle(Geom_BezierCurve)&);
     ConstrainedBezierCurve(int s, int e);
@@ -254,8 +251,8 @@ public:
     virtual Geometry *copy(void) const;
     std::vector<Base::Vector3d> getPoles() const;
     std::vector<double> getWeights() const;
-    void buildMatrix() const;
-    void solve(const std::vector<Base::Vector3d>&, const std::vector<Base::Vector3d>&) const;
+    void buildMatrix();
+    void solve(const std::vector<Base::Vector3d>&, const std::vector<Base::Vector3d>&);
 
     // Persistence implementer ---------------------
     virtual unsigned int getMemSize (void) const;
@@ -269,6 +266,9 @@ public:
 
 private:
     Handle(Geom_BezierCurve) myCurve;
+    int nb_start_vecs;
+    int nb_end_vecs;
+    math_Matrix* matrix;
 };
 
 class PartExport GeomBSplineCurve : public GeomBoundedCurve
