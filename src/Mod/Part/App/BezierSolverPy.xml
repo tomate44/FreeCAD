@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+  <PythonExport 
+      Father="BaseClassPy" 
+      Name="BezierSolverPy" 
+      PythonName="Part.BezierSolver"
+      Twin="BezierSolver"
+      TwinPointer="BezierSolver"
+      Include="Mod/Part/App/BezierSolver.h" 
+      Namespace="Part" 
+      FatherInclude="Base/BaseClassPy.h" 
+      FatherNamespace="Part"
+      Constructor="true">
+    <Documentation>
+      <Author Licence="LGPL" Name="Christophe Grellier" EMail="cg@grellier.fr" />
+      <UserDocu>Generate the poles of a Bezier curve that interpolates some end constraints</UserDocu>
+    </Documentation>
+  </PythonExport>
+</GenerateModel>

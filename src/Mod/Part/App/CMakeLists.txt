@@ -92,6 +92,7 @@ generate_from_xml(TopoShapeVertexPy)
 generate_from_xml(TopoShapeWirePy)
 generate_from_xml(BRepOffsetAPI_MakePipeShellPy)
 generate_from_xml(BRepOffsetAPI_MakeFillingPy)
+generate_from_xml(BezierSolverPy)
 
 # make sure to create the directory at configure time
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Geom2d)
@@ -307,6 +308,8 @@ SET(Python_SRCS
     BRepOffsetAPI_MakePipeShellPyImp.cpp
     BRepOffsetAPI_MakeFillingPy.xml
     BRepOffsetAPI_MakeFillingPyImp.cpp
+    BezierSolverPy.xml
+    BezierSolverPyImp.cpp
     PartPyCXX.cpp
     PartPyCXX.h
 )
@@ -422,6 +425,8 @@ SET(Part_SRCS
     FaceMakerCheese.h
     FaceMakerBullseye.cpp
     FaceMakerBullseye.h
+    BezierSolver.cpp
+    BezierSolver.h
 )
 
 if(FREECAD_USE_PCH)
