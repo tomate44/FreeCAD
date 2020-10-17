@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+    <PythonExport
+      Father="PyObjectBase"
+      Name="MatrixPy"
+      PythonName="Part.Math.Matrix"
+      Twin="Math_Matrix"
+      TwinPointer="math_Matrix"
+      Include="math_Matrix.hxx"
+      Namespace="Part"
+      FatherInclude="Base/PyObjectBase.h"
+      FatherNamespace="Base"
+      Constructor="true"
+      Delete="true">
+    <Documentation>
+        <Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+            <UserDocu>Describes a generic matrix.
+                mat = Matrix(num_rows, num_cols, fill_value=0.0)
+            </UserDocu>
+    </Documentation>
+<!--    <Methode Name="shape" Const="true">
+        <Documentation>
+            <UserDocu>Returns a shape built by the shape construction algorithm.</UserDocu>
+        </Documentation>
+    </Methode>-->
+    </PythonExport>
+</GenerateModel>
+ 

@@ -98,6 +98,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BRepFeat)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Geom2d)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/GeomPlate)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ShapeUpgrade)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Math)
 
 generate_from_xml(BRepFeat/MakePrismPy)
 
@@ -124,6 +125,8 @@ generate_from_xml(GeomPlate/CurveConstraintPy)
 generate_from_xml(GeomPlate/PointConstraintPy)
 
 generate_from_xml(ShapeUpgrade/UnifySameDomainPy)
+
+generate_from_xml(Math/MatrixPy)
 
 SET(Features_SRCS
     FeaturePartBoolean.cpp
@@ -383,6 +386,14 @@ SET(ShapeUpgradePy_SRCS
 
 SOURCE_GROUP("ShapeUpgrade" FILES ${ShapeUpgradePy_SRCS})
 
+# Math wrappers
+SET(MathPy_SRCS
+    Math/MatrixPy.xml
+    Math/MatrixPyImp.cpp
+)
+
+SOURCE_GROUP("Math" FILES ${MathPy_SRCS})
+
 SET(Part_SRCS
     ${Features_SRCS}
     ${Properties_SRCS}
@@ -391,6 +402,7 @@ SET(Part_SRCS
     ${Geom2dPy_SRCS}
     ${GeomPlatePy_SRCS}
     ${ShapeUpgradePy_SRCS}
+    ${MathPy_SRCS}
     Attacher.cpp
     Attacher.h
     AppPart.cpp
