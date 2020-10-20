@@ -98,7 +98,7 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BRepFeat)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Geom2d)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/GeomPlate)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ShapeUpgrade)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Math)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Nurbs)
 
 generate_from_xml(BRepFeat/MakePrismPy)
 
@@ -126,7 +126,7 @@ generate_from_xml(GeomPlate/PointConstraintPy)
 
 generate_from_xml(ShapeUpgrade/UnifySameDomainPy)
 
-generate_from_xml(Math/MatrixPy)
+generate_from_xml(Nurbs/MatrixPy)
 
 SET(Features_SRCS
     FeaturePartBoolean.cpp
@@ -323,8 +323,7 @@ SET(BRepFeatPy_SRCS
     BRepFeat/MakePrismPy.xml
     BRepFeat/MakePrismPyImp.cpp
 )
-
-SOURCE_GROUP("ShapeUpgrade" FILES ${ShapeUpgradePy_SRCS})
+SOURCE_GROUP("BRepFeat" FILES ${BRepFeatPy_SRCS})
 
 # Geom2d wrappers
 SET(Geom2dPy_SRCS
@@ -363,7 +362,6 @@ SET(Geom2dPy_SRCS
     Geom2d/Parabola2dPy.xml
     Geom2d/Parabola2dPyImp.cpp
 )
-
 SOURCE_GROUP("Geom2d" FILES ${Geom2dPy_SRCS})
 
 # GeomPlate wrappers
@@ -375,7 +373,6 @@ SET(GeomPlatePy_SRCS
     GeomPlate/PointConstraintPy.xml
     GeomPlate/PointConstraintPyImp.cpp
 )
-
 SOURCE_GROUP("GeomPlate" FILES ${GeomPlatePy_SRCS})
 
 # ShapeUpgrade wrappers
@@ -383,16 +380,14 @@ SET(ShapeUpgradePy_SRCS
     ShapeUpgrade/UnifySameDomainPy.xml
     ShapeUpgrade/UnifySameDomainPyImp.cpp
 )
-
 SOURCE_GROUP("ShapeUpgrade" FILES ${ShapeUpgradePy_SRCS})
 
-# Math wrappers
-SET(MathPy_SRCS
-    Math/MatrixPy.xml
-    Math/MatrixPyImp.cpp
+# Nurbs wrappers
+SET(NurbsPy_SRCS
+    Nurbs/MatrixPy.xml
+    Nurbs/MatrixPyImp.cpp
 )
-
-SOURCE_GROUP("Math" FILES ${MathPy_SRCS})
+SOURCE_GROUP("Nurbs" FILES ${NurbsPy_SRCS})
 
 SET(Part_SRCS
     ${Features_SRCS}
@@ -402,7 +397,7 @@ SET(Part_SRCS
     ${Geom2dPy_SRCS}
     ${GeomPlatePy_SRCS}
     ${ShapeUpgradePy_SRCS}
-    ${MathPy_SRCS}
+    ${NurbsPy_SRCS}
     Attacher.cpp
     Attacher.h
     AppPart.cpp

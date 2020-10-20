@@ -3,15 +3,14 @@
     <PythonExport
       Father="PyObjectBase"
       Name="MatrixPy"
-      PythonName="Part.Math.Matrix"
-      Twin="Math_Matrix"
+      PythonName="Part.Nurbs.Matrix"
+      Twin="math_Matrix"
       TwinPointer="math_Matrix"
       Include="math_Matrix.hxx"
       Namespace="Part"
       FatherInclude="Base/PyObjectBase.h"
       FatherNamespace="Base"
-      Constructor="true"
-      Delete="true">
+      Constructor="true">
     <Documentation>
         <Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
             <UserDocu>Describes a generic matrix.

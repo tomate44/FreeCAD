@@ -26,12 +26,12 @@
 # include <math_Matrix.hxx>
 #endif
 
-# include "Math/MatrixPy.h"
-# include "Math/MatrixPy.cpp"
-// #include "Geometry.h"
-// #include "TopoShapeEdgePy.h"
-// #include "TopoShapeFacePy.h"
-// #include <Base/VectorPy.h>
+#include "Nurbs/MatrixPy.h"
+#include "Nurbs/MatrixPy.cpp"
+#include "Geometry.h"
+#include "TopoShapeEdgePy.h"
+#include "TopoShapeFacePy.h"
+#include <Base/VectorPy.h>
 
 using namespace Part;
 
@@ -45,13 +45,13 @@ PyObject *MatrixPy::PyMake(struct _typeobject *, PyObject *, PyObject *)  // Pyt
 // returns a string which represents the object e.g. when printed in python
 std::string MatrixPy::representation(void) const
 {
-    math_Matrix* mat = getMath_MatrixPtr();
-    std::stringstream str;
-    str << "<Matrix (";
-    str << mat->RowNumber() << " x " ;
-    str << mat->ColNumber() << ") object>";
-    return str.str();
-//     return std::string("<math_Matrix object>");
+//     math_Matrix* mat = getmath_MatrixPtr();
+//     std::stringstream str;
+//     str << "<Matrix (";
+//     str << mat->RowNumber() << " x " ;
+//     str << mat->ColNumber() << ") object>";
+//     return str.str();
+    return std::string("<math_Matrix object>");
 }
 
 // constructor method

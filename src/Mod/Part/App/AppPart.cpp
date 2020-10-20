@@ -130,7 +130,7 @@
 #include <Mod/Part/App/GeomPlate/CurveConstraintPy.h>
 #include <Mod/Part/App/GeomPlate/PointConstraintPy.h>
 #include <Mod/Part/App/ShapeUpgrade/UnifySameDomainPy.h>
-#include <Mod/Part/App/Math/MatrixPy.h>
+#include <Mod/Part/App/Nurbs/MatrixPy.h>
 #include "PropertyGeometryList.h"
 #include "DatumFeature.h"
 #include "Attacher.h"
@@ -417,9 +417,9 @@ PyMOD_INIT_FUNC(Part)
     PyObject* shapeUpgrade(module.getAttr("ShapeUpgrade").ptr());
     Base::Interpreter().addType(&Part::UnifySameDomainPy::Type, shapeUpgrade, "UnifySameDomain");
 
-    // Math sub-module
-    PyObject* Math(module.getAttr("Math").ptr());
-    Base::Interpreter().addType(&Part::MatrixPy::Type, Math, "Matrix");
+    // Nurbs sub-module
+//     PyObject* nurbsModule(module.getAttr("Nurbs").ptr());
+//     Base::Interpreter().addType(&Part::MatrixPy::Type, nurbsModule, "Matrix");
 
     Part::TopoShape             ::init();
     Part::PropertyPartShape     ::init();
