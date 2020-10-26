@@ -130,6 +130,8 @@
 #include <Mod/Part/App/GeomPlate/CurveConstraintPy.h>
 #include <Mod/Part/App/GeomPlate/PointConstraintPy.h>
 #include <Mod/Part/App/ShapeUpgrade/UnifySameDomainPy.h>
+#include <Mod/Part/App/NurbsMatrixPy.h>
+#include <Mod/Part/App/NurbsGaussPy.h>
 #include "PropertyGeometryList.h"
 #include "DatumFeature.h"
 #include "Attacher.h"
@@ -272,6 +274,9 @@ PyMOD_INIT_FUNC(Part)
     Base::Interpreter().addType(&Part::GeometryBoolExtensionPy ::Type,partModule,"GeometryBoolExtension");
     Base::Interpreter().addType(&Part::GeometryDoubleExtensionPy ::Type,partModule,"GeometryDoubleExtension");
 
+    Base::Interpreter().addType(&Part::NurbsMatrixPy        ::Type,partModule,"NurbsMatrix");
+    Base::Interpreter().addType(&Part::NurbsGaussPy        ::Type,partModule,"NurbsGauss");
+    
     // BRepFeat package
     PyObject* brepfeatModule(module.getAttr("BRepFeat").ptr());
     Base::Interpreter().addType(&Part::MakePrismPy::Type,brepfeatModule,"MakePrism");

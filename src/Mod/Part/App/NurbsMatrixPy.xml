@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+    <PythonExport
+      Father="PyObjectBase"
+      Name="NurbsMatrixPy"
+      PythonName="Part.NurbsMatrix"
+      Twin="math_Matrix"
+      TwinPointer="math_Matrix"
+      Include="math_Matrix.hxx"
+      Namespace="Part"
+      FatherInclude="Base/PyObjectBase.h"
+      FatherNamespace="Base"
+      Constructor="true"
+      Delete="true">
+    <Documentation>
+        <Author Licence="LGPL" Name="Christophe Grellier" EMail="cg[at]grellier.fr" />
+            <UserDocu>Describes a matrix containing Nurbs basis functions values.
+                mat = NurbsMatrix(num_rows, num_cols, fill_value=0.0)
+            </UserDocu>
+    </Documentation>
+    <Methode Name="setEndContinuity">
+        <Documentation>
+            <UserDocu>Set the start and end continuity</UserDocu>
+        </Documentation>
+    </Methode>
+    <Methode Name="getValues">
+        <Documentation>
+            <UserDocu>Returns the content of the matrix</UserDocu>
+        </Documentation>
+    </Methode>
+    </PythonExport>
+</GenerateModel>
+ 

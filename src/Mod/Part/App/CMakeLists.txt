@@ -92,6 +92,8 @@ generate_from_xml(TopoShapeVertexPy)
 generate_from_xml(TopoShapeWirePy)
 generate_from_xml(BRepOffsetAPI_MakePipeShellPy)
 generate_from_xml(BRepOffsetAPI_MakeFillingPy)
+generate_from_xml(NurbsMatrixPy)
+generate_from_xml(NurbsGaussPy)
 
 # make sure to create the directory at configure time
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/BRepFeat)
@@ -310,6 +312,10 @@ SET(Python_SRCS
     BRepOffsetAPI_MakePipeShellPyImp.cpp
     BRepOffsetAPI_MakeFillingPy.xml
     BRepOffsetAPI_MakeFillingPyImp.cpp
+    NurbsMatrixPy.xml
+    NurbsMatrixPyImp.cpp
+    NurbsGaussPy.xml
+    NurbsGaussPyImp.cpp
     PartPyCXX.cpp
     PartPyCXX.h
 )
