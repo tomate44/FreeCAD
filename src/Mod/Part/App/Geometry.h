@@ -249,12 +249,10 @@ class PartExport ConstrainedBezierCurve : public GeomBezierCurve
 public:
     ConstrainedBezierCurve();
     ConstrainedBezierCurve(const Handle(Geom_BezierCurve)&);
-    ConstrainedBezierCurve(int s, int e);
-    ConstrainedBezierCurve(const std::vector<Base::Vector3d>&, const std::vector<Base::Vector3d>&);
     virtual ~ConstrainedBezierCurve();
     virtual Geometry *copy(void) const;
     std::vector<Base::Vector3d> getPoles() const;
-    std::vector<double> getWeights() const;
+//     std::vector<double> getWeights() const;
     void buildMatrix();
     void solve(const std::vector<Base::Vector3d>&, const std::vector<Base::Vector3d>&);
 

@@ -380,6 +380,52 @@ Py::Object BezierCurvePy::getEndPoint(void) const
     return Py::Vector(Base::Vector3d(pnt.X(), pnt.Y(), pnt.Z()));
 }
 
+PyObject* BezierCurvePy::interpolate(PyObject * args)
+{
+    PyObject* obj1;
+    PyObject* obj2;
+    if (!PyArg_ParseTuple(args, "OO", &obj1, &obj2))
+        return 0;
+    try {
+        Handle(Geom_BezierCurve) curve = Handle(Geom_BezierCurve)::DownCast
+        (getGeometryPtr()->handle());
+        Py::Sequence constraints1(obj1);
+        Py::Sequence constraints2(obj2);
+        if ((constraints1.size() < 1) || (constraints2.size() < 1))
+            Standard_Failure::Raise("not enough points given");
+
+        int num_poles = constraints1.size() + constraints2.size();
+        if (num_poles > curve->MaxDegree())
+            Standard_Failure::Raise("number of constraints exceeds bezier curve capacity");
+
+        std::vector<Base::Vector3d> cons1;
+        cons1.reserve(constraints1.size());
+        for (Py::Sequence::iterator it1 = constraints1.begin(); it1 != constraints1.end(); ++it1) {
+            Py::Vector vec(*it1);
+            Base::Vector3d pnt = vec.toVector();
+            cons1.emplace_back(pnt.x, pnt.y, pnt.z);
+        }
+        std::vector<Base::Vector3d> cons2;
+        cons2.reserve(constraints2.size());
+        for (Py::Sequence::iterator it2 = constraints2.begin(); it2 != constraints2.end(); ++it2) {
+            Py::Vector vec(*it2);
+            Base::Vector3d pnt = vec.toVector();
+            cons2.emplace_back(pnt.x, pnt.y, pnt.z);
+        }
+        ConstrainedBezierCurve interpocurve;
+        interpocurve.solve(cons1, cons2);
+
+        Handle(Geom_BezierCurve) c = Handle(Geom_BezierCurve)::DownCast
+        (interpocurve.handle());
+        this->getGeomBezierCurvePtr()->setHandle(c);
+        Py_Return;
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
 PyObject *BezierCurvePy::getCustomAttributes(const char* /*attr*/) const
 {
     return 0;
