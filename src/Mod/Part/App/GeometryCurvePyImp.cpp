@@ -1169,3 +1169,28 @@ PyObject* GeometryCurvePy::isClosed(PyObject *args)
         return 0;
     }
 }
+
+PyObject* GeometryCurvePy::parameterList(PyObject *args)
+{
+    int num=10;
+    if (!PyArg_ParseTuple(args, "|i", &num))
+        return 0;
+    try {
+        if (num < 2) {
+            PyErr_SetString(PyExc_RuntimeError, "Number of parameters must be >= 2");
+            return 0;
+        }
+        Handle(Geom_Geometry) g = getGeometryPtr()->handle();
+        Handle(Geom_Curve) c = Handle(Geom_Curve)::DownCast(g);
+        Py::List params;
+        for (Standard_Integer i=0; i<num; i++) {
+            double p = c->FirstParameter() + (1.0*i/(num-1)) * (c->LastParameter() - c->FirstParameter());
+            params.append(Py::Float(p));
+        }
+        return Py::new_reference_to(params);
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}

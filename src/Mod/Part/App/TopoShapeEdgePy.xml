@@ -537,6 +537,15 @@ Returns a 5-items tuple of a curve, a surface, a placement, first parameter and 
 				</UserDocu>
 			</Documentation>
 		</Methode>
+        <Methode Name="parameterList" Const="true">
+          <Documentation>
+            <UserDocu>
+              Returns a list of N parameters along the edge.
+              params = edge.parameterList(N=10)
+              N must be equal or greater than 2.
+            </UserDocu>
+          </Documentation>
+        </Methode>
         <ClassDeclarations>
 		</ClassDeclarations>
 	</PythonExport>

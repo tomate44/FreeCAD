@@ -223,6 +223,15 @@ or raises an exception if it is not periodic.</UserDocu>
             </UserDocu>
           </Documentation>
         </Methode>
+        <Methode Name="parameterList" Const="true">
+          <Documentation>
+            <UserDocu>
+              Returns a list of N parameters along the edge.
+              params = edge.parameterList(N=10)
+              N must be equal or greater than 2.
+            </UserDocu>
+          </Documentation>
+        </Methode>
         <Attribute Name="Continuity" ReadOnly="true">
 			<Documentation>
 				<UserDocu>

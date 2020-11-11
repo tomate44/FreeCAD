@@ -1070,6 +1070,31 @@ PyObject* TopoShapeEdgePy::curveOnSurface(PyObject *args)
     }
 }
 
+PyObject* TopoShapeEdgePy::parameterList(PyObject *args)
+{
+    int num=10;
+    if (!PyArg_ParseTuple(args, "|i", &num))
+        return 0;
+    try {
+        if (num < 2) {
+            PyErr_SetString(PyExc_RuntimeError, "Number of parameters must be >= 2");
+            return 0;
+        }
+        TopoDS_Edge edge = TopoDS::Edge(getTopoShapePtr()->getShape());
+        BRepAdaptor_Curve adapt(edge);
+        Py::List params;
+        for (Standard_Integer i=0; i<num; i++) {
+            double p = adapt.FirstParameter() + ((double)i/(num-1)) * (adapt.LastParameter() - adapt.FirstParameter());
+            params.append(Py::Float(p));
+        }
+        return Py::new_reference_to(params);
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return 0;
+    }
+}
+
 PyObject *TopoShapeEdgePy::getCustomAttributes(const char* /*attr*/) const
 {
     return 0;
