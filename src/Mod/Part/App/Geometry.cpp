@@ -4260,6 +4260,68 @@ void GeomSurface::curvatureDirections(double u, double v, gp_Dir& maxD, gp_Dir& 
     THROWM(Base::RuntimeError,"No curvature defined")
 }
 
+std::vector<Base::Vector3d> GeomSurface::getDirectionalDerivatives(double u, double v, double dirU, double dirV, int order) const
+// Returns the (order+1) derivatives of the surface, at point (u,v), in direction(dirU, dirV)
+{
+    
+//     a, b = location
+//     pt = surface.getD0(a, b)
+//     if order == 0:
+//         return pt
+//     direction.normalize()
+//     x, y, _ = direction
+//     du = surface.getDN(a, b, 1, 0)
+//     dv = surface.getDN(a, b, 0, 1)
+//     d1 = x * du + y * dv
+//     if order == 1:
+//         return pt, d1
+//     d2u = surface.getDN(a, b, 2, 0)
+//     d2v = surface.getDN(a, b, 0, 2)
+//     duv = surface.getDN(a, b, 1, 1)
+//     d2 = pow(x, 2) * d2u + 2 * x * y * duv + pow(y, 2) * d2v
+//     if order == 2:
+//         return pt, d1, d2
+//     d3u = surface.getDN(a, b, 3, 0)
+//     d2uv = surface.getDN(a, b, 2, 1)
+//     du2v = surface.getDN(a, b, 1, 2)
+//     d3v = surface.getDN(a, b, 0, 3)
+//     d3 = pow(x, 3) * d3u + 3 * pow(x, 2) * y * d2uv + 3 * x * pow(y, 2) * du2v + pow(y, 3) * d3v
+//     if order == 3:
+//         return d1, d2, d3
+//     d4u = surface.getDN(a, b, 4, 0)
+//     d3uv = surface.getDN(a, b, 3, 1)
+//     d2u2v = surface.getDN(a, b, 2, 2)
+//     du3v = surface.getDN(a, b, 1, 3)
+//     d4v = surface.getDN(a, b, 0, 4)
+//     d4 = (pow(x, 4) * d4u) + (4 * pow(x, 3) * y * d3uv) + (4 * pow(x, 2) * pow(y, 2) * d2u2v) + (4 * x * pow(y, 3) * du3v) + (pow(y, 4) * d4v)
+//     return d1, d2, d3, d4
+    
+    Handle(Geom_Surface) s = Handle(Geom_Surface)::DownCast(handle());
+    std::vector<Base::Vector3d> derivs;
+    derivs.reserve(order+1);
+
+    gp_Pnt p;
+    s->D0(u, v, p);
+    derivs.emplace_back(p.X(), p.Y(), p.Z());
+    if (order < 1)
+        return derivs;
+
+    gp_Vec du = s->DN(u, v, 1, 0);
+    gp_Vec dv = s->DN(u, v, 0, 1);
+    gp_Vec d1 = dirU * du + dirV * dv;
+    derivs.emplace_back(d1.X(), d1.Y(), d1.Z());
+    if (order == 1)
+        return derivs;
+//     TColgp_Array1OfPnt p(1,myCurve->NbPoles());
+//     myCurve->Poles(p);
+// 
+//     for (Standard_Integer i=p.Lower(); i<=p.Upper(); i++) {
+//         const gp_Pnt& pnt = p(i);
+//         poles.emplace_back(pnt.X(), pnt.Y(), pnt.Z());
+//     }
+    return derivs;
+}
+
 // -------------------------------------------------
 
 TYPESYSTEM_SOURCE(Part::GeomBezierSurface,Part::GeomSurface)
