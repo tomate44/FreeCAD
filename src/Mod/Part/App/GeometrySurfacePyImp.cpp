@@ -199,6 +199,35 @@ PyObject* GeometrySurfacePy::getDN(PyObject *args)
     return nullptr;
 }
 
+PyObject* GeometrySurfacePy::directionalDerivatives(PyObject *args)
+{
+    try {
+        GeomSurface* s = getGeomSurfacePtr();
+        if (s) {
+            double u,v;
+            double diru,dirv;
+            int order=4;
+            if (!PyArg_ParseTuple(args, "dddd|i", &u, &v, &diru, &dirv, &order))
+                return nullptr;
+            std::vector<Base::Vector3d> derivs = s->getDirectionalDerivatives(u, v, diru, dirv, order);
+
+            Py::List result;
+            for (std::size_t i = 0; i < derivs.size(); i++) {
+                Base::Vector3d v = derivs[i];
+                result.append(Py::Vector(v));
+            }
+            return Py::new_reference_to(result);
+        }
+    }
+    catch (Standard_Failure& e) {
+        PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
+        return nullptr;
+    }
+
+    PyErr_SetString(PartExceptionOCCError, "Geometry is not a surface");
+    return nullptr;
+}
+
 PyObject* GeometrySurfacePy::value(PyObject *args)
 {
     Handle(Geom_Geometry) g = getGeometryPtr()->handle();

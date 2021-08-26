@@ -32,6 +32,12 @@
                 <UserDocu>Returns the n-th derivative</UserDocu>
             </Documentation>
         </Methode>
+        <Methode Name="directionalDerivatives" Const="true">
+            <Documentation>
+                <UserDocu>directionalDerivatives(u, v, dirU, dirV, order) -> list of vectors
+Returns the (order+1) derivatives of the surface, at point (u,v), in direction (dirU,dirV)</UserDocu>
+            </Documentation>
+        </Methode>
         <Methode Name="value" Const="true">
 			<Documentation>
                 <UserDocu>value(u,v) -> Point

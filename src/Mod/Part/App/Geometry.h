@@ -798,7 +798,9 @@ public:
     double curvature(double u, double v, Curvature) const;
     void curvatureDirections(double u, double v, gp_Dir& maxD, gp_Dir& minD) const;
     //@}
-    std::vector<Base::Vector3d> getDirectionalDerivatives(double u, double v, double dirU, double dirV, int continuity) const;
+
+    // Returns the (order+1) derivatives of the surface, at point (u,v), in direction(dirU, dirV)
+    std::vector<Base::Vector3d> getDirectionalDerivatives(double u, double v, double dirU, double dirV, int order) const;
 };
 
 class PartExport GeomBezierSurface : public GeomSurface
