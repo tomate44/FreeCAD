@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+		Father="PersistencePy"
+		FatherInclude="Base/PersistencePy.h"
+    FatherNamespace="Base"
+		Name="BlendPointPy"
+		PythonName="Surface.BlendPoint"
+		Twin="BlendPoint"
+		TwinPointer="BlendPoint"
+		Include="Mod/Surface/App/Blending/BlendPoint.h"
+		Namespace="Surface"
+		Constructor="true"
+		Delete="true">
+		<Documentation>
+		</Documentation>
+		<Documentation>
+			<Author Licence="LGPL" Name="Mattéo Grellier" EMail="matteogrellier@gmail.com" />
+			<UserDocu>
+				Create BlendPoint
+        myBlendPoint = BlendPoint([vec(x,y,z), vec(x,y,z)])
+			</UserDocu>
+		</Documentation>
+		<Attribute Name="Vectors" ReadOnly="true">
+			<Documentation>
+				<UserDocu>List of vectors.</UserDocu>
+			</Documentation>
+			<Parameter Name="vectors" Type="List"/>
+		</Attribute>
+		<Methode Name="setSize">
+			<Documentation>
+				<UserDocu>
+        Set vectors
+        bc.setSize(size)
+        </UserDocu>
+			</Documentation>
+		</Methode>
+    <Methode Name="setvectors">
+			<Documentation>
+				<UserDocu>
+        Set the vectors of BlendPoint
+        BlendPoint.setvectors(PyObject)
+        </UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="getSize">
+			<Documentation>
+				<UserDocu>
+        Return BlendPoint vector length
+        </UserDocu>
+			</Documentation>
+		</Methode>
+	</PythonExport>
+</GenerateModel>

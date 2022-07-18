@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GenerateModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="generateMetaModel_Module.xsd">
+	<PythonExport
+		Father="PersistencePy"
+		FatherInclude="Base/PersistencePy.h"
+		FatherNamespace="Base"
+		Name="BlendCurvePy"
+		PythonName="Surface.BlendCurve"
+		Twin="BlendCurve"
+		TwinPointer="BlendCurve"
+		Include="Mod/Surface/App/Blending/BlendCurve.h"
+		Namespace="Surface"
+		Constructor="true"
+		Delete="true">
+		<Documentation>
+		</Documentation>
+		<Documentation>
+			<Author Licence="LGPL" Name="Mattéo Grellier" EMail="matteogrellier@gmail.com" />
+			<UserDocu>
+			</UserDocu>
+		</Documentation>
+		<Methode Name="compute">
+			<Documentation>
+				<UserDocu>Return the BezierCurve that interpolate the input BlendPoints</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setSize">
+			<Documentation>
+				<UserDocu>Set the tengent size of the blendpoint at given index
+        myBlendCurve.setSize(idx, size)
+        </UserDocu>
+			</Documentation>
+		</Methode>
+		
+	</PythonExport>
+</GenerateModel>

@@ -33,6 +33,7 @@
 #include "TaskFilling.h"
 #include "TaskSections.h"
 #include "ViewProviderExtend.h"
+#include "Blending/ViewProviderBlendCurve.h"
 
 
 // use a different name to CreateCommand()
@@ -78,7 +79,8 @@ PyMOD_INIT_FUNC(SurfaceGui)
     SurfaceGui::ViewProviderGeomFillSurface ::init();
     SurfaceGui::ViewProviderFilling         ::init();
     SurfaceGui::ViewProviderSections        ::init();
-    SurfaceGui::ViewProviderExtend::init();
+    SurfaceGui::ViewProviderExtend          ::init();
+    SurfaceGui::ViewProviderBlendCurve      ::init();
     // SurfaceGui::ViewProviderCut::init();
 
     PyObject* mod = SurfaceGui::initModule();

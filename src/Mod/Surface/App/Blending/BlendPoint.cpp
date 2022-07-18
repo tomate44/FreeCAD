@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (c) 2014 Nathan Miller <Nathan.A.Mill[at]gmail.com>         *
- *   Copyright (c) 2014 Balázs Bámer                                       *
+ *   Copyright (c) 2022 Matteo Grellier <matteogrellier@gmail.com>         *
+ *                                                                         *
  *                                                                         *
  *   This file is part of the FreeCAD CAx development system.              *
  *                                                                         *
@@ -21,68 +21,75 @@
  *                                                                         *
  ***************************************************************************/
 
-
-#include "PreCompiled.h"
-
+#include "../PreCompiled.h"
 #ifndef _PreComp_
+#include <Base/Persistence.h>
+#include <Base/Vector3D.h>
+#include <Precision.hxx>
+#include <Standard_Version.hxx>
+#include <TopoDS.hxx>
+#include <gp_Pnt.hxx>
 #endif
+#include "BlendPoint.h"
 
-#include "Workbench.h"
-#include <Gui/MenuManager.h>
-#include <Gui/ToolBarManager.h>
 
-using namespace SurfaceGui;
+using namespace Surface;
 
-/// @namespace SurfaceGui @class Workbench
-TYPESYSTEM_SOURCE(SurfaceGui::Workbench, Gui::StdWorkbench)
+//PROPERTY_SOURCE(Surface::BlendPoint, Base::Persistence)
 
-Workbench::Workbench()
+unsigned int BlendPoint::getMemSize(void) const
+{
+    return 1;
+}
+
+
+BlendPoint::BlendPoint(std::vector<Base::Vector3d> vectorList)
+{
+    if (vectorList.size() == 0) {
+        throw Base::ValueError("the vector List is empty");
+    }
+    for (int i = 0; i < vectorList.size(); i++) {
+        vectors.emplace_back(vectorList[i]);
+    }
+}
+
+BlendPoint::BlendPoint()
 {
 }
 
-Workbench::~Workbench()
+BlendPoint::~BlendPoint()
 {
 }
 
-Gui::MenuItem* Workbench::setupMenuBar() const
+void BlendPoint::multiply(double f)
 {
-    Gui::MenuItem* root = StdWorkbench::setupMenuBar();
-    Gui::MenuItem* item = root->findItem( "&Windows" );
-
-    Gui::MenuItem* surface = new Gui::MenuItem;
-    root->insertItem( item, surface );
-    surface->setCommand("Surface");
-    *surface << "Surface_Filling"
-             << "Surface_GeomFillSurface"
-             << "Surface_Sections"
-             << "Surface_ExtendFace"
-             << "Surface_CurveOnMesh"
-             << "BlendCurve"
-             << "BlendSurface";
-
-/*
-    *surface << "Surface_Cut";
-*/
-
-    return root;
+    for (size_t i = 0; i < vectors.size(); i++) {
+        vectors[i] *= Pow(f, i);
+    }
 }
 
-Gui::ToolBarItem* Workbench::setupToolBars() const
+void BlendPoint::setSize(double f)
 {
-    Gui::ToolBarItem* root = StdWorkbench::setupToolBars();
+    if (vectors.size() > 1) {
+        double il = vectors[1].Length();
+        if (il > Precision::Confusion()) {
+            multiply(f / il);
+        }
+    }
+}
 
-    Gui::ToolBarItem* surface = new Gui::ToolBarItem(root);
-    surface->setCommand("Surface");
-    *surface << "Surface_Filling"
-             << "Surface_GeomFillSurface"
-             << "Surface_Sections"
-             << "Surface_ExtendFace"
-             << "Surface_CurveOnMesh"
-             << "BlendCurve"
-             << "BlendSurface";
-        /*
-    *surface << "Surface_Cut";
-*/
+PyObject *BlendPoint::getPyObject(void)
+{
+    PyObject *pcObject = PyList_New(vectors.size());
+    return Py::new_reference_to(pcObject);
+}
 
-    return root;
+void BlendPoint::Save(Base::Writer & /*writer*/) const
+{
+    throw Base::NotImplementedError("BlendPoint::Save");
+}
+
+void BlendPoint::Restore(Base::XMLReader & /*reader*/)
+{
+    throw Base::NotImplementedError("BlendPoint::Restore");
 }
