@@ -17,6 +17,8 @@
 		<Documentation>
 			<Author Licence="LGPL" Name="Mattéo Grellier" EMail="matteogrellier@gmail.com" />
 			<UserDocu>
+				Create a BlendCurve that interpolate a list of BlendPoints
+				curve = BlendCurve(list_of_BlendPoints)
 			</UserDocu>
 		</Documentation>
 		<Methode Name="compute">
@@ -26,11 +28,10 @@
 		</Methode>
 		<Methode Name="setSize">
 			<Documentation>
-				<UserDocu>Set the tengent size of the blendpoint at given index
-        myBlendCurve.setSize(idx, size)
-        </UserDocu>
+				<UserDocu>Set the tangent size of the blendpoint at given index
+					myBlendCurve.setSize(idx, size)
+				</UserDocu>
 			</Documentation>
 		</Methode>
-		
 	</PythonExport>
 </GenerateModel>

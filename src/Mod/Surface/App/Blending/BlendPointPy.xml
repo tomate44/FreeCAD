@@ -3,7 +3,7 @@
 	<PythonExport
 		Father="PersistencePy"
 		FatherInclude="Base/PersistencePy.h"
-    FatherNamespace="Base"
+		FatherNamespace="Base"
 		Name="BlendPointPy"
 		PythonName="Surface.BlendPoint"
 		Twin="BlendPoint"
@@ -17,37 +17,38 @@
 		<Documentation>
 			<Author Licence="LGPL" Name="Mattéo Grellier" EMail="matteogrellier@gmail.com" />
 			<UserDocu>
-				Create BlendPoint
-        myBlendPoint = BlendPoint([vec(x,y,z), vec(x,y,z)])
+				Create BlendPoint from a point and some derivatives
+				myBlendPoint = BlendPoint([Point, D1, D2, ..., DN])
 			</UserDocu>
 		</Documentation>
 		<Attribute Name="Vectors" ReadOnly="true">
 			<Documentation>
-				<UserDocu>List of vectors.</UserDocu>
+				<UserDocu>The list of vectors of this BlendPoint.</UserDocu>
 			</Documentation>
 			<Parameter Name="vectors" Type="List"/>
 		</Attribute>
-		<Methode Name="setSize">
-			<Documentation>
-				<UserDocu>
-        Set vectors
-        bc.setSize(size)
-        </UserDocu>
-			</Documentation>
-		</Methode>
-    <Methode Name="setvectors">
-			<Documentation>
-				<UserDocu>
-        Set the vectors of BlendPoint
-        BlendPoint.setvectors(PyObject)
-        </UserDocu>
-			</Documentation>
-		</Methode>
 		<Methode Name="getSize">
 			<Documentation>
 				<UserDocu>
-        Return BlendPoint vector length
-        </UserDocu>
+					Return BlendPoint first derivative length
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setSize">
+			<Documentation>
+				<UserDocu>
+					Resizes the BlendPoint vectors,
+					by setting the lenght of the first derivative
+					theBlendPoint.setSize(new_size)
+				</UserDocu>
+			</Documentation>
+		</Methode>
+		<Methode Name="setvectors">
+			<Documentation>
+				<UserDocu>
+					Set the vectors of BlendPoint
+					BlendPoint.setvectors([Point, D1, D2, ..., DN])
+				</UserDocu>
 			</Documentation>
 		</Methode>
 	</PythonExport>

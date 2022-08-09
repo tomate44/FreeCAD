@@ -64,7 +64,8 @@ public:
     virtual void Save(Base::Writer & /*writer*/) const;
     virtual void Restore(Base::XMLReader & /*reader*/);
 
-private:
+// protected:
+//     math_Matrix            _BsplineCoefMatrix;
 };
 }// namespace Surface
 

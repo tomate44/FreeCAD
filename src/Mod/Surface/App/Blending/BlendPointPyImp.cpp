@@ -1,5 +1,5 @@
 ///***************************************************************************
-// *   Copyright (c) 2022 Matteo Grellier <matteogrellier@gmail.com>     *
+// *   Copyright (c) 2022 Matteo Grellier <matteogrellier@gmail.com>         *
 // *                                                                         *
 // *   This file is part of the FreeCAD CAx development system.              *
 // *                                                                         *
@@ -24,16 +24,10 @@
 #include "../PreCompiled.h"
 #ifndef _PreComp_
 #include <BRepAdaptor_Curve.hxx>
-#include <GC_MakeCircle.hxx>
-#include <Geom_Circle.hxx>
-#include <Mod/Part/App/PartFeature.h>
-#include <TColStd_Array1OfReal.hxx>
-#include <TColgp_Array1OfPnt.hxx>
 #include <TopoDS.hxx>
-#include <gp_Circ.hxx>
 #endif
-#include "Mod/Surface/App/Blending/BlendPointPy.cpp"
 #include "Mod/Surface/App/Blending/BlendPointPy.h"
+#include "Mod/Surface/App/Blending/BlendPointPy.cpp"
 #include <Base/GeometryPyCXX.h>
 #include <Base/VectorPy.h>
 #include <Mod/Part/App/TopoShapePy.h>
@@ -41,7 +35,7 @@
 
 using namespace Surface;
 
-extern const char *gce_ErrorStatusText(gce_ErrorType et);
+// extern const char *gce_ErrorStatusText(gce_ErrorType et);
 
 std::string BlendPointPy::representation(void) const
 {
@@ -143,7 +137,7 @@ Py::List BlendPointPy::getVectors() const
 
         std::vector<Base::Vector3d> p = bp->vectors;
         Py::List poles;
-        for (Standard_Integer i = 0; i < p.size(); i++) {
+        for (size_t i = 0; i < p.size(); i++) {
             Base::VectorPy *vec = new Base::VectorPy(Base::Vector3d(
                 p[i].x, p[i].y, p[i].z));
             poles.append(Py::asObject(vec));

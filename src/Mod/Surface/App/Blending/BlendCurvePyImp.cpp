@@ -1,5 +1,5 @@
 ///***************************************************************************
-// *   Copyright (c) 2022 Matt�o Grellier <matteogrellier@gmail.com>            *
+// *   Copyright (c) 2022 Matteo Grellier <matteogrellier@gmail.com>         *
 // *                                                                         *
 // *   This file is part of the FreeCAD CAx development system.              *
 // *                                                                         *
@@ -22,26 +22,19 @@
 //
 //
 #include "../PreCompiled.h"
-#ifndef _PreComp_
-#include <GC_MakeCircle.hxx>
-#include <Geom_Circle.hxx>
-#include <TColStd_Array1OfReal.hxx>
-#include <TColgp_Array1OfPnt.hxx>
-#include <gp_Circ.hxx>
-#endif
+
 #include "Mod/Part/App/BezierCurvePy.h"
 #include "Mod/Part/App/Geometry.h"
-#include "Mod/Surface/App/Blending/BlendCurvePy.cpp"
-#include "Mod/Surface/App/Blending/BlendCurvePy.h"
 #include "Mod/Surface/App/Blending/BlendPointPy.h"
+#include "Mod/Surface/App/Blending/BlendCurvePy.h"
+#include "Mod/Surface/App/Blending/BlendCurvePy.cpp"
 #include <Base/GeometryPyCXX.h>
 #include <Base/VectorPy.h>
-#include <Mod/Part/App/BezierCurvePy.h>
 
 
 using namespace Surface;
 
-extern const char *gce_ErrorStatusText(gce_ErrorType et);
+// extern const char *gce_ErrorStatusText(gce_ErrorType et);
 
 std::string BlendCurvePy::representation(void) const
 {
@@ -55,7 +48,7 @@ PyObject *BlendCurvePy::PyMake(struct _typeobject *, PyObject *, PyObject *)// P
 }
 
 
-int BlendCurvePy::PyInit(PyObject *args, PyObject *kwds)
+int BlendCurvePy::PyInit(PyObject *args, PyObject */*kwds*/)
 {
     PyObject *plist;
     if (!PyArg_ParseTuple(args, "O", &plist)) {
@@ -88,7 +81,7 @@ int BlendCurvePy::PyInit(PyObject *args, PyObject *kwds)
     }
 }
 
-PyObject *BlendCurvePy::compute(PyObject *args)
+PyObject *BlendCurvePy::compute(PyObject */*args*/)
 {
     BlendCurve *bc = getBlendCurvePtr();
 
