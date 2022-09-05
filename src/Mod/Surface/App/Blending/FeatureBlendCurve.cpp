@@ -47,19 +47,19 @@ PROPERTY_SOURCE(Surface::FeatureBlendCurve, Part::Spline)
 
 FeatureBlendCurve::FeatureBlendCurve() : lockOnChangeMutex(false)
 {
-    ADD_PROPERTY_TYPE(StartEdge, (nullptr), "FirstEdge", App::Prop_None, "");
-    ADD_PROPERTY_TYPE(StartContinuity, (2), "FirstEdge", App::Prop_None, "");
+    ADD_PROPERTY_TYPE(StartEdge, (nullptr), "FirstEdge", App::Prop_None, "First support edge");
+    ADD_PROPERTY_TYPE(StartContinuity, (2), "FirstEdge", App::Prop_None, "Continuity order with support edge");
     StartContinuity.setConstraints(&StartContinuityConstraint);
-    ADD_PROPERTY_TYPE(StartParameter, (0.0f), "FirstEdge", App::Prop_None, "");
+    ADD_PROPERTY_TYPE(StartParameter, (0.0f), "FirstEdge", App::Prop_None, "Relative position of start point on first edge");
     StartParameter.setConstraints(&StartParameterConstraint);
-    ADD_PROPERTY_TYPE(StartSize, (1.0f), "FirstEdge", App::Prop_None, "");
+    ADD_PROPERTY_TYPE(StartSize, (-1.0f), "FirstEdge", App::Prop_None, "Size of the start constraints");
 
-    ADD_PROPERTY_TYPE(EndEdge, (nullptr), "SecondEdge", App::Prop_None, "");
-    ADD_PROPERTY_TYPE(EndContinuity, (2), "SecondEdge", App::Prop_None, "");
+    ADD_PROPERTY_TYPE(EndEdge, (nullptr), "SecondEdge", App::Prop_None, "Second support edge");
+    ADD_PROPERTY_TYPE(EndContinuity, (2), "SecondEdge", App::Prop_None, "Continuity order with support edge");
     EndContinuity.setConstraints(&EndContinuityConstraint);
-    ADD_PROPERTY_TYPE(EndParameter, (0.0f), "SecondEdge", App::Prop_None, "");
+    ADD_PROPERTY_TYPE(EndParameter, (0.0f), "SecondEdge", App::Prop_None, "Relative position of end point on second edge");
     EndParameter.setConstraints(&EndParameterConstraint);
-    ADD_PROPERTY_TYPE(EndSize, (1.0f), "SecondEdge", App::Prop_None, "");
+    ADD_PROPERTY_TYPE(EndSize, (1.0f), "SecondEdge", App::Prop_None, "Size of the end constraints");
     Handle(Geom_BezierCurve) maxDegreeCurve;
     maxDegree = maxDegreeCurve->MaxDegree();
 }

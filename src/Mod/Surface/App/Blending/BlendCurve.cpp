@@ -31,6 +31,13 @@
 #include <gp_Pnt.hxx>
 #include <math_Gauss.hxx>
 #include <math_Matrix.hxx>
+#include <Geom_BSplineSurface.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <GProp_GProps.hxx>
+#include <BRepGProp.hxx>
+#include <BRepFill.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Face.hxx>
 #endif
 #include "Blending/BlendCurve.h"
 #include "Blending/BlendCurvePy.h"
@@ -126,18 +133,47 @@ Handle(Geom_BezierCurve) BlendCurve::compute()
     return nullptr;
 }
 
+double BlendCurve::chordLength() const
+{
+    Base::Vector3d diff = blendPoints[1].vectors[0] - blendPoints[0].vectors[0];
+    return diff.Length();
+}
+
 void BlendCurve::setSize(int i, double f, bool relative)
 {
     double size = f;
     try {
         if (relative) {
-            double nb_poles = blendPoints.front().nbVectors() + blendPoints[1].nbVectors();
-            Base::Vector3d diff = blendPoints[1].vectors[0] - blendPoints[0].vectors[0];
-            size = size * diff.Length() / nb_poles;
+            double cl = chordLength();
+            size = size * cl;
         }
         blendPoints[i].setSize(size);
     }
     catch (Standard_Failure &e) {
         PyErr_SetString(Base::PyExc_FC_CADKernelError, e.GetMessageString());
     }
+}
+
+double BlendCurve::tangentArea(double f) const
+{
+    try {
+        BlendPoint bp1(blendPoints[0].vectors);
+        BlendPoint bp2(blendPoints[1].vectors);
+        double cl = chordLength();
+        bp1.setSize(f * cl);
+        bp2.setSize(f * cl);
+        const TopoDS_Shape sh1 = bp1.tangentEdge();
+        const TopoDS_Shape sh2 = bp2.tangentEdge();
+        
+        TopoDS_Face face = BRepFill::Face(TopoDS::Edge(sh1), TopoDS::Edge(sh2));
+        TopoDS_Shape sh(face);
+        GProp_GProps gprops;
+        BRepGProp::SurfaceProperties(sh, gprops);
+        double area = gprops.Mass();
+        return area;
+    }
+    catch (Standard_Failure& e) {
+        THROWM(Base::CADKernelError,e.GetMessageString())
+    }
+    return 0;
 }

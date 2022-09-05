@@ -38,6 +38,7 @@
 #include <Geom_BSplineCurve.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include <BRepLProp_CLProps.hxx>
 #include <Inventor/events/SoMouseButtonEvent.h>
 #endif
 
@@ -278,6 +279,31 @@ CmdBlendCurve::CmdBlendCurve()
     sPixmap = "BlendCurve";
 }
 
+bool pickedNearEnd(Gui::SelectionObject sel, int subidx) {
+    App::DocumentObject *obj = sel.getObject();
+    TopoDS_Shape edge = static_cast<Part::Feature *>(obj)
+                            ->Shape.getShape()
+                            .getSubShape(sel.getSubNames()[subidx].c_str());
+    if (edge.IsNull() || edge.ShapeType() != TopAbs_EDGE)
+       return false;
+
+    Base::Vector3d pickedPoint = sel.getPickedPoints()[subidx];
+    const TopoDS_Edge &e1 = TopoDS::Edge(edge);
+    BRepAdaptor_Curve adapt1(e1);
+
+    BRepLProp_CLProps prop1(adapt1,adapt1.FirstParameter(),0,Precision::Confusion());
+    const gp_Pnt& fp = prop1.Value();
+    BRepLProp_CLProps prop2(adapt1,adapt1.LastParameter(),0,Precision::Confusion());
+    const gp_Pnt& lp = prop2.Value();
+    const gp_Pnt pnt1(pickedPoint.x, pickedPoint.y, pickedPoint.z);
+    double dist1 = pnt1.Distance(fp);
+    double dist2 = pnt1.Distance(lp);
+    if (dist1 > dist2) {
+        return true;
+    }
+    return false;
+}
+
 void CmdBlendCurve::activated(int)
 {
     // To do add pickpoints to parameters
@@ -286,48 +312,32 @@ void CmdBlendCurve::activated(int)
     std::string edge[2];
     std::string featName = getUniqueObjectName("BlendCurve");
     std::vector<Gui::SelectionObject> sel = getSelection().getSelectionEx(0, Part::Feature::getClassTypeId());
-    //std::vector<Base::Vector3d> pickedPoints = sel[0].getPickedPoints();
-    //App::DocumentObject *obj1 = sel[0].getObject();
-    //App::DocumentObject *obj2 = sel[1].getObject();
-    //std::vector<std::string> edge1SubName =  sel[0].getSubNames();
-    //std::vector<std::string> edge2SubName =  sel[1].getSubNames();
-
-    //TopoDS_Shape edge1 = static_cast<Part::Feature *>(obj1)
-    //                         ->Shape.getShape()
-    //                         .getSubShape(edge1SubName[0].c_str());
-    //if (edge1.IsNull() || edge1.ShapeType() != TopAbs_EDGE)
-    //    return;
-    //TopoDS_Shape edge2 = static_cast<Part::Feature *>(obj2)
-    //                         ->Shape.getShape()
-    //                         .getSubShape(edge2SubName[0].c_str());
-    //if (edge2.IsNull() || edge2.ShapeType() != TopAbs_EDGE)
-    //    return;
-
-    //const TopoDS_Edge &e1 = TopoDS::Edge(edge1);
-    //BRepAdaptor_Curve adapt1(e1);
-    //gp_Pnt pnt1(pickedPoints[0].x, pickedPoints[0].y, pickedPoints[0].z);
-
-    //GeomAdaptor_Curve geomCurve = adapt1.Curve();
-    //GeomAPI_ProjectPointOnCurve geomAPI(pnt1, geomCurve.Curve());
-    //double par = geomAPI.LowerDistanceParameter();
-
-    //edge2.Curve.closestParameter(vec, par)
-
-    objName[0] = sel[0].getFeatName();
-    edge[0] = sel[0].getSubNames()[0];
-
+    int obj1idx = 0;
+    int sub1idx = 0;
+    int obj2idx = 1;
+    int sub2idx = 0;
     if (sel.size() == 1) {
-        objName[1] = sel[0].getFeatName();
-        edge[1] = sel[0].getSubNames()[1];
+        obj2idx = 0;
+        sub2idx = 1;
     }
-    else {
-        objName[1] = sel[1].getFeatName();
-        edge[1] = sel[1].getSubNames()[0];
-    }
+    objName[0] = sel[obj1idx].getFeatName();
+    edge[0] = sel[obj1idx].getSubNames()[sub1idx];
+    objName[1] = sel[obj2idx].getFeatName();
+    edge[1] = sel[obj2idx].getSubNames()[sub2idx];
+
     openCommand(QT_TRANSLATE_NOOP("Command", "Blend Curve"));
     doCommand(Doc, "App.ActiveDocument.addObject(\"Surface::FeatureBlendCurve\",\"%s\")", featName.c_str());
     doCommand(Doc, "App.ActiveDocument.%s.StartEdge = (App.getDocument('%s').getObject('%s'),['%s'])", featName.c_str(), docName.c_str(), objName[0].c_str(), edge[0].c_str());
     doCommand(Doc, "App.ActiveDocument.%s.EndEdge = (App.getDocument('%s').getObject('%s'),['%s'])", featName.c_str(), docName.c_str(), objName[1].c_str(), edge[1].c_str());
+    // doCommand(Doc, "#  %f, %f, %f, %f", dist1, dist2, dist3, dist4);
+    if (pickedNearEnd(sel[obj1idx], sub1idx)) {
+        doCommand(Doc, "App.ActiveDocument.%s.StartParameter = 1.0", featName.c_str());
+        doCommand(Doc, "App.ActiveDocument.%s.StartSize = 1.0", featName.c_str());
+    }
+    if (pickedNearEnd(sel[obj2idx], sub2idx)) {
+        doCommand(Doc, "App.ActiveDocument.%s.EndParameter = 1.0", featName.c_str());
+        doCommand(Doc, "App.ActiveDocument.%s.EndSize = -1.0", featName.c_str());
+    }
     updateActive();
     commitCommand();
 }

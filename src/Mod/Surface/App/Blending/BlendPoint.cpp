@@ -25,6 +25,8 @@
 #ifndef _PreComp_
 #include <Precision.hxx>
 #include <Standard_Real.hxx>
+#include <TopoDS_Shape.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 #endif
 #include "Blending/BlendPoint.h"
 #include "Blending/BlendPointPy.h"
@@ -67,4 +69,18 @@ int BlendPoint::getContinuity()
 int BlendPoint::nbVectors()
 {
     return vectors.size();
+}
+
+TopoDS_Shape BlendPoint::tangentEdge()
+{
+    try{
+        gp_Pnt pt1(vectors[0].x, vectors[0].y, vectors[0].z);
+        gp_Vec tn1(vectors[1].x, vectors[1].y, vectors[1].z);
+        gp_Pnt pt2 = pt1.Translated(tn1);
+        BRepBuilderAPI_MakeEdge mkEdge(pt1, pt2);
+        return mkEdge.Shape();
+    }
+    catch (Standard_Failure& e) {
+        THROWM(Base::CADKernelError,e.GetMessageString())
+    }
 }

@@ -56,6 +56,8 @@ public:
     *\param bool interpret new size relative to chordlength
     */
     void setSize(int, double, bool);
+    double chordLength() const;
+    double tangentArea(double) const;
 };
 }// namespace Surface
 

@@ -23,6 +23,7 @@
 #ifndef SURFACE_BLEND_POINT_H
 #define SURFACE_BLEND_POINT_H
 
+#include <TopoDS_Shape.hxx>
 
 #include <Mod/Surface/SurfaceGlobal.h>
 #include <Base/Vector3D.h>
@@ -67,6 +68,7 @@ public:
     *\return Number of vectors of this BlendPoint
     */
     int nbVectors();
+    TopoDS_Shape tangentEdge();
 
 private:
 };
