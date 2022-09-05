@@ -46,6 +46,8 @@ PROPERTY_SOURCE(Surface::FeatureBlendCurve, Part::Spline)
 
 FeatureBlendCurve::FeatureBlendCurve() : lockOnChangeMutex(false)
 {
+    ADD_PROPERTY_TYPE(SizeSync, (true), "BlendCurve", App::Prop_None, "Synchronize Size properties to get a balanced curve");
+
     ADD_PROPERTY_TYPE(StartEdge, (nullptr), "FirstEdge", App::Prop_None, "First support edge");
     ADD_PROPERTY_TYPE(StartContinuity, (2), "FirstEdge", App::Prop_None, "Continuity order with support edge");
     StartContinuity.setConstraints(&ContinuityConstraint);
@@ -68,6 +70,8 @@ FeatureBlendCurve::FeatureBlendCurve() : lockOnChangeMutex(false)
 
 short FeatureBlendCurve::mustExecute() const
 {
+    if (SizeSync.isTouched())
+        return 1;
     if (StartEdge.isTouched())
         return 1;
     if (StartParameter.isTouched())
@@ -163,19 +167,58 @@ void FeatureBlendCurve::onChanged(const App::Property *prop)
         return;
     Base::StateLocker lock(lockOnChangeMutex);
 
+    bool autosize = SizeSync.getValue();
+
     if (prop == &StartContinuity) {
         auto changedStartProp = dynamic_cast<const App::PropertyInteger *>(prop);
+        int scont = changedStartProp->getValue();
 
-        if (changedStartProp->getValue() > (maxDegree - 2 - EndContinuity.getValue())) {
-
+        if (scont > (maxDegree - 2 - EndContinuity.getValue())) {
             StartContinuity.setValue(maxDegree - 2 - EndContinuity.getValue());
+        }
+        if (autosize && (scont > 0)) {
+            float endsize = EndSize.getValue();
+            int econt = EndContinuity.getValue();
+            float startsize = StartSize.getValue();
+            int sgn = (startsize > 0) - (startsize < 0);
+            StartSize.setValue(sgn * abs(endsize) * econt / scont);
         }
     }
     else if (prop == &EndContinuity) {
         auto changedEndProp = dynamic_cast<const App::PropertyInteger *>(prop);
+        int econt = changedEndProp->getValue();
 
-        if (changedEndProp->getValue() > (maxDegree - 2 - StartContinuity.getValue())) {
+        if (econt > (maxDegree - 2 - StartContinuity.getValue())) {
             EndContinuity.setValue(maxDegree - 2 - StartContinuity.getValue());
+        }
+        if (autosize && (econt > 0)) {
+            float startsize = StartSize.getValue();
+            int scont = StartContinuity.getValue();
+            float endsize = EndSize.getValue();
+            int sgn = (endsize > 0) - (endsize < 0);
+            EndSize.setValue(sgn * abs(startsize) * scont / econt);
+        }
+    }
+    else if ((prop == &StartSize) && autosize) {
+        auto startsize = dynamic_cast<const App::PropertyFloat *>(prop);
+        float ssize = startsize->getValue();
+        int econt = EndContinuity.getValue();
+        int scont = StartContinuity.getValue();
+        float endsize = EndSize.getValue();
+        int sgn = (endsize > 0) - (endsize < 0);
+        if ((econt > 0) && (scont > 0)){
+            EndSize.setValue(sgn * abs(ssize) * scont / econt);
+        }
+    }
+    else if ((prop == &EndSize) && autosize) {
+        auto endsize = dynamic_cast<const App::PropertyFloat *>(prop);
+        float esize = endsize->getValue();
+        int econt = EndContinuity.getValue();
+        int scont = StartContinuity.getValue();
+        float startsize = StartSize.getValue();
+        int sgn = (startsize > 0) - (startsize < 0);
+        if ((econt > 0) && (scont > 0)){
+            StartSize.setValue(sgn * abs(esize) * econt / scont);
         }
     }
     Part::Spline::onChanged(prop);

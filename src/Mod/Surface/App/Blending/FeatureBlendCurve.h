@@ -41,6 +41,8 @@ public:
 
     FeatureBlendCurve();
 
+    App::PropertyBool SizeSync;
+
     App::PropertyLinkSub StartEdge;
     App::PropertyFloatConstraint StartParameter;
     App::PropertyIntegerConstraint StartContinuity;
