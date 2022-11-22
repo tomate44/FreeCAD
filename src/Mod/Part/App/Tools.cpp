@@ -736,3 +736,36 @@ TopLoc_Location Part::Tools::fromPlacement(const Base::Placement& plm)
     trf.SetRotation(gp_Quaternion(q1, q2, q3, q4));
     return {trf};
 }
+
+void Part::Tools::interpolationParameters(const std::vector<Base::Vector3d>& pts,
+                                          const Standard_Real fac,
+                                          const Standard_Boolean per,
+                                          TColStd_Array1OfReal& pars)
+{
+    if (pts.size() < 2)
+        return;
+    int xtra = 0;
+    if (per)
+        xtra = 1;
+    if (pars.Length() == (int)(pts.size() + xtra)) {
+        double total = 0.0;
+        pars(pars.Lower()) = 0.0;
+        for (size_t i=1; i<pts.size(); i++) {
+            double dist = Base::Distance(pts[i-1], pts[i]);
+            double powdist = pow(dist, fac);
+            pars(pars.Lower()+i) = powdist;
+            total += powdist;
+        }
+        if (per) {
+            double dist = Base::Distance(pts.back(), pts.front());
+            double powdist = pow(dist, fac);
+            pars(pars.Upper()) = powdist;
+            total += powdist;
+        }
+        if (total <= Precision::Confusion())
+            return;
+        for (Standard_Integer j=pars.Lower(); j<=pars.Upper(); j++) {
+            pars(j) /= total;
+        }
+    }
+}

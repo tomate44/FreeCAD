@@ -225,6 +225,14 @@ public:
      * \return TopLoc_Location
      */
     static TopLoc_Location fromPlacement(const Base::Placement&);
+    /*! \brief interpolationParameters
+     * Returns the interpolation parameters of the given points, with the given interpolation factor.
+     * \param pts
+     * \param fac
+     * \param periodic
+     * \param pars
+     */
+    static void interpolationParameters(const std::vector<Base::Vector3d>& pts, const Standard_Real fac, const Standard_Boolean periodic, TColStd_Array1OfReal& pars);
 };
 
 } //namespace Part
