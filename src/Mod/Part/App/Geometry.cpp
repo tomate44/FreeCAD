@@ -103,6 +103,8 @@
 # include <ctime>
 #endif //_PreComp_
 
+# include <math_Gauss.hxx>
+
 #include <Base/Exception.h>
 #include <Base/Reader.h>
 #include <Base/Writer.h>
@@ -1429,6 +1431,86 @@ void GeomBSplineCurve::interpolate(const std::vector<gp_Pnt>& p,
     interpolate.Load(tgs, fgs);
     interpolate.Perform();
     this->myCurve = interpolate.Curve();
+}
+
+void GeomBSplineCurve::interpolate(const std::vector<gp_Pnt>& p, Standard_Real factor, Standard_Boolean periodic)
+{
+    if (p.size() < 2)
+        Standard_ConstructionError::Raise();
+
+    double tol3d = Precision::Approximation();
+    int degree = 3;
+    if (p.size() < 4)
+        degree = (int)p.size() - 1;
+
+    TColgp_HArray1OfPnt pts(1, p.size());
+    for (std::size_t i=0; i<p.size(); i++) {
+        pts.SetValue(i+1, p[i]);
+    }
+
+    // GeomAPI_Interpolate interpolate(pts, periodic, tol3d);
+    // interpolate.Perform();
+    // this->myCurve = interpolate.Curve();
+
+    double enddist = p.back().Distance(p.front());
+    int n = 0;
+    if (periodic && (enddist > Precision::Confusion()))
+        n = 1;
+    TColStd_Array1OfReal params(1, p.size() + n);
+    Tools::interpolationParameters(p, factor, periodic, params);
+
+    int nbknots = pts.Length() * 2;
+    if (degree == 3)
+        nbknots = pts.Length() + 6;
+    TColStd_Array1OfReal knots(1.0, 1, nbknots + 1);
+    int idx = 0;
+    for (int i=0; i<=degree; i++) {
+        knots(knots.Lower() + i) = params(params.Lower());
+        knots(knots.Upper() - i + 1) = params(params.Upper());
+        idx++;
+    }
+    if (degree == 3) {
+        for (int i=params.Lower()+1; i<params.Upper(); i++) {
+            knots(idx + i) = params(i);
+        }
+    }
+
+    // Handle(Geom_BezierCurve) curve = Handle(Geom_BezierCurve)::DownCast
+    int num_poles = params.Length() - n;
+    math_Matrix OCCmatrix(1, num_poles, 1, num_poles, 0.0);
+    math_Vector res_x(1, num_poles, 0.0);
+    math_Vector res_y(1, num_poles, 0.0);
+    math_Vector res_z(1, num_poles, 0.0);
+    int row_idx = 1;
+    int cons_idx = 1;
+    for (int it=params.Lower(); it<=params.Upper(); ++it) {
+        math_Matrix bezier_eval(1, 1, 1, num_poles, 0.0);
+        Standard_Integer first_non_zero;
+        BSplCLib::EvalBsplineBasis(0, num_poles, knots, params(it), first_non_zero, bezier_eval, Standard_False);
+        OCCmatrix.SetRow(it, bezier_eval.Row(1));
+        res_x(row_idx) = pts.Value(it).X();
+        res_y(row_idx) = pts.Value(it).Y();
+        res_z(row_idx) = pts.Value(it).Z();
+    }
+    math_Gauss gauss(OCCmatrix);
+    gauss.Solve(res_x);
+    if (!gauss.IsDone())
+        Standard_Failure::Raise("Failed to solve equations");
+    gauss.Solve(res_y);
+    if (!gauss.IsDone())
+        Standard_Failure::Raise("Failed to solve equations");
+    gauss.Solve(res_z);
+    if (!gauss.IsDone())
+        Standard_Failure::Raise("Failed to solve equations");
+
+    TColgp_Array1OfPnt poles(1,num_poles);
+    for (int idx=1; idx<=num_poles; ++idx) {
+        poles.SetValue(idx, gp_Pnt(res_x(idx),res_y(idx),res_z(idx)));
+    }
+
+    // Handle(Geom_BezierCurve) bezier = new Geom_BezierCurve(poles);
+    // this->getGeomBezierCurvePtr()->setHandle(bezier);
+    // Py_Return;
 }
 
 void GeomBSplineCurve::getCardinalSplineTangents(const std::vector<gp_Pnt>& p,

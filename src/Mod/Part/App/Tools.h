@@ -232,7 +232,7 @@ public:
      * \param periodic
      * \param pars
      */
-    static void interpolationParameters(const std::vector<Base::Vector3d>& pts, const Standard_Real fac, const Standard_Boolean periodic, TColStd_Array1OfReal& pars);
+    static void interpolationParameters(const std::vector<gp_Pnt>& pts, const Standard_Real fac, const Standard_Boolean periodic, TColStd_Array1OfReal& pars);
 };
 
 } //namespace Part

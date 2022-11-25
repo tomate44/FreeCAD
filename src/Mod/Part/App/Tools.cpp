@@ -737,7 +737,7 @@ TopLoc_Location Part::Tools::fromPlacement(const Base::Placement& plm)
     return {trf};
 }
 
-void Part::Tools::interpolationParameters(const std::vector<Base::Vector3d>& pts,
+void Part::Tools::interpolationParameters(const std::vector<gp_Pnt>& pts,
                                           const Standard_Real fac,
                                           const Standard_Boolean per,
                                           TColStd_Array1OfReal& pars)
@@ -751,16 +751,18 @@ void Part::Tools::interpolationParameters(const std::vector<Base::Vector3d>& pts
         double total = 0.0;
         pars(pars.Lower()) = 0.0;
         for (size_t i=1; i<pts.size(); i++) {
-            double dist = Base::Distance(pts[i-1], pts[i]);
+            double dist = pts[i-1].Distance(pts[i]);
             double powdist = pow(dist, fac);
             pars(pars.Lower()+i) = powdist;
             total += powdist;
         }
         if (per) {
-            double dist = Base::Distance(pts.back(), pts.front());
-            double powdist = pow(dist, fac);
-            pars(pars.Upper()) = powdist;
-            total += powdist;
+            double dist = pts.back().Distance(pts.front());
+            if (dist > Precision::Confusion()) {
+                double powdist = pow(dist, fac);
+                pars(pars.Upper()) = powdist;
+                total += powdist;
+            }
         }
         if (total <= Precision::Confusion())
             return;
