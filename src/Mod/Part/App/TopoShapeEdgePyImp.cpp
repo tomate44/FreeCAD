@@ -711,10 +711,19 @@ PyObject* TopoShapeEdgePy::split(PyObject *args)
 
         BRepBuilderAPI_MakeWire mkWire;
         Handle(Geom_Curve) c = adapt.Curve().Curve();
+        const TopoDS_Edge& edge = TopoDS::Edge(this->getTopoShapePtr()->getShape());
+        BRep_Builder builder;
+        TopoDS_Edge e;
         std::vector<Standard_Real>::iterator end = par.end() - 1;
         for (std::vector<Standard_Real>::iterator it = par.begin(); it != end; ++it) {
-            BRepBuilderAPI_MakeEdge mkBuilder(c, it[0], it[1]);
-            mkWire.Add(mkBuilder.Edge());
+            // TopoDS_Edge e;
+            BRepBuilderAPI_MakeEdge mke(c, it[0], it[1]);
+            e =  mke.Edge();
+            // builder.UpdateEdge(edge, curve, Precision::Confusion());
+            // builder.makeEdge(edge);
+            builder.Transfert(edge, e);
+            builder.Range(e, it[0], it[1], false);
+            mkWire.Add(e);
         }
 
         return new TopoShapeWirePy(new TopoShape(mkWire.Shape()));
