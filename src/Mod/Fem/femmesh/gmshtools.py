@@ -415,9 +415,18 @@ class GmshTools(ObjectTools):
         gmsh_stdout, gmsh_stderr = p.communicate()
         return gmsh_stdout
 
+    def _get_definitions_of_type(self, type_):
+        result = []
+        for definition in self.obj.MeshDefinitionList:
+            if femutils.is_of_type(definition, type_):
+                result.append(definition)
+
+        return result
+
     def get_region_data(self):
         # mesh regions
-        if not self.obj.MeshRegionList:
+        mesh_region_list = self._get_definitions_of_type("Fem::MeshRegion")
+        if not mesh_region_list:
             # print("  No mesh refinements.")
             pass
         else:
@@ -428,7 +437,7 @@ class GmshTools(ObjectTools):
             # https://forum.freecad.org/viewtopic.php?f=18&t=18780&p=149520#p149520
             part = self.part_obj
             if (
-                self.obj.MeshRegionList
+                mesh_region_list
                 and part.Shape.ShapeType == "Compound"
                 and (
                     femutils.is_of_type(part, "FeatureBooleanFragments")
@@ -437,7 +446,8 @@ class GmshTools(ObjectTools):
                 )
             ):
                 self.outputCompoundWarning
-            for mr_obj in self.obj.MeshRegionList:
+
+            for mr_obj in mesh_region_list:
                 if mr_obj.Suppressed:
                     continue
                 # print(mr_obj.Name)
@@ -512,7 +522,9 @@ class GmshTools(ObjectTools):
         # but multiple boundary can be selected
         # Mesh.CharacteristicLengthMin, must be zero
         # or a value less than first inflation layer height
-        if not self.obj.MeshBoundaryLayerList:
+
+        mesh_boundary_list = self._get_definitions_of_type("Fem::MeshBoundaryLayer")
+        if not mesh_boundary_list:
             # print("  No mesh boundary layer setting document object.")
             pass
         else:
@@ -523,8 +535,8 @@ class GmshTools(ObjectTools):
                 self.outputCompoundWarning
 
             boundary_layer_set = False
-            for mr_obj in self.obj.MeshBoundaryLayerList:
 
+            for mr_obj in mesh_boundary_list:
                 if mr_obj.Suppressed:
                     continue
                 if boundary_layer_set:
