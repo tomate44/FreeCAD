@@ -428,7 +428,7 @@ class GmshTools(ObjectTools):
 
     def _get_definitions_of_type(self, type_):
         result = []
-        for definition in self.obj.MeshDefinitionList:
+        for definition in self.obj.MeshRefinementList:
             if femutils.is_of_type(definition, type_):
                 result.append(definition)
 
@@ -927,29 +927,35 @@ class GmshTools(ObjectTools):
 
         # write the background size field, if fields have been added
         if self._background_fields:
-            field_id = self._next_field_number()
+
+            # background field
+            field_id = self._next_field_number(False)
             geo.write(f"\nField[{field_id}] = Min;\n")
             id_list = ", ".join(str(i) for i in self._background_fields)
             geo.write(f"Field[{field_id}].FieldsList = {{ {id_list} }};\n")
             geo.write(f"Background Field = {field_id};\n\n")
 
+            geo.write("\n")
 
-        # mesh parameter
-        geo.write("// min, max Characteristic Length\n")
-        geo.write("Mesh.CharacteristicLengthMax = " + str(self.clmax) + ";\n")
-        if len(self.bl_setting_list):
-            # if minLength must smaller than first layer of boundary_layer
-            # it is safer to set it as zero (default value) to avoid error
-            geo.write("Mesh.CharacteristicLengthMin = " + str(0) + ";\n")
         else:
-            geo.write("Mesh.CharacteristicLengthMin = " + str(self.clmin) + ";\n")
-            geo.write(
-                "Mesh.MeshSizeFromCurvature = {}"
-                "; // number of elements per 2*pi radians, 0 to deactivate\n".format(
-                    self.obj.MeshSizeFromCurvature
+            # mesh parameter
+            geo.write("// min, max Characteristic Length\n")
+            geo.write("Mesh.CharacteristicLengthMax = " + str(self.clmax) + ";\n")
+            if len(self.bl_setting_list):
+                # if minLength must smaller than first layer of boundary_layer
+                # it is safer to set it as zero (default value) to avoid error
+                geo.write("Mesh.CharacteristicLengthMin = " + str(0) + ";\n")
+            else:
+                geo.write("Mesh.CharacteristicLengthMin = " + str(self.clmin) + ";\n")
+            if self.obj.MeshSizeFromCurvature:
+                geo.write(
+                    "Mesh.MeshSizeFromCurvature = {}"
+                    "; // number of elements per 2*pi radians, 0 to deactivate\n".format(
+                        self.obj.MeshSizeFromCurvature
+                    )
                 )
-            )
-        geo.write("\n")
+            geo.write("\n")
+
         if self.obj.RecombineAll:
             geo.write("// recombination for surfaces\n")
             geo.write("Mesh.RecombineAll = 1;\n")
