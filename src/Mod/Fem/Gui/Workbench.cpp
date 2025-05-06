@@ -158,7 +158,9 @@ Gui::ToolBarItem* Workbench::setupToolBars() const
           << "Separator"
           << "FEM_MeshRegion"
           << "FEM_MeshGroup"
+          << "Seperator"
           << "FEM_MeshGMSHRefinement"
+          << "FEM_MeshGMSHStructured"
           << "Separator"
           << "FEM_FEMMesh2Mesh";
 
@@ -308,7 +310,9 @@ Gui::MenuItem* Workbench::setupMenuBar() const
           << "Separator"
           << "FEM_MeshRegion"
           << "FEM_MeshGroup"
+          << "Seperator"
           << "FEM_MeshGMSHRefinement"
+          << "FEM_MeshGMSHStructured"
           << "Separator"
           // << "FEM_CreateNodesSet"
           << "FEM_CreateElementsSet"
