@@ -308,7 +308,11 @@ class GmshTools(ObjectTools):
         # geometry file
         self.temp_file_geometry = os.path.join(self.obj.WorkingDirectory, _geometry_name + ".brep")
         # mesh file
-        self.temp_file_mesh = os.path.join(self.obj.WorkingDirectory, self.mesh_name + ".unv")
+        mesh_file_type = ".unv"
+        if "BUILD_FEM_VTK" in FreeCAD.__cmake__:
+            # when available use vtk, as UNV is lossy (e.g. no pyramid elements)
+            mesh_file_type = ".vtk"
+        self.temp_file_mesh = os.path.join(self.obj.WorkingDirectory, self.mesh_name + mesh_file_type)
         # Gmsh input file
         self.model_file = os.path.join(self.obj.WorkingDirectory, "shape2mesh.geo")
         Console.PrintMessage("  " + self.temp_file_geometry + "\n")
@@ -1200,8 +1204,10 @@ class GmshTools(ObjectTools):
         geo.write("Mesh.HighOrderOptimize = " + self.HighOrderOptimize + ";\n")
         geo.write("\n")
 
-        geo.write("// mesh order\n")
+        geo.write("// mesh order and supported elements\n")
         geo.write("Mesh.ElementOrder = " + self.order + ";\n")
+        geo.write("Mesh.SecondOrderIncomplete = 1;\n")
+
         if self.order == "2":
             if self.obj.SecondOrderLinear:
                 geo.write(
@@ -1236,18 +1242,6 @@ class GmshTools(ObjectTools):
 
         geo.write("// subdivision algorithm\n")
         geo.write("Mesh.SubdivisionAlgorithm = " + self.SubdivisionAlgorithm + ";\n")
-        geo.write("\n")
-
-        geo.write("// incomplete second order elements\n")
-        if (
-            self.SubdivisionAlgorithm == "1"
-            or self.SubdivisionAlgorithm == "2"
-            or self.obj.RecombineAll
-        ):
-            sec_order_inc = "1"
-        else:
-            sec_order_inc = "0"
-        geo.write("Mesh.SecondOrderIncomplete = " + sec_order_inc + ";\n")
         geo.write("\n")
 
         geo.write("// meshing\n")
