@@ -474,7 +474,6 @@ void StdCmdExport::activated(int iMsg)
             filterList << QString::fromStdString(filter.first);
         }
     }
-    QString formatList = filterList.join(QLatin1String(";;"));
     Base::Reference<ParameterGrp> hPath = App::GetApplication()
                                               .GetUserParameter()
                                               .GetGroup("BaseApp")
@@ -537,7 +536,7 @@ void StdCmdExport::activated(int iMsg)
         getMainWindow(),
         QObject::tr("Export File"),
         defaultFilename,
-        formatList,
+        filterList,
         &selectedFilter
     );
     if (!filename.isEmpty()) {
@@ -603,7 +602,7 @@ void StdCmdMergeProjects::activated(int iMsg)
         Gui::getMainWindow(),
         QString::fromUtf8(QT_TR_NOOP("Merge Document")),
         FileDialog::getWorkingDirectory(),
-        QString::fromUtf8(QT_TR_NOOP("%1 document (*.FCStd)")).arg(exe)
+        QStringList(QString::fromUtf8(QT_TR_NOOP("%1 document (*.FCStd)")).arg(exe))
     );
     if (!project.isEmpty()) {
         FileDialog::setWorkingDirectory(project);
@@ -695,7 +694,7 @@ void StdCmdExportDependencyGraph::activated(int iMsg)
         Gui::getMainWindow(),
         Gui::GraphvizView::tr("Export Graph"),
         QString(),
-        format
+        QStringList(format)
     );
     if (!fn.isEmpty()) {
         QFile file(fn);
