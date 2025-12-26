@@ -36,15 +36,18 @@ import FreeCADGui
 
 from femguiutils import selection_widgets
 from . import base_femtaskpanel
+from . import base_fempreviewpanel
 
 
-class _TaskPanel(base_femtaskpanel._BaseTaskPanel):
+class _TaskPanel(base_femtaskpanel._BaseTaskPanel, base_fempreviewpanel._TaskPanel):
     """
     The TaskPanel for editing References property of FemMeshRegion objects
     """
 
     def __init__(self, obj):
-        super().__init__(obj)
+
+        base_femtaskpanel._BaseTaskPanel.__init__(self, obj)
+        base_fempreviewpanel._TaskPanel.__init__(self, obj)
 
         self.parameter_widget = FreeCADGui.PySideUic.loadUi(
             FreeCAD.getHomePath() + "Mod/Fem/Resources/ui/MeshDistance.ui"
@@ -60,6 +63,7 @@ class _TaskPanel(base_femtaskpanel._BaseTaskPanel):
         )
         self.selection_widget.setWindowTitle("Reference geometries")
         self.selection_widget.setWindowIcon(FreeCADGui.getIcon(":icons/FEM_MeshDistance.svg"))
+        self.selection_widget.referencesUpdated.connect(self.referencesUpdated)
 
         # form made from param and selection widget
         self.form = [self.parameter_widget, self.selection_widget]
@@ -109,38 +113,53 @@ class _TaskPanel(base_femtaskpanel._BaseTaskPanel):
         ui.Linear.setChecked(self.obj.LinearInterpolation)
         ui.Linear.toggled.connect(self.linearChanged)
 
+        # add the preview widget
+        ui.layout().addWidget(self.preview_widget())
 
     def accept(self):
         self.obj.References = self.selection_widget.references
         self.selection_widget.finish_selection()
+        self.stop_preview()
         return super().accept()
 
     def reject(self):
         self.selection_widget.finish_selection()
+        self.stop_preview()
         return super().reject()
 
     @QtCore.Slot(FreeCAD.Units.Quantity)
     def distMaxChanged(self, value):
         self.obj.DistanceMaximum = value
+        self.update_preview()
 
     @QtCore.Slot(FreeCAD.Units.Quantity)
     def distMinChanged(self, value):
         self.obj.DistanceMinimum = value
+        self.update_preview()
 
     @QtCore.Slot(FreeCAD.Units.Quantity)
     def sizeMaxChanged(self, value):
         self.obj.SizeMaximum = value
+        self.update_preview()
 
     @QtCore.Slot(FreeCAD.Units.Quantity)
     def sizeMinChanged(self, value):
         self.obj.SizeMinimum = value
+        self.update_preview()
 
     @QtCore.Slot(FreeCAD.Units.Quantity)
     def samplingChanged(self, value):
         self.obj.Sampling = int(value)
+        self.update_preview()
 
     @QtCore.Slot(bool)
     def linearChanged(self, value):
         self.obj.LinearInterpolation = value
+        self.update_preview()
+
+    @QtCore.Slot(object)
+    def referencesUpdated(self, references):
+        self.obj.References = references
+        self.update_preview()
 
 
