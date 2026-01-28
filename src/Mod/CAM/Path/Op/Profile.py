@@ -673,20 +673,34 @@ class ObjectProfile(PathAreaOp.ObjectOp):
                         Path.Log.error(msg)
                     else:
                         flattened = self._flattenWire(obj, wire, obj.FinalDepth.Value)
-                        zDiff = math.fabs(wire.BoundBox.ZMin - obj.FinalDepth.Value)
-                        if flattened and zDiff >= self.JOB.GeometryTolerance.Value:
-                            cutWireObjs = False
-                            openEdges = []
+                        if flattened:
+                            origWire, flatWire = flattened
+
+                            if Path.Geom.isRoughly(origWire.BoundBox.ZMax, obj.FinalDepth.Value):
+                                # FinalDepth in extreme height
+                                diffDepth = self._getOpenProfileDiffDepth(base, edgelist)
+                                # translate wire in Z to get correct cross-section with model
+                                flatWire.translate(FreeCAD.Vector(0, 0, diffDepth))
+                            else:
+                                # FinalDepth not on the wire
+                                msg = translate(
+                                    "PathProfile",
+                                    "For open profile uses cross-section with model.\n"
+                                    "Check edge selection and Final Depth requirements for profiling open edge(s).\n"
+                                    "Verify that Final Depth inside shape.",
+                                )
+                                Path.Log.warning(msg)
+
+                            self._addDebugObject("FlatWire", flatWire)
+
                             params = self.areaOpAreaParams(obj, False)
                             passOffsets = [
                                 self.ofstRadius + i * abs(params["Stepover"])
                                 for i in range(params["ExtraPass"] + 1)
                             ][::-1]
-                            origWire, flatWire = flattened
-
-                            self._addDebugObject("FlatWire", flatWire)
-
+                            openEdges = []
                             for po in passOffsets:
+                                cutWireObjs = False
                                 self.ofstRadius = po
                                 cutShp = self._getCutAreaCrossSection(obj, base, origWire, flatWire)
                                 if cutShp:
@@ -701,17 +715,31 @@ class ObjectProfile(PathAreaOp.ObjectOp):
                             if openEdges:
                                 tup = openEdges, False, "OpenEdge"
                                 shapes.append(tup)
+
                         else:
-                            if zDiff < self.JOB.GeometryTolerance.Value:
-                                msg = translate(
-                                    "PathProfile",
-                                    "Check edge selection and Final Depth requirements for profiling open edge(s).",
-                                )
-                                Path.Log.error(msg)
-                            else:
-                                Path.Log.error(self.inaccessibleMsg)
+                            Path.Log.error(self.inaccessibleMsg)
 
         return shapes
+
+    def _getOpenProfileDiffDepth(self, base, edges):
+        """_getOpenProfileDiffDepth(base, edges)...
+        Return extra depth with sign to get correct cross-section with model for open profile"""
+        tol = self.JOB.GeometryTolerance.Value
+        diffDepth = 2 * tol
+        offset = FreeCAD.Vector(0, 0, diffDepth)
+        edgeMiddlePoint = edges[0].discretize(3)[1]
+        edgeHash = edges[0].hashCode()
+        for face in base.Shape.Faces:
+            if Path.Geom.isHorizontal(face):
+                continue
+            if any(e.hashCode() == edgeHash for e in face.Edges):
+                if face.isInside(edgeMiddlePoint + offset, tol, True):
+                    return diffDepth
+                elif face.isInside(edgeMiddlePoint - offset, tol, True):
+                    return -diffDepth
+
+        Path.Log.warning("Can not define depth for open edges.")
+        return 0
 
     def _flattenWire(self, obj, wire, trgtDep):
         """_flattenWire(obj, wire)... Return a flattened version of the wire"""
@@ -741,26 +769,22 @@ class ObjectProfile(PathAreaOp.ObjectOp):
     # Open-edges methods
     def _getCutAreaCrossSection(self, obj, base, origWire, flatWire):
         Path.Log.debug("_getCutAreaCrossSection()")
-        # FCAD = FreeCAD.ActiveDocument
         tolerance = self.JOB.GeometryTolerance.Value
         toolDiam = 2 * self.radius  # self.radius defined in PathAreaOp or PathProfileBase modules
         minBfr = toolDiam * 1.25
         bbBfr = (self.ofstRadius * 2) * 1.25
         if bbBfr < minBfr:
             bbBfr = minBfr
-        # fwBB = flatWire.BoundBox
+        fwBB = flatWire.BoundBox
         wBB = origWire.BoundBox
         minArea = (self.ofstRadius - tolerance) ** 2 * math.pi
 
         useWire = origWire.Wires[0]
         numOrigEdges = len(useWire.Edges)
         sdv = wBB.ZMax
-        fdv = obj.FinalDepth.Value
+        fdv = fwBB.ZMax
         extLenFwd = sdv - fdv
         if extLenFwd <= 0.0:
-            msg = "For open edges, verify Final Depth for this operation."
-            FreeCAD.Console.PrintError(msg + "\n")
-            # return False
             extLenFwd = 0.1
         WIRE = flatWire.Wires[0]
         numEdges = len(WIRE.Edges)
