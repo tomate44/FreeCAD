@@ -441,7 +441,8 @@ class TaskPanelHoleGeometryPage(PathOpGui.TaskPanelBaseGeometryPage):
         self.obj.Base = []
         self.obj.Disabled = []
         self.form.baseList.horizontalHeader().setSortIndicator(-1, QtCore.Qt.AscendingOrder)
-        self.obj.Proxy.findAllHoles(self.obj)
+        selection = FreeCADGui.Selection.getSelection()
+        self.obj.Proxy.findAllHoles(self.obj, selection)
         self.obj.Proxy.execute(self.obj)
         FreeCAD.ActiveDocument.recompute()
 
