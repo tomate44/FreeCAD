@@ -30,9 +30,11 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
+#include <cassert>
 
 #include <fmt/format.h>
 
+#include "Base/Console.h"
 #include <Base/Color.h>
 #include <Base/Exception.h>
 #include <FCGlobal.h>
@@ -179,7 +181,13 @@ struct GuiExport Value: std::variant<Numeric, Base::Color, std::string, Tuple>
     template<typename T>
     const T& get() const
     {
-        return std::get<T>(*this);
+        try {
+            return std::get<T>(*this);
+        }
+        catch (...) {
+            Base::Console().critical("This should never happen, probably missing holds<T> check.");
+            throw;
+        }
     }
 
     /**
