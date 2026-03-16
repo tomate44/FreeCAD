@@ -950,7 +950,7 @@ int SketchObject::addConstraint(std::unique_ptr<Constraint> constraint)
         AutoLockTangencyAndPerpty(constNew);
     }
     setOrientation(constNew, false);
-    
+
     addGeometryState(constNew);
 
     signalConstraintAdded(constNew);
