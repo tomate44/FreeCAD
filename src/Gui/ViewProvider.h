@@ -20,8 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef GUI_VIEWPROVIDER_H
-#define GUI_VIEWPROVIDER_H
+#pragma once
 
 #include <bitset>
 #include <map>
@@ -560,6 +559,8 @@ public:
     virtual ViewProvider* startEditing(int ModNum = 0);
     bool isEditing() const;
     void finishEditing();
+    virtual void setActive(bool active);
+
     /// adjust viewer settings when editing a view provider
     virtual void setEditViewer(View3DInventorViewer*, int ModNum);
     /// restores viewer settings when leaving editing mode
@@ -729,5 +730,3 @@ private:
 };
 
 }  // namespace Gui
-
-#endif  // GUI_VIEWPROVIDER_H
