@@ -786,7 +786,9 @@ TEST_F(SketchObjectTest, testReverseAngleConstraintToSupplementaryExpressionAppl
 {
     auto [constraint, id] = setupAngleConstraint(getObject(), "(30 + 15) * 2 / 3");
     getObject()->reverseAngleConstraintToSupplementary(constraint.get(), id);
+    auto supExpr = getObject()->getConstraintExpression(id);
     getObject()->reverseAngleConstraintToSupplementary(constraint.get(), id);
+    EXPECT_EQ(std::string("180 - (30 + 15) * 2 / 3"), supExpr);
     EXPECT_EQ(std::string("(30 + 15) * 2 / 3"), getObject()->getConstraintExpression(id));
 }
 
@@ -803,6 +805,16 @@ TEST_F(SketchObjectTest, testReverseAngleConstraintToSupplementaryExpressionAppl
     getObject()->reverseAngleConstraintToSupplementary(constraint.get(), id);
     getObject()->reverseAngleConstraintToSupplementary(constraint.get(), id);
     EXPECT_EQ(std::string("32 °"), getObject()->getConstraintExpression(id));
+}
+
+TEST_F(SketchObjectTest, testReverseAngleConstraintToSupplementaryExpressionFunction)
+{
+    auto [constraint, id] = setupAngleConstraint(getObject(), "atan(0.03)");
+    getObject()->reverseAngleConstraintToSupplementary(constraint.get(), id);
+    auto supExpr = getObject()->getConstraintExpression(id);
+    getObject()->reverseAngleConstraintToSupplementary(constraint.get(), id);
+    EXPECT_EQ(std::string("180 ° - atan(0.03)"), supExpr);
+    EXPECT_EQ(std::string("atan(0.03)"), getObject()->getConstraintExpression(id));
 }
 
 TEST_F(SketchObjectTest, testGetElementName)
