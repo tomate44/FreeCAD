@@ -707,6 +707,8 @@ def parse_a_path(values: Values, gcode: Gcode, pathobj) -> None:
 
     # Process canned cycles for drilling operations
     path_to_process = pathobj.Path
+
+    # Process canned cycles for drilling operations
     path_to_process = PostUtils.cannedCycleTerminator(path_to_process)
 
     # Apply arc splitting if requested
