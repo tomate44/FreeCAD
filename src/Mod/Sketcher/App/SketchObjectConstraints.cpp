@@ -539,34 +539,21 @@ void SketchObject::inverseAngleConstraint(Constraint* constr)
 
 bool SketchObject::constraintHasExpression(int constNum) const
 {
-    App::ObjectIdentifier path = Constraints.createPath(constNum);
-    auto info = getExpression(path);
-    if (info.expression) {
-        return true;
-    }
-    return false;
+    return (bool)getExpression(Constraints.createPath(constNum)).expression;
 }
 
 std::string SketchObject::getConstraintExpression(int constNum) const
 {
-    App::ObjectIdentifier path = Constraints.createPath(constNum);
-    auto info = getExpression(path);
-    if (info.expression) {
-        std::string expression = info.expression->toString();
-        return expression;
-    }
-
-    return {};
+    auto expr = getExpression(Constraints.createPath(constNum)).expression;
+    return expr ? expr->toString() : "";
 }
 
 void SketchObject::setConstraintExpression(int constNum, const std::string& newExpression)
 {
-    App::ObjectIdentifier path = Constraints.createPath(constNum);
-    auto info = getExpression(path);
-    if (info.expression) {
+    auto path = Constraints.createPath(constNum);
+    if (getExpression(path).expression) {
         try {
-            std::shared_ptr<App::Expression> expr(App::Expression::parse(this, newExpression));
-            setExpression(path, std::move(expr));
+            setExpression(path, App::Expression::parse(this, newExpression));
         }
         catch (const Base::Exception&) {
             Base::Console().error("Failed to set constraint expression.");
