@@ -891,6 +891,30 @@ class TopoShape(ComplexGeoData):
         ...
 
     @constmethod
+    def toBSpline(
+        self,
+        *,
+        Tol3d: float = 1e-7,
+        Tol2d: float = 1e-9,
+        MaxDegree: int = 15,
+        MaxSegments: int = 10000,
+        Cont3d: str = "C1",
+        Cont2d: str = "C1",
+        Degree: bool = False,
+        Rational: bool = False,
+    ) -> TopoShape:
+        """
+        Approximation of the complete geometry of a shape into BSpline geometry.
+        toBSpline() -> Shape
+        nsh = o1.Shape.toBSpline()
+        --
+        For example, all curves supporting edges of the basis shape are converted
+        into B-spline curves, and all surfaces supporting its faces are converted
+        into B-spline surfaces.
+        """
+        ...
+
+    @constmethod
     def copy(self, copyGeom: bool = True, copyMesh: bool = False, /) -> TopoShape:
         """
         Create a copy of this shape

@@ -55,6 +55,8 @@
 #include <Poly_Polygon3D.hxx>
 #include <Poly_Triangulation.hxx>
 #include <ShapeAnalysis_ShapeTolerance.hxx>
+#include <ShapeCustom.hxx>
+#include <ShapeCustom_RestrictionParameters.hxx>
 #include <ShapeFix_ShapeTolerance.hxx>
 #include <Standard_Version.hxx>
 #include <TopExp.hxx>
@@ -1993,6 +1995,119 @@ PyObject* TopoShapePy::toNurbs(PyObject* args) const
         PyErr_SetString(PartExceptionOCCError, e.GetMessageString());
         return nullptr;
     }
+}
+
+PyObject* TopoShapePy::toBSpline(PyObject* args, PyObject* kwds) const
+{
+    double Tol3d = 1.0e-07;
+    double Tol2d = 1.0e-09;
+    int MaxDegree = 15;
+    int MaxSegments = 10000;
+    const char* Cont3d = "C1";
+    const char* Cont2d = "C1";
+    PyObject* Degree = Py_False;
+    PyObject* Rational = Py_False;
+
+    static const std::array<const char*, 9> kwds_tobspline {
+        "Tol3d",
+        "Tol2d",
+        "MaxDegree",
+        "MaxSegments",
+        "Cont3d",
+        "Cont2d",
+        "Degree",
+        "Rational",
+        nullptr
+    };
+    if (!Base::Wrapped_ParseTupleAndKeywords(
+            args,
+            kwds,
+            "|ddiissO!O!",
+            kwds_tobspline,
+            &Tol3d,
+            &Tol2d,
+            &MaxDegree,
+            &MaxSegments,
+            &Cont3d,
+            &Cont2d,
+            &PyBool_Type,
+            &Degree,
+            &PyBool_Type,
+            &Rational
+        )) {
+        return nullptr;
+    }
+    try {
+        Handle(ShapeCustom_RestrictionParameters) tags = new ShapeCustom_RestrictionParameters;
+        tags->ConvertConicalSurf() = Standard_True;
+        tags->ConvertCylindricalSurf() = Standard_True;
+        tags->ConvertToroidalSurf() = Standard_True;
+        tags->ConvertSphericalSurf() = Standard_True;
+
+        TopoDS_Shape shape = getTopoShapePtr()->getShape();
+
+        GeomAbs_Shape abs3d, abs2d;
+        std::string c3d = Cont3d;
+        if (c3d == "C0") {
+            abs3d = GeomAbs_C0;
+        }
+        else if (c3d == "C1") {
+            abs3d = GeomAbs_C1;
+        }
+        else if (c3d == "C2") {
+            abs3d = GeomAbs_C2;
+        }
+        else if (c3d == "C3") {
+            abs3d = GeomAbs_C3;
+        }
+        else if (c3d == "CN") {
+            abs3d = GeomAbs_CN;
+        }
+        else if (c3d == "G1") {
+            abs3d = GeomAbs_G1;
+        }
+        else {
+            abs3d = GeomAbs_G2;
+        }
+
+        std::string c2d = Cont2d;
+        if (c2d == "C0") {
+            abs2d = GeomAbs_C0;
+        }
+        else if (c2d == "C1") {
+            abs2d = GeomAbs_C1;
+        }
+        else if (c2d == "C2") {
+            abs2d = GeomAbs_C2;
+        }
+        else if (c2d == "C3") {
+            abs2d = GeomAbs_C3;
+        }
+        else if (c2d == "CN") {
+            abs2d = GeomAbs_CN;
+        }
+        else if (c2d == "G1") {
+            abs2d = GeomAbs_G1;
+        }
+        else {
+            abs2d = GeomAbs_G2;
+        }
+
+        TopoDS_Shape approx = ShapeCustom::BSplineRestriction(
+            shape,
+            Tol3d,
+            Tol2d,
+            MaxDegree,
+            MaxSegments,
+            abs3d,
+            abs2d,
+            Base::asBoolean(Degree),
+            Base::asBoolean(Rational),
+            tags
+        );
+        return new TopoShapePy(new TopoShape(approx));
+    }
+    PY_CATCH_OCC
 }
 
 PyObject* TopoShapePy::isInside(PyObject* args) const
