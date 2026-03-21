@@ -1130,7 +1130,7 @@ if FreeCAD.GuiUp:
             self.checkSolarDiagram.setToolTip(
                 translate(
                     "Arch",
-                    "Show a sun path arc diagram projected onto the site,\n"
+                    "Shows a sun path arc diagram projected onto the site,\n"
                     "computed from the site's latitude, longitude and north offset.",
                 )
             )
@@ -1141,7 +1141,7 @@ if FreeCAD.GuiUp:
             self.checkCompass.setToolTip(
                 translate(
                     "Arch",
-                    "Show a compass rose overlay on the site,\n"
+                    "Shows a compass rose overlay on the site,\n"
                     "oriented according to the north offset.",
                 )
             )
@@ -1158,7 +1158,7 @@ if FreeCAD.GuiUp:
             self.sunGroup.setToolTip(
                 translate(
                     "Arch",
-                    "Show a sphere and ray indicating the sun position\n"
+                    "Shows a sphere and ray indicating the sun position\n"
                     "for the selected date and time.",
                 )
             )
@@ -1216,7 +1216,7 @@ if FreeCAD.GuiUp:
                 vobj.ShowHourLabels if hasattr(vobj, "ShowHourLabels") else True
             )
             self.checkHourLabels.setToolTip(
-                translate("Arch", "Show text labels at key hours along the sun path arc.")
+                translate("Arch", "Shows text labels at key hours along the sun path arc")
             )
             sunLayout.addWidget(self.checkHourLabels)
 
@@ -1237,7 +1237,8 @@ if FreeCAD.GuiUp:
                 warningLabel = QtGui.QLabel(
                     translate(
                         "Arch",
-                        "Solar calculations unavailable.\n" "Install ladybug or pysolar to enable.",
+                        "Solar calculations unavailable.\n"
+                        "The ladybug or pysolar Python module is required.",
                     )
                 )
                 font = warningLabel.font()
