@@ -672,25 +672,12 @@ class ObjectProfile(PathAreaOp.ObjectOp):
                         msg += "Please set to an acceptable value greater than zero."
                         Path.Log.error(msg)
                     else:
-                        flattened = self._flattenWire(obj, wire, obj.FinalDepth.Value)
+                        flattened = self._flattenWire(obj, wire, wire.BoundBox.Center.z)
                         if flattened:
                             origWire, flatWire = flattened
-
-                            if Path.Geom.isRoughly(origWire.BoundBox.ZMax, obj.FinalDepth.Value):
-                                # FinalDepth in extreme height
-                                diffDepth = self._getOpenProfileDiffDepth(base, edgelist)
-                                # translate wire in Z to get correct cross-section with model
-                                flatWire.translate(FreeCAD.Vector(0, 0, diffDepth))
-                            else:
-                                # FinalDepth not on the wire
-                                msg = translate(
-                                    "PathProfile",
-                                    "For open profile uses cross-section with model.\n"
-                                    "Check edge selection and Final Depth requirements for profiling open edge(s).\n"
-                                    "Verify that Final Depth inside shape.",
-                                )
-                                Path.Log.warning(msg)
-
+                            diffDepth = self._getOpenProfileDiffDepth(base, edgelist)
+                            # translate wire in Z to get correct cross-section with model
+                            flatWire.translate(FreeCAD.Vector(0, 0, diffDepth))
                             self._addDebugObject("FlatWire", flatWire)
 
                             params = self.areaOpAreaParams(obj, False)
@@ -781,11 +768,7 @@ class ObjectProfile(PathAreaOp.ObjectOp):
 
         useWire = origWire.Wires[0]
         numOrigEdges = len(useWire.Edges)
-        sdv = wBB.ZMax
         fdv = fwBB.ZMax
-        extLenFwd = sdv - fdv
-        if extLenFwd <= 0.0:
-            extLenFwd = 0.1
         WIRE = flatWire.Wires[0]
         numEdges = len(WIRE.Edges)
 
@@ -820,7 +803,7 @@ class ObjectProfile(PathAreaOp.ObjectOp):
 
         # Create extended wire boundbox, and extrude
         extBndbox = self._makeExtendedBoundBox(wBB, bbBfr, fdv)
-        extBndboxEXT = extBndbox.extrude(FreeCAD.Vector(0, 0, extLenFwd))
+        extBndboxEXT = extBndbox.extrude(FreeCAD.Vector(0, 0, 1))
 
         # Cut model(selected edges) from extended edges boundbox
         cutArea = extBndboxEXT.cut(base.Shape)
@@ -990,7 +973,7 @@ class ObjectProfile(PathAreaOp.ObjectOp):
         rtnWIRES = []
         osWrIdxs = []
         subDistFactor = 1.0  # Raise to include sub wires at greater distance from original
-        fdv = obj.FinalDepth.Value
+        fdv = flatWire.BoundBox.ZMax
         wire = flatWire
         lstVrtIdx = len(wire.Vertexes) - 1
         lstVrt = wire.Vertexes[lstVrtIdx]
