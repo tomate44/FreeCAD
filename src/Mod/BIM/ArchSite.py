@@ -1057,7 +1057,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyBool",
                 "WindRose",
-                "Site",
+                "Diagrams",
                 QT_TRANSLATE_NOOP(
                     "App::Property",
                     "Show wind rose diagram or not. Uses solar diagram scale. Needs Ladybug module",
@@ -1068,7 +1068,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyBool",
                 "SolarDiagram",
-                "Site",
+                "Diagrams",
                 QT_TRANSLATE_NOOP("App::Property", "Show solar diagram or not"),
                 locked=True,
             )
@@ -1076,7 +1076,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyFloat",
                 "SolarDiagramScale",
-                "Site",
+                "Solar Diagram",
                 QT_TRANSLATE_NOOP("App::Property", "The scale of the solar diagram"),
                 locked=True,
             )
@@ -1085,7 +1085,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyVector",
                 "SolarDiagramPosition",
-                "Site",
+                "Solar Diagram",
                 QT_TRANSLATE_NOOP("App::Property", "The position of the solar diagram"),
                 locked=True,
             )
@@ -1093,7 +1093,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyColor",
                 "SolarDiagramColor",
-                "Site",
+                "Solar Diagram",
                 QT_TRANSLATE_NOOP("App::Property", "The color of the solar diagram"),
                 locked=True,
             )
@@ -1102,7 +1102,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyEnumeration",
                 "Orientation",
-                "Site",
+                "Compass",
                 QT_TRANSLATE_NOOP(
                     "App::Property",
                     "When set to 'True North' the whole geometry will be rotated to match the true north of this site",
@@ -1115,7 +1115,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyBool",
                 "Compass",
-                "Compass",
+                "Diagrams",
                 QT_TRANSLATE_NOOP("App::Property", "Show compass or not"),
                 locked=True,
             )
@@ -1153,7 +1153,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyBool",
                 "ShowSunPosition",
-                "Sun",
+                "Diagrams",
                 QT_TRANSLATE_NOOP(
                     "App::Property", "Show the sun position for a specific date and time"
                 ),
@@ -1163,7 +1163,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyIntegerConstraint",
                 "SunDateMonth",
-                "Sun",
+                "Sun Position",
                 QT_TRANSLATE_NOOP(
                     "App::Property", "The month of the year to show the sun position"
                 ),
@@ -1173,7 +1173,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyIntegerConstraint",
                 "SunDateDay",
-                "Sun",
+                "Sun Position",
                 QT_TRANSLATE_NOOP("App::Property", "The day of the month to show the sun position"),
                 locked=True,
             )
@@ -1181,7 +1181,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyFloatConstraint",
                 "SunTimeHour",
-                "Sun",
+                "Sun Position",
                 QT_TRANSLATE_NOOP("App::Property", "The hour of the day to show the sun position"),
                 locked=True,
             )
@@ -1189,7 +1189,7 @@ class _ViewProviderSite:
             vobj.addProperty(
                 "App::PropertyBool",
                 "ShowHourLabels",
-                "Sun",
+                "Sun Position",
                 QT_TRANSLATE_NOOP(
                     "App::Property", "Show text labels for key hours on the sun path"
                 ),
