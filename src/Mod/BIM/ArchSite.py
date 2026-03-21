@@ -2023,7 +2023,14 @@ class _ViewProviderSite:
                 # If updating fails, fall back to creating a new ray
                 ray_object = None
         if not ray_object:
+            # Draft.make_line() automatically selects the new object, which shifts the Properties
+            # panel focus away from the Site. Save and restore the selection so the user's context
+            # is not disrupted.
+            saved_selection = FreeCADGui.Selection.getSelection()
             ray_object = Draft.make_line(sun_pos_3d, vobj.SolarDiagramPosition)
+            FreeCADGui.Selection.clearSelection()
+            for sel_obj in saved_selection:
+                FreeCADGui.Selection.addSelection(sel_obj)
             vo = ray_object.ViewObject
             vo.LineColor = (1.0, 1.0, 0.0)
             vo.DrawStyle = "Dashed"
