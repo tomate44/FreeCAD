@@ -1448,7 +1448,7 @@ StdCmdViewBottom::StdCmdViewBottom()
     : Command("Std_ViewBottom")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("&5 Bottom");
+    sMenuText = QT_TR_NOOP("Bottom");
     sToolTipText = QT_TR_NOOP("Sets the camera to the bottom view");
     sWhatsThis = "Std_ViewBottom";
     sStatusTip = sToolTipText;
@@ -1472,7 +1472,7 @@ StdCmdViewFront::StdCmdViewFront()
     : Command("Std_ViewFront")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("&1 Front");
+    sMenuText = QT_TR_NOOP("Front");
     sToolTipText = QT_TR_NOOP("Sets the camera to the front view");
     sWhatsThis = "Std_ViewFront";
     sStatusTip = sToolTipText;
@@ -1496,7 +1496,7 @@ StdCmdViewLeft::StdCmdViewLeft()
     : Command("Std_ViewLeft")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("&6 Left");
+    sMenuText = QT_TR_NOOP("Left");
     sToolTipText = QT_TR_NOOP("Sets the camera to the left view");
     sWhatsThis = "Std_ViewLeft";
     sStatusTip = sToolTipText;
@@ -1520,7 +1520,7 @@ StdCmdViewRear::StdCmdViewRear()
     : Command("Std_ViewRear")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("&4 Rear");
+    sMenuText = QT_TR_NOOP("Rear");
     sToolTipText = QT_TR_NOOP("Sets the camera to the rear view");
     sWhatsThis = "Std_ViewRear";
     sStatusTip = sToolTipText;
@@ -1544,7 +1544,7 @@ StdCmdViewRight::StdCmdViewRight()
     : Command("Std_ViewRight")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("&3 Right");
+    sMenuText = QT_TR_NOOP("Right");
     sToolTipText = QT_TR_NOOP("Sets the camera to the right view");
     sWhatsThis = "Std_ViewRight";
     sStatusTip = sToolTipText;
@@ -1568,7 +1568,7 @@ StdCmdViewTop::StdCmdViewTop()
     : Command("Std_ViewTop")
 {
     sGroup = "Standard-View";
-    sMenuText = QT_TR_NOOP("&2 Top");
+    sMenuText = QT_TR_NOOP("Top");
     sToolTipText = QT_TR_NOOP("Sets the camera to the top view");
     sWhatsThis = "Std_ViewTop";
     sStatusTip = sToolTipText;
