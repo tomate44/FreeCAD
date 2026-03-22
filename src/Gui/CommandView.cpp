@@ -3704,7 +3704,7 @@ StdTreeSyncView::StdTreeSyncView()
     : Command("Std_TreeSyncView")
 {
     sGroup = "TreeView";
-    sMenuText = QT_TR_NOOP("&1 Sync View");
+    sMenuText = QT_TR_NOOP("Sync View");
     sToolTipText = QT_TR_NOOP(
         "Switches to the 3D view containing the selected item from the tree view"
     );
@@ -3724,7 +3724,7 @@ StdTreeSyncSelection::StdTreeSyncSelection()
     : Command("Std_TreeSyncSelection")
 {
     sGroup = "TreeView";
-    sMenuText = QT_TR_NOOP("&2 Sync Selection");
+    sMenuText = QT_TR_NOOP("Sync Selection");
     sToolTipText = QT_TR_NOOP(
         "Expands the tree item when the corresponding object is selected in the 3D view"
     );
@@ -3744,7 +3744,7 @@ StdTreeSyncPlacement::StdTreeSyncPlacement()
     : Command("Std_TreeSyncPlacement")
 {
     sGroup = "TreeView";
-    sMenuText = QT_TR_NOOP("&3 Sync Placement");
+    sMenuText = QT_TR_NOOP("Sync Placement");
     sToolTipText
         = QT_TR_NOOP("Adjusts the placement on drag-and-drop of objects across coordinate systems (e.g. in part containers)");
     sStatusTip = sToolTipText;
@@ -3763,7 +3763,7 @@ StdTreePreSelection::StdTreePreSelection()
     : Command("Std_TreePreSelection")
 {
     sGroup = "TreeView";
-    sMenuText = QT_TR_NOOP("&4 Preselection");
+    sMenuText = QT_TR_NOOP("Preselection");
     sToolTipText = QT_TR_NOOP(
         "Preselects the object in 3D view when hovering the cursor over the tree item"
     );
@@ -3783,7 +3783,7 @@ StdTreeRecordSelection::StdTreeRecordSelection()
     : Command("Std_TreeRecordSelection")
 {
     sGroup = "TreeView";
-    sMenuText = QT_TR_NOOP("&5 Record Selection");
+    sMenuText = QT_TR_NOOP("Record Selection");
     sToolTipText
         = QT_TR_NOOP("Records the selection in the tree view in order to go back/forward using the navigation buttons");
     sStatusTip = sToolTipText;
