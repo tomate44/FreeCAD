@@ -2201,7 +2201,10 @@ void _createThreadCircle(const std::string Name, TechDraw::DrawViewPart* objFeat
             std::make_shared<TechDraw::AOC>(center, radius, ArcStartDegree, ArcEndDegree);
         std::string arcTag = objFeat->addCosmeticEdge(threadArc);
         TechDraw::CosmeticEdge* arc = objFeat->getCosmeticEdge(arcTag);
-        _setLineAttributes(arc);
+        int solidStyle = 1; // Qt::SolidLine
+        float thinWeight = (float)TechDraw::DrawUtil::getDefaultLineWeight("Thin");
+        Base::Color threadColor = _getActiveLineAttributes().getColor(); 
+        _setLineAttributes(arc, solidStyle, thinWeight, threadColor);
     }
 }
 
@@ -2246,8 +2249,11 @@ void _createThreadLines(const std::vector<std::string>& SubNames, TechDraw::Draw
             objFeat->addCosmeticEdge(start1 + delta, end1 + delta);
         TechDraw::CosmeticEdge* cosTag0 = objFeat->getCosmeticEdge(line0Tag);
         TechDraw::CosmeticEdge* cosTag1 = objFeat->getCosmeticEdge(line1Tag);
-        _setLineAttributes(cosTag0);
-        _setLineAttributes(cosTag1);
+        int solidStyle = Qt::SolidLine;
+        float thinWeight = (float)TechDraw::DrawUtil::getDefaultLineWeight("Thin");
+        Base::Color threadColor = _getActiveLineAttributes().getColor();
+        _setLineAttributes(cosTag0, solidStyle, thinWeight, threadColor);
+        _setLineAttributes(cosTag1, solidStyle, thinWeight, threadColor);
     }
 }
 
