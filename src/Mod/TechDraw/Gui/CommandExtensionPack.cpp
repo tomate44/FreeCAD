@@ -2183,8 +2183,8 @@ Base::Vector3d _circleCenter(Base::Vector3d p1, Base::Vector3d p2, Base::Vector3
 
 void _createThreadCircle(const std::string Name, TechDraw::DrawViewPart* objFeat, double factor)
 {
-    constexpr double ArcStartDegree{255.0};
-    constexpr double ArcEndDegree{165.0};
+    constexpr double ArcStartDegree{15.0};
+    constexpr double ArcEndDegree{285.0};
     // create the 3/4 arc symbolizing a thread from top seen
     double scale = objFeat->getScale();
     int GeoId = TechDraw::DrawUtil::getIndexFromName(Name);
