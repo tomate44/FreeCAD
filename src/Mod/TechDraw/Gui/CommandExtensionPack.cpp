@@ -81,7 +81,7 @@ TechDraw::LineFormat& _getActiveLineAttributes();
 Base::Vector3d _circleCenter(Base::Vector3d p1, Base::Vector3d p2, Base::Vector3d p3);
 void _createThreadCircle(const std::string Name, TechDraw::DrawViewPart* objFeat, double factor);
 void _createThreadLines(const std::vector<std::string>& SubNames, TechDraw::DrawViewPart* objFeat,
-                        double factor);
+                        double factor, bool endLine);
 void _setLineAttributes(TechDraw::CosmeticEdge* cosEdge);
 void _setLineAttributes(TechDraw::CenterLine* cosEdge);
 void _setLineAttributes(TechDraw::CosmeticEdge* cosEdge, int style, float weight, Base::Color color);
@@ -378,7 +378,7 @@ void execThreadHoleSide(Gui::Command* cmd)
     cmd->openCommand(QT_TRANSLATE_NOOP("Command", "Cosmetic Thread Hole Side"));
     const std::vector<std::string> SubNames = selection[0].getSubNames();
     if (SubNames.size() >= 2) {
-        _createThreadLines(SubNames, objFeat, ThreadFactor);
+        _createThreadLines(SubNames, objFeat, ThreadFactor, true);
     }
     cmd->getSelection().clearSelection();
     objFeat->refreshCEGeoms();
@@ -429,7 +429,7 @@ void execThreadBoltSide(Gui::Command* cmd)
     cmd->openCommand(QT_TRANSLATE_NOOP("Command", "Cosmetic Thread Bolt Side"));
     const std::vector<std::string> SubNames = selection[0].getSubNames();
     if (SubNames.size() >= 2) {
-        _createThreadLines(SubNames, objFeat, ThreadFactor);
+        _createThreadLines(SubNames, objFeat, ThreadFactor, false);
     }
     cmd->getSelection().clearSelection();
     objFeat->refreshCEGeoms();
@@ -2209,7 +2209,7 @@ void _createThreadCircle(const std::string Name, TechDraw::DrawViewPart* objFeat
 }
 
 void _createThreadLines(const std::vector<std::string>& SubNames, TechDraw::DrawViewPart* objFeat,
-                        double factor)
+                        double factor, bool endLine)
 {
     // create symbolizing lines of a thread from the side seen
     std::string GeoType0 = TechDraw::DrawUtil::getGeomTypeFromName(SubNames[0]);
@@ -2254,6 +2254,13 @@ void _createThreadLines(const std::vector<std::string>& SubNames, TechDraw::Draw
         Base::Color threadColor = _getActiveLineAttributes().getColor();
         _setLineAttributes(cosTag0, solidStyle, thinWeight, threadColor);
         _setLineAttributes(cosTag1, solidStyle, thinWeight, threadColor);
+        if (endLine) {
+            float graphicWeight = (float)TechDraw::DrawUtil::getDefaultLineWeight("Graphic");
+            std::string line3Tag =
+                objFeat->addCosmeticEdge(end0 - delta, end1 + delta);
+            TechDraw::CosmeticEdge* cosTag3 = objFeat->getCosmeticEdge(line3Tag);
+            _setLineAttributes(cosTag3, solidStyle, graphicWeight, threadColor);
+        }
     }
 }
 
