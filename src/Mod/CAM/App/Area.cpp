@@ -73,7 +73,6 @@
 #include <Base/Tools.h>
 #include <Mod/Part/App/CrossSection.h>
 #include <Mod/Part/App/FaceMakerBullseye.h>
-#include <Mod/Part/App/FCBRepAlgoAPI_Cut.h>
 #include <Mod/Part/App/FuzzyHelper.h>
 #include <Mod/Part/App/PartFeature.h>
 #include <Mod/CAM/App/PathSegmentWalker.h>
@@ -1722,7 +1721,6 @@ std::vector<shared_ptr<Area>> Area::makeSections(
     const TopoDS_Shape& section_plane
 )
 {
-    FC_LOG_INSTANCE.lvl = 5;
     TopoDS_Shape plane;
     gp_Trsf trsf;
 
@@ -1943,28 +1941,7 @@ std::vector<shared_ptr<Area>> Area::makeSections(
                         // This fix might be better to move into Part::CrossSection but it is kept
                         // here for now to be on the safe side.
                         wires = section.slice(-d);
-
-                        {
-                            AREA_TRACE("a " << a << " b " << b << " c " << c << " d " << d);
-                            gp_Pln slicePlane(a, b, c, d);
-                            BRepBuilderAPI_MakeFace mkFace(slicePlane);
-                            TopoDS_Face face = mkFace.Face();
-                            showShape(face, nullptr, "section_%zu_plane", i);
-
-                            gp_Vec tempVector(a, b, c);
-                            tempVector.Normalize();  // just in case.
-                            tempVector *= (d + 1.0);
-                            gp_Pnt refPoint(0.0, 0.0, 0.0);
-                            refPoint.Translate(tempVector);
-                            AREA_TRACE("ref z " << refPoint.Z());
-
-                            BRepPrimAPI_MakeHalfSpace mkSolid(face, refPoint);
-                            TopoDS_Solid solid = mkSolid.Solid();
-                            FCBRepAlgoAPI_Cut mkCut(shape, solid);
-                            showShape(mkCut.Shape(), nullptr, "section_%zu_aftercut", i);
-                        }
                     });
-
                     showShapes(wires, nullptr, "section_%zu_wire", i);
                     if (wires.empty()) {
                         AREA_LOG("Section returns no wires");
@@ -2044,7 +2021,6 @@ std::vector<shared_ptr<Area>> Area::makeSections(
         }
     }
     FC_TIME_LOG(t, "makeSection count: " << sections.size() << ", total");
-    FC_LOG_INSTANCE.lvl = -1;
     return sections;
 }
 

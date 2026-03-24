@@ -284,11 +284,6 @@ class ObjectOp(PathOp.ObjectOp):
         sections = area.makeSections(mode=0, project=self.areaOpUseProjection(obj), heights=heights)
         Path.Log.debug("sections = %s" % sections)
 
-        print()
-        for o in obj.Document.Objects:
-            if o.Name.startswith("section_"):
-                print("{:20} \t {}".format(o.Name, o.Shape.BoundBox))
-
         # Rest machining
         self.sectionShapes = self.sectionShapes + [section.toTopoShape() for section in sections]
         if hasattr(obj, "UseRestMachining") and obj.UseRestMachining:
@@ -366,10 +361,7 @@ class ObjectOp(PathOp.ObjectOp):
         obj.PathParams = str({key: value for key, value in pathParams.items() if key != "shapes"})
         Path.Log.debug("Path with params: {}".format(obj.PathParams))
 
-        print(FreeCAD.getLogLevel("Path.Area"))
-        FreeCAD.setLogLevel("Path.Area", 5)
         (pp, end_vector) = Path.fromShapes(**pathParams)
-        FreeCAD.setLogLevel("Path.Area", -1)
         Path.Log.debug("pp: {}, end vector: {}".format(pp, end_vector))
 
         # Keep track of this segment's end only if it has movement (otherwise end_vector is 0,0,0 and the next segment will unnecessarily start there)
