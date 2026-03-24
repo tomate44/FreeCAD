@@ -259,10 +259,15 @@ TaskMassProperties::TaskMassProperties()
     unitsSchemaIndex
         = getUnitsSchemaIndex(panel->ui.unitsComboBox->currentIndex(), preferredSchemaIndex);
 
-    connect(panel->ui.unitsComboBox, &QComboBox::currentIndexChanged, this, [=](int index) {
-        unitsSchemaIndex = getUnitsSchemaIndex(index, preferredSchemaIndex);
-        update(Gui::SelectionChanges());
-    });
+    connect(
+        panel->ui.unitsComboBox,
+        &QComboBox::currentIndexChanged,
+        this,
+        [this, preferredSchemaIndex](int index) {
+            unitsSchemaIndex = getUnitsSchemaIndex(index, preferredSchemaIndex);
+            update(Gui::SelectionChanges());
+        }
+    );
 
     auto addTaskBox = [this](const char* icon, const QString& title, QWidget* page) {
         auto* box = new Gui::TaskView::TaskBox(Gui::BitmapFactory().pixmap(icon), title, true, nullptr);
@@ -318,7 +323,7 @@ bool TaskMassProperties::eventFilter(QObject* watched, QEvent* event)
                     toRemove.push_back(item->data(Qt::UserRole).toString());
                 }
 
-                if (toRemove.size() == panel->ui.objectList->count()) {
+                if (toRemove.size() == static_cast<std::size_t>(panel->ui.objectList->count())) {
                     Gui::Selection().clearSelection();
                 }
 
@@ -490,18 +495,23 @@ void TaskMassProperties::onSelectionChanged(const Gui::SelectionChanges& msg)
         App::SubObjectT sub(obj, msg.pSubName);
         if (sub.hasSubElement()) {
             std::string promotedSubName = sub.getSubNameNoElement();
-            if (!promotedSubName.empty() && promotedSubName != msg.pSubName) {
+            if (promotedSubName != msg.pSubName) {
                 {
                     QScopedValueRollback<bool> updatingGuard(isUpdating, true);
                     Gui::Selection().rmvSelection(msg.pDocName, msg.pObjectName, msg.pSubName);
-                    Gui::Selection().addSelection(
-                        msg.pDocName,
-                        msg.pObjectName,
-                        promotedSubName.c_str(),
-                        msg.x,
-                        msg.y,
-                        msg.z
-                    );
+                    if (promotedSubName.empty()) {
+                        Gui::Selection().addSelection(msg.pDocName, msg.pObjectName);
+                    }
+                    else {
+                        Gui::Selection().addSelection(
+                            msg.pDocName,
+                            msg.pObjectName,
+                            promotedSubName.c_str(),
+                            msg.x,
+                            msg.y,
+                            msg.z
+                        );
+                    }
                 }
                 update(msg);
                 return;
@@ -514,6 +524,7 @@ void TaskMassProperties::onSelectionChanged(const Gui::SelectionChanges& msg)
 
 void TaskMassProperties::update(const Gui::SelectionChanges& msg)
 {
+    (void)msg;
     try {
         tryUpdate();
     }
@@ -557,7 +568,7 @@ void TaskMassProperties::tryUpdate()
             }
 
             std::string promotedSubName = sub.getSubNameNoElement();
-            if (promotedSubName.empty() || promotedSubName == sel.SubName) {
+            if (promotedSubName == sel.SubName) {
                 continue;
             }
 
@@ -566,11 +577,19 @@ void TaskMassProperties::tryUpdate()
                 sel.pObject->getNameInDocument(),
                 sel.SubName
             );
-            Gui::Selection().addSelection(
-                sel.pObject->getDocument()->getName(),
-                sel.pObject->getNameInDocument(),
-                promotedSubName.c_str()
-            );
+            if (promotedSubName.empty()) {
+                Gui::Selection().addSelection(
+                    sel.pObject->getDocument()->getName(),
+                    sel.pObject->getNameInDocument()
+                );
+            }
+            else {
+                Gui::Selection().addSelection(
+                    sel.pObject->getDocument()->getName(),
+                    sel.pObject->getNameInDocument(),
+                    promotedSubName.c_str()
+                );
+            }
             promotedSelection = true;
         }
 
@@ -645,7 +664,10 @@ void TaskMassProperties::tryUpdate()
 
                 const std::string& subName = std::get<1>(selected);
                 std::string key = obj->getDocument()->getName();
-                key += '|' + obj->getNameInDocument() + '|' + subName;
+                key += '|';
+                key += obj->getNameInDocument();
+                key += '|';
+                key += subName;
 
                 if (!seen.insert(key).second) {
                     continue;
@@ -1041,8 +1063,7 @@ void TaskMassProperties::tryUpdate()
         hasCurrentDatumPlacement ? &currentDatumPlacement : nullptr
     );
 
-    if (info.volume.getValue() == 0.0 && info.mass.getValue() == 0.0
-        && info.surfaceArea.getValue() == 0.0) {
+    if (info.volume.getValue() == 0.0 && info.mass.getValue() == 0.0) {
         this->clearUiFields();
         this->removeTemporaryObjects();
         objectsToMeasure.clear();
