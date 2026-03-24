@@ -160,7 +160,8 @@ App::DocumentObjectExecReturn* Revolved::tryExecuteRevolved(Part::RevolMode revo
 
     supportface.move(invObjLoc);
 
-    if (method == RevolMethod::ToFirst || method == RevolMethod::ToLast) {
+    if (method == RevolMethod::ToFirst
+        || (method == RevolMethod::ToLast && revolMode == Part::RevolMode::FuseWithBase)) {
         TopoShape upToFace;
         gp_Ax1 axis(pnt, dir);
         if (Reversed.getValue()) {
