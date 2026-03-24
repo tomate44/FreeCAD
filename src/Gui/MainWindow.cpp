@@ -442,7 +442,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags f)
     // the button state is always an approximation until the first toggle.
     toggleBottomPanelsButton->setChecked(true);
     //: Tooltip for the status bar button that toggles bottom dock panels
-    toggleBottomPanelsButton->setToolTip(tr("Toggles the bottom dock panels on/off (Ctrl+0)"));
+    toggleBottomPanelsButton->setToolTip(tr("Toggles the bottom dock panels"));
     toggleBottomPanelsButton->setAutoRaise(true);
     connect(toggleBottomPanelsButton, &QToolButton::clicked, this, []() {
         Application::Instance->commandManager().runCommandByName("Std_ToggleBottomPanels");

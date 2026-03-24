@@ -4211,7 +4211,7 @@ StdCmdToggleBottomPanels::StdCmdToggleBottomPanels()
 {
     sGroup = "View";
     sMenuText = QT_TR_NOOP("Toggle &Bottom Panels");
-    sToolTipText = QT_TR_NOOP("Toggles the bottom dock panels on/off");
+    sToolTipText = QT_TR_NOOP("Toggles the bottom dock panels");
     sWhatsThis = "Std_ToggleBottomPanels";
     sStatusTip = sToolTipText;
     sAccel = "Ctrl+0";
