@@ -1732,12 +1732,18 @@ class _ViewProviderSite:
 
         if prop in ["Longitude", "Latitude", "TimeZone"]:
             self.onChanged(obj.ViewObject, "SolarDiagram")
-            self.updateSunPosition(obj.ViewObject)
+            vobj = obj.ViewObject
+            from PySide import QtCore
+
+            QtCore.QTimer.singleShot(0, lambda: self.updateSunPosition(vobj))
         elif prop == "Declination":
             self.onChanged(obj.ViewObject, "SolarDiagramPosition")
             self.updateTrueNorthRotation()
             if hasattr(obj.ViewObject, "ShowSunPosition"):
-                self.updateSunPosition(obj.ViewObject)
+                vobj = obj.ViewObject
+                from PySide import QtCore
+
+                QtCore.QTimer.singleShot(0, lambda: self.updateSunPosition(vobj))
         elif prop == "Terrain":
             self.updateCompassLocation(obj.ViewObject)
         elif prop == "Placement":
@@ -1825,6 +1831,11 @@ class _ViewProviderSite:
                 self.coords.rotation.setValue(
                     coin.SbVec3f((0, 0, 1)), math.radians(vobj.Object.Declination.Value)
                 )
+            if all(
+                hasattr(vobj, required)
+                for required in ["ShowSunPosition", "SunDateMonth", "SunDateDay", "SunTimeHour"]
+            ):
+                self.updateSunPosition(vobj)
         elif prop == "SolarDiagramColor":
             if hasattr(vobj, "SolarDiagramColor"):
                 l = vobj.SolarDiagramColor
@@ -1857,9 +1868,9 @@ class _ViewProviderSite:
             "SolarDiagramPosition",
             "ShowHourLabels",
         ]:
-            # During file load or property creation, this method can be triggered
-            # before all necessary properties are available. This guard ensures
-            # that the sun position is only updated when the object is in a consistent state.
+            # During file load or property creation, this method can be triggered before all
+            # necessary properties are available. Ensure that the sun position is only updated when
+            # the object is in a consistent state.
             if all(
                 hasattr(vobj, p)
                 for p in ["ShowSunPosition", "SunDateMonth", "SunDateDay", "SunTimeHour"]
@@ -2383,3 +2394,4 @@ class _ViewProviderSite:
         time_string = dt_object_for_label.strftime("%B %d, %H:%M")
         ray_object.Time = time_string
         ray_object.Label = f"Sun Ray ({time_string})"
+        ray_object.purgeTouched()
