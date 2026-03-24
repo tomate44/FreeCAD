@@ -1667,8 +1667,9 @@ class _ViewProviderSite:
         self.sunSep.addChild(self.sunSphere)
         self.sunSwitch.addChild(self.sunSep)
 
-        # Add the entire sun assembly to the object's annotation node
-        vobj.Annotation.addChild(self.sunSwitch)
+        # Inside basesep, sunSwitch inherits self.coords (SolarDiagramPosition +
+        # Declination rotation), so sun path nodes use plain local coordinates.
+        basesep.addChild(self.sunSwitch)
 
         def setup_path_segment(color_tuple):
             separator = coin.SoSeparator()
@@ -2211,7 +2212,7 @@ class _ViewProviderSite:
                 x = math.cos(az_rad) * xy_proj
                 y = math.sin(az_rad) * xy_proj
                 z = math.sin(alt_rad) * vobj.SolarDiagramScale
-                point = declination_rot * FreeCAD.Vector(x, y, z)
+                point = FreeCAD.Vector(x, y, z)
                 if hour_float < 10:
                     morning_points.append(point)
                 elif hour_float <= 14:
@@ -2299,11 +2300,14 @@ class _ViewProviderSite:
         x = math.cos(azimuth_rad) * xy_proj
         y = math.sin(azimuth_rad) * xy_proj
         z = math.sin(altitude_rad) * vobj.SolarDiagramScale
-        sun_pos_3d = vobj.SolarDiagramPosition.add(
-            declination_rot * FreeCAD.Vector(x, y, z)
-        )  # Final absolute position
+        # Local coordinates for the Coin sphere: self.coords applies the Declination rotation and
+        # SolarDiagramPosition translation automatically.
+        sun_pos_local = FreeCAD.Vector(x, y, z)
+        self.sunTransform.translation.setValue(sun_pos_local.x, sun_pos_local.y, sun_pos_local.z)
 
-        self.sunTransform.translation.setValue(sun_pos_3d.x, sun_pos_3d.y, sun_pos_3d.z)
+        # The ray is a document object, unaffected by the Coin scene graph transform, so its
+        # endpoints must be absolute world positions.
+        sun_pos_3d = vobj.SolarDiagramPosition.add(declination_rot * sun_pos_local)
         self.sunSphere.radius = vobj.SolarDiagramScale * 0.02
 
         # Safely obtain existing SunRay if present, and update it; otherwise create one
