@@ -1930,37 +1930,37 @@ std::vector<shared_ptr<Area>> Area::makeSections(
                 builder.MakeCompound(comp);
 
                 for (TopExp_Explorer xp(s.shape.Moved(loc), TopAbs_SOLID); xp.More(); xp.Next()) {
-                    TopoDS_Shape copy(xp.Current());
+                    TopoDS_Shape shape(xp.Current());
                     ShapeFix_ShapeTolerance sTol;
-                    sTol.SetTolerance(copy, Precision::Confusion());
+                    sTol.SetTolerance(shape, Precision::Confusion());
 
-                    showShape(copy, nullptr, "section_%zu_shape", i);
+                    showShape(shape, nullptr, "section_%zu_shape", i);
                     std::list<TopoDS_Wire> wires;
-                    Part::CrossSection section(-a, -b, -c, copy);
-                    Part::FuzzyHelper::withBooleanFuzzy(Precision::Confusion(), [&]() {
+                    Part::CrossSection section(a, b, c, shape);
+                    Part::FuzzyHelper::withBooleanFuzzy(.0, [&]() {
                         // Workaround for https://github.com/FreeCAD/FreeCAD/issues/17748
                         // needed to make finish pass work.
                         // This fix might be better to move into Part::CrossSection but it is kept
                         // here for now to be on the safe side.
-                        wires = section.slice(d);
+                        wires = section.slice(-d);
 
                         {
                             AREA_TRACE("a " << a << " b " << b << " c " << c << " d " << d);
-                            gp_Pln slicePlane(-a, -b, -c, -d);
+                            gp_Pln slicePlane(a, b, c, d);
                             BRepBuilderAPI_MakeFace mkFace(slicePlane);
                             TopoDS_Face face = mkFace.Face();
                             showShape(face, nullptr, "section_%zu_plane", i);
 
-                            gp_Vec tempVector(-a, -b, -c);
+                            gp_Vec tempVector(a, b, c);
                             tempVector.Normalize();  // just in case.
-                            tempVector *= (-d + 1.0);
+                            tempVector *= (d + 1.0);
                             gp_Pnt refPoint(0.0, 0.0, 0.0);
                             refPoint.Translate(tempVector);
                             AREA_TRACE("ref z " << refPoint.Z());
 
                             BRepPrimAPI_MakeHalfSpace mkSolid(face, refPoint);
                             TopoDS_Solid solid = mkSolid.Solid();
-                            FCBRepAlgoAPI_Cut mkCut(copy, solid);
+                            FCBRepAlgoAPI_Cut mkCut(shape, solid);
                             showShape(mkCut.Shape(), nullptr, "section_%zu_aftercut", i);
                         }
                     });
