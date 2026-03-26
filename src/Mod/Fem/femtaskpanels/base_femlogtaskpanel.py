@@ -75,8 +75,12 @@ class _BaseLogTaskPanel(base_femtaskpanel._BaseTaskPanel, ABC):
         self.elapsed = QtCore.QElapsedTimer()
         self._thread = _Thread(self.tool)
 
-        self.text_log = self.form.te_output
-        self.text_time = self.form.l_time
+        if hasattr(self, "form"):
+            self.text_log = self.form.te_output
+            self.text_time = self.form.l_time
+        else:
+            self.text_log = None
+            self.text_time = None
 
     def setup_connections(self):
         QtCore.QObject.connect(self._thread, QtCore.SIGNAL("started()"), self.thread_started)

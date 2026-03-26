@@ -31,7 +31,8 @@ __url__ = "https://www.freecad.org"
 
 import FreeCAD
 from FreeCAD import Console
-from os import path
+from os import path, remove
+
 
 def create_mesh_file(objname, data, folder_path):
     # writes a mesh file to the folder, that gmsh can import
@@ -178,6 +179,11 @@ def write_result_settings(settings, geo, folder):
                          folder)
 
         code += generate_model_code(objname)
+
+        # need to clear element files from last run, as they append and not override
+        element_file = path.join(folder, f"{objname}.elementdata")
+        if path.isfile(element_file):
+            remove(element_file)
 
         # for each field of that object create geo file and the correct code
         for obj_setting in obj_settings:

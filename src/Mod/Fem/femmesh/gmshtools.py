@@ -1,4 +1,3 @@
-gmshtools.py
 # ***************************************************************************
 # *                                                                         *
 # *   Copyright (c) 2016 Bernd Hahnebach <bernd@bimstatik.org>              *
@@ -178,7 +177,7 @@ class GmshTools(ObjectTools):
             self.SubdivisionAlgorithm = "0"
 
         # multi-threading
-        self.ParallelProcessing = self.mesh_obj.ParallelProcessing
+        self.ParallelProcessing = self.obj.ParallelProcessing
 
         # mesh groups
         if self.obj.GroupsOfNodes:
@@ -208,7 +207,6 @@ class GmshTools(ObjectTools):
         # other initializations
         self.temp_file_geometry = ""
         self.temp_file_mesh = ""
-        self.temp_file_geo = ""
         self.mesh_name = ""
         self.gmsh_bin = ""
         self._field_counter = 0
@@ -227,26 +225,34 @@ class GmshTools(ObjectTools):
         self.write_geo()
 
     def convert(self):
-        # converts all available vtk files into msh files, and add element definition
+        # converts all available vtk/eement files into msh files, and add element definition
         # to it. Workaround to use adaptive meshing
 
-        vtk_files = [file for file in os.listdir(self.working_dir) if file.endswith('.vtk')]
+        vtk_files = [file for file in os.listdir(self.obj.WorkingDirectory) if file.endswith('.vtk')]
 
         process = QProcess()
         for vtk_file in vtk_files:
-            Console.PrintLog(f"Convert VTK file {vtk_file} \n")
 
             file_name = vtk_file.split(".")[0]
-            command_list = [os.path.join(self.working_dir,vtk_file),
+            element_file_name = file_name + ".elementdata"
+
+            # check if there is a element file for this, otherwise this is not a mesh file ocnvertion
+            if not element_file_name in os.listdir(self.obj.WorkingDirectory):
+                continue
+
+            Console.PrintLog(f"Convert VTK file {vtk_file} \n")
+
+
+            command_list = [os.path.join(self.obj.WorkingDirectory,vtk_file),
                             "-save",
-                            os.path.join(self.working_dir,file_name+".msh")]
+                            os.path.join(self.obj.WorkingDirectory,file_name+".msh")]
 
             process.start(self.gmsh_bin, command_list)
             process.waitForFinished();
 
             # append element data onto mesh file
-            with open(os.path.join(self.working_dir, file_name + ".elementdata"), "r") as element_f:
-                with open(os.path.join(self.working_dir, file_name + ".msh"), "a+") as msh_f:
+            with open(os.path.join(self.obj.WorkingDirectory, element_file_name), "r") as element_f:
+                with open(os.path.join(self.obj.WorkingDirectory, file_name + ".msh"), "a+") as msh_f:
                     msh_f.write(element_f.read())
                     msh_f.flush()
 
@@ -1417,7 +1423,7 @@ class GmshTools(ObjectTools):
         geo.write("// result views for adaptive meshing\n\n")
 
 
-        folder = os.path.dirname(self.temp_file_geo)
+        folder = os.path.dirname(self.model_file)
         try:
             adt.write_result_settings(self.result_view_settings, geo, folder)
 
@@ -1778,12 +1784,12 @@ box_obj = doc.addObject("Part::Box", "Box")
 doc.recompute()
 box_obj.ViewObject.Visibility = False
 
-femmesh_obj = ObjectsFem.makeMeshGmsh(doc, box_obj.Name + "_Mesh")
-femmesh_obj.Shape = box_obj
+femobj = ObjectsFem.makeMeshGmsh(doc, box_obj.Name + "_Mesh")
+femobj.Shape = box_obj
 doc.recompute()
 
 from femmesh.gmshtools import GmshTools as gt
-gmsh_mesh = gt(femmesh_obj)
+gmsh_mesh = gt(femobj)
 error = gmsh_mesh.create_mesh()
 print(error)
 doc.recompute()
@@ -1805,10 +1811,10 @@ max_mesh_sizes = [0.5, 1, 2, 3, 5, 10]
 for len in max_mesh_sizes:
     quantity_len = "{}".format(len)
     print("\n\n Start length = {}".format(quantity_len))
-    femmesh_obj = ObjectsFem.makeMeshGmsh(doc, box_obj.Name + "_Mesh")
-    femmesh_obj.Shape = box_obj
-    femmesh_obj.CharacteristicLengthMax = "{}".format(quantity_len)
-    femmesh_obj.CharacteristicLengthMin = "{}".format(quantity_len)
+    femobj = ObjectsFem.makeMeshGmsh(doc, box_obj.Name + "_Mesh")
+    femobj.Shape = box_obj
+    femobj.CharacteristicLengthMax = "{}".format(quantity_len)
+    femobj.CharacteristicLengthMin = "{}".format(quantity_len)
     doc.recompute()
     gm = GmshTools(femmesh_obj)
     gm.update_mesh_data()
@@ -1858,7 +1864,7 @@ class GmshPreviewTools(GmshTools):
         # visualize the preview node data
 
         # load the generated mesh
-        self.mesh_obj.FemMesh = Fem.read(self.temp_file_mesh)
+        self.obj.FemMesh = Fem.read(self.temp_file_mesh)
         self.rename_groups()
 
         # read and extract node data
@@ -1885,7 +1891,7 @@ class GmshPreviewTools(GmshTools):
                 data.append(float(entries[1]))
 
         # visualize node data
-        self.mesh_obj.ViewObject.setNodeColorByScalars(ids, data)
+        self.obj.ViewObject.setNodeColorByScalars(ids, data)
         self.size_limits = (min(data), max(data))
 
         self.preview_signals.finished.emit()
@@ -1898,8 +1904,8 @@ class GmshPreviewTools(GmshTools):
         # writes a geo file for previewing the mesh size generated from
         # size fields
 
-        temp_dir = os.path.dirname(self.temp_file_geo)
-        geo = open(self.temp_file_geo, "w")
+        temp_dir = os.path.dirname(self.model_file)
+        geo = open(self.model_file, "w")
 
         # first create other models that may be required for adaptive meshing
         self.write_result_data(geo)

@@ -42,8 +42,8 @@ from . import base_femlogtaskpanel
 
 class _LogTask(base_femlogtaskpanel._BaseLogTaskPanel):
 
-    def __init__(self, obj, tool):
-        super().__init__(obj, tool)
+    def __init__(self, obj):
+        super().__init__(obj)
 
     def get_object_params(self):
         pass
@@ -123,9 +123,10 @@ class _TaskPanel:
         # we do not derive from this task panel to enable deriving from
         # annother base task panel for functionality, and adding this only
         # for visualization button purposes
-        self.logtask = _LogTask(obj, gmshtools.GmshPreviewTools(self.gmsh_obj, obj))
+        self.tool = gmshtools.GmshPreviewTools(self.gmsh_obj, obj)
+        self.logtask = _LogTask(self.gmsh_obj)
         self.logtask.setup_connections()
-        self.logtask.tool.preview_signals.finished.connect(self._calculation_finished)
+        self.tool.preview_signals.finished.connect(self._calculation_finished)
 
         self._preview_running = False
 
@@ -148,7 +149,7 @@ class _TaskPanel:
 
     def preview_is_calculating(self):
         return (self.logtask._thread.isRunning() or
-                (self.logtask.tool.process.state() != QtCore.QProcess.ProcessState.NotRunning))
+                (self.tool.process.state() != QtCore.QProcess.ProcessState.NotRunning))
 
     def preview_is_running(self):
         return self._preview_running
@@ -192,8 +193,8 @@ class _TaskPanel:
 
         self.logtask.timer.stop()
         QtGui.QApplication.restoreOverrideCursor()
-        if self.logtask.tool.process.state() != QtCore.QProcess.ProcessState.NotRunning:
-            self.logtask.tool.process.kill()
+        if self.tool.process.state() != QtCore.QProcess.ProcessState.NotRunning:
+            self.tool.process.kill()
 
     def stop_preview(self):
 
@@ -227,7 +228,7 @@ class _TaskPanel:
             if self.gmsh_obj.Shape:
                 self.gmsh_obj.Shape.ViewObject.Visibility = False
 
-        limits = self.logtask.tool.size_limits
+        limits = self.tool.size_limits
         self._preview_widget.Min.setText("%.2e"%limits[0])
         self._preview_widget.Max.setText("%.2e"%limits[1])
 
