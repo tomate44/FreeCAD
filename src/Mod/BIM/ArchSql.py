@@ -118,14 +118,25 @@ _CUSTOM_FRIENDLY_TOKEN_NAMES = {
 
 
 def _get_property(obj, prop_name):
-    """Gets a property from a FreeCAD object, including sub-properties."""
+    """Gets a property from a FreeCAD object, including sub-properties.
+
+    Link properties (e.g. Material) are resolved to the linked object's Label
+    so that queries like ``WHERE Material = 'Brick'`` work intuitively.
+    Nested access (e.g. ``Material.Color``) bypasses this and traverses
+    the linked object directly.
+    """
     # The property name implies sub-property access (e.g., 'Placement.Base.x')
     is_nested_property = lambda prop_name: "." in prop_name
 
     if not is_nested_property(prop_name):
         # Handle simple, direct properties first, which is the most common case.
         if hasattr(obj, prop_name):
-            return getattr(obj, prop_name)
+            value = getattr(obj, prop_name)
+            # Resolve link properties to the linked object's Label so that
+            # comparisons and SELECT columns show a human-readable name.
+            if isinstance(value, FreeCAD.DocumentObject):
+                return value.Label
+            return value
         return None
     else:
         # Handle nested properties (e.g., Placement.Base.x)
