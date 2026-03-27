@@ -349,6 +349,21 @@ class TaskPanelHoleGeometryPage(PathOpGui.TaskPanelBaseGeometryPage):
         self.obj.Disabled = disabled
         FreeCAD.ActiveDocument.recompute()
 
+    def updateChecked(self):
+        self.updating = True
+        for i in range(self.form.baseList.rowCount()):
+            item = self.form.baseList.item(i, COL_FEATURE)
+            base_name = item.data(self.DataObjectName)
+            base = FreeCAD.ActiveDocument.getObject(base_name)
+            sub = str(item.data(self.DataObjectSub))
+            guiState = item.checkState() == QtCore.Qt.Checked
+            holeEnabled = self.obj.Proxy.isHoleEnabled(self.obj, base, sub)
+            if not holeEnabled and guiState:
+                item.setCheckState(QtCore.Qt.Unchecked)
+            elif holeEnabled and not guiState:
+                item.setCheckState(QtCore.Qt.Checked)
+        self.updating = False
+
     def updateOrderNumbers(self):
         """Update the order numbers in the first column after row reordering or sorting."""
         table = self.form.baseList
@@ -512,7 +527,7 @@ class TaskPanelHoleGeometryPage(PathOpGui.TaskPanelBaseGeometryPage):
 
     def itemChanged(self, item):
         """itemChanged(item) ... callback when any item in the table changes"""
-        if item.column() == COL_FEATURE:
+        if not self.updating and item.column() == COL_FEATURE:
             self.checkedChanged()
 
 
@@ -522,6 +537,14 @@ class TaskPanelOpPage(PathOpGui.TaskPanelPage):
     def taskPanelBaseGeometryPage(self, obj, features):
         """taskPanelBaseGeometryPage(obj, features) ... Return circular hole specific page controller for Base Geometry."""
         return TaskPanelHoleGeometryPage(obj, features)
+
+    def pageUpdateData(self, obj, prop):
+        if prop == "Disabled" and getattr(self, "parent", None):
+            for page in self.parent.featurePages:
+                if isinstance(page, TaskPanelHoleGeometryPage):
+                    page.updateChecked()
+
+        self.updateData(obj, prop)
 
 
 class LineEditEventFilter(QtCore.QObject):
