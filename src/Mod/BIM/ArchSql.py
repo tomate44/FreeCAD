@@ -36,7 +36,7 @@ else:
 
 
 # Import exception types from the generated parser for type-safe handling.
-from generated_sql_parser import UnexpectedEOF, UnexpectedToken, VisitError
+from generated_sql_parser import UnexpectedCharacters, UnexpectedEOF, UnexpectedToken, VisitError
 import generated_sql_parser
 
 from typing import List, Tuple, Any, Optional
@@ -2091,6 +2091,12 @@ def _run_query(query_string: str, mode: str, source_objects: Optional[List] = No
             raise SqlEngineError(str(e))
         except VisitError as e:
             message = f"Transformer Error: Failed to process rule '{e.rule}'. Original error: {e.orig_exc}"
+            raise BimSqlSyntaxError(message) from e
+        except UnexpectedCharacters as e:
+            message = (
+                f"Syntax Error: Unexpected character '{e.char}' at line {e.line},"
+                f" column {e.column}."
+            )
             raise BimSqlSyntaxError(message) from e
         except UnexpectedToken as e:
             # Heuristic for a better typing experience: If the unexpected token's
