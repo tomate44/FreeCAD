@@ -1385,11 +1385,10 @@ class ReportTaskPanel:
 
         # After populating all rows, trigger a validation for all statements.
         # This ensures the counts and statuses are up-to-date when the panel opens.
-        for statement in self.obj.Proxy.live_statements:
-            statement.validate_and_update_status()
-            self._update_table_row_status(
-                self.obj.Proxy.live_statements.index(statement), statement
-            )
+        statements = self.obj.Proxy.live_statements
+        for index, statement in enumerate(statements):
+            statement.validate_and_update_status(statements, index)
+            self._update_table_row_status(index, statement)
 
         # Re-enable signals after population so user edits are handled
         self.table_statements.blockSignals(False)
@@ -1577,7 +1576,9 @@ class ReportTaskPanel:
             statement.include_column_names = self.chk_include_column_names.isChecked()
             statement.add_empty_row_after = self.chk_add_empty_row_after.isChecked()
             statement.print_results_in_bold = self.chk_print_results_in_bold.isChecked()
-            statement.validate_and_update_status()  # Update status in the statement object
+            statement.validate_and_update_status(
+                self.obj.Proxy.live_statements, self.current_edited_statement_index
+            )
             self._update_table_row_status(
                 self.current_edited_statement_index, statement
             )  # Refresh table status
@@ -1994,7 +1995,9 @@ class ReportTaskPanel:
         statement.add_empty_row_after = self.chk_add_empty_row_after.isChecked()
         statement.print_results_in_bold = self.chk_print_results_in_bold.isChecked()
 
-        statement.validate_and_update_status()
+        statement.validate_and_update_status(
+            self.obj.Proxy.live_statements, self.current_edited_statement_index
+        )
         self._update_table_row_status(self.current_edited_statement_index, statement)
         self._set_dirty(True)
 
