@@ -23,15 +23,15 @@
 
 #pragma once
 
-#include <QCompleter>
 #include <QFileDialog>
 #include <QFileIconProvider>
-#include <QFileSystemModel>
 #include <QPointer>
 #include <FCGlobal.h>
 
 class QButtonGroup;
+class QCompleter;
 class QDialogButtonBox;
+class QFileSystemModel;
 class QGridLayout;
 class QGroupBox;
 class QHBoxLayout;

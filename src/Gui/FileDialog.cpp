@@ -38,6 +38,7 @@
 #include <QCryptographicHash>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QFileSystemModel>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLineEdit>
