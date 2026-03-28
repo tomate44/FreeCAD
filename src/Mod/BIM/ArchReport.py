@@ -2064,7 +2064,11 @@ class ReportTaskPanel:
 
             for row_idx, row_data in enumerate(data_rows):
                 for col_idx, cell_value in enumerate(row_data):
-                    item = QtWidgets.QTableWidgetItem(str(cell_value))
+                    if isinstance(cell_value, FreeCAD.Units.Quantity):
+                        display_text = cell_value.toStr()
+                    else:
+                        display_text = str(cell_value)
+                    item = QtWidgets.QTableWidgetItem(display_text)
                     self.table_preview_results.setItem(row_idx, col_idx, item)
             self.table_preview_results.horizontalHeader().setSectionResizeMode(
                 QtWidgets.QHeaderView.Interactive
