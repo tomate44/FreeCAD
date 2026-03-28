@@ -785,6 +785,7 @@ class ViewProviderReport:
     def __init__(self, vobj):
         vobj.Proxy = self
         self.vobj = vobj
+        vobj.ToggleVisibility = "NoToggleVisibility"
 
     def getIcon(self):
         return ":/icons/Arch_Schedule.svg"
@@ -817,7 +818,12 @@ class ViewProviderReport:
 
     def attach(self, vobj):
         """Called by the C++ loader when the view provider is rehydrated."""
-        self.vobj = vobj  # Ensure self.vobj is set for consistent access
+        self.vobj = vobj
+        vobj.ToggleVisibility = "NoToggleVisibility"
+
+    def isShow(self):
+        """Always return True so the Tree View does not fade this object."""
+        return True
 
     def claimChildren(self):
         """
