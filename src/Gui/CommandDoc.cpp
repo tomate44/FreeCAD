@@ -1818,9 +1818,14 @@ void StdCmdPlacement::activated(int iMsg)
 bool StdCmdPlacement::isActive()
 {
     std::vector<App::DocumentObject*> sel = Gui::Selection().getObjectsOfType(
-        App::GeoFeature::getClassTypeId()
+        App::GeoFeature::getClassTypeId(),
+        nullptr,
+        ResolveMode::FollowLink
     );
-    return !(sel.empty() || std::ranges::any_of(sel, [](auto obj) { return obj->isFreezed(); }));
+    return !(sel.empty() || std::ranges::any_of(sel, [](auto obj) {
+                 auto* prop = obj->getPlacementProperty();
+                 return obj->isFreezed() || !prop || prop->isReadOnly();
+             }));
 }
 
 //===========================================================================
@@ -1846,7 +1851,9 @@ void StdCmdTransformManip::activated(int iMsg)
         getActiveGuiDocument()->resetEdit();
     }
     std::vector<App::DocumentObject*> sel = Gui::Selection().getObjectsOfType(
-        App::GeoFeature::getClassTypeId()
+        App::GeoFeature::getClassTypeId(),
+        nullptr,
+        ResolveMode::FollowLink
     );
     Gui::ViewProvider* vp = Application::Instance->getViewProvider(sel.front());
     // FIXME: Need a way to force 'Transform' edit mode
@@ -1859,9 +1866,14 @@ void StdCmdTransformManip::activated(int iMsg)
 bool StdCmdTransformManip::isActive()
 {
     std::vector<App::DocumentObject*> sel = Gui::Selection().getObjectsOfType(
-        App::GeoFeature::getClassTypeId()
+        App::GeoFeature::getClassTypeId(),
+        nullptr,
+        ResolveMode::FollowLink
     );
-    return (sel.size() == 1 && !sel.front()->isFreezed());
+    return (
+        sel.size() == 1 && !sel.front()->isFreezed() && sel.front()->getPlacementProperty()
+        && !sel.front()->getPlacementProperty()->isReadOnly()
+    );
 }
 
 //===========================================================================
