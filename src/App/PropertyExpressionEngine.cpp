@@ -153,7 +153,7 @@ struct PropertyExpressionEngine::Private
                     continue;
                 }
             }
-            this->buildGraphStructures(expr.first, expr.second.expression, nodes, revNodes, edges);
+            buildGraphStructures(expr.first, expr.second.expression, nodes, revNodes, edges);
         }
 
         // Create graph
