@@ -828,7 +828,7 @@ def combineHorizontalFaces(faces, keepOrder=False):
     if not topFace:
         return horizontal
 
-    outer = [Part.Face(w) for w in topFace.Wires[1:]]
+    outer = [Part.Face(w) for w in topFace.Wires[1:] if w.isClosed()]
 
     if outer:
         for f in outer:
