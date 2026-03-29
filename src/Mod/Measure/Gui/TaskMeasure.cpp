@@ -563,7 +563,7 @@ void TaskMeasure::invoke()
 
     const std::list<Gui::InputHint> hints {
         {
-            .message = tr("%1 toggle auto-save"),
+            .message = tr("%1 auto-save"),
             .sequences = {ModifierShift},
         },
         {
