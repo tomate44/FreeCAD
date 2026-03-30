@@ -31,6 +31,7 @@ add_executable(Base_tests_run
         Unit.cpp
         UnitsApi.cpp
         Uuid.cpp
+        UnitsSchemaFormat.cpp
         Vector3D.cpp
         ViewProj.cpp
         Writer.cpp

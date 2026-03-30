@@ -36,6 +36,10 @@
 
 class QString;
 
+#include <string_view>
+#include <vector>
+#include <fastsignals/signal.h>
+
 namespace Base
 {
 
@@ -399,6 +403,9 @@ struct BaseExport Tools
      * @return Current time formatted as an ISO 8601 UTC timestamp, ending in 'Z'.
      */
     static std::string currentDateTimeString();
+
+    static bool isCLocaleName(std::string_view localeName);
+    static void setIcuDefaultLocale(std::string_view icuLocaleId);
 
     static std::vector<std::string> splitSubName(const std::string& subname);
 };
