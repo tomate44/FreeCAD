@@ -1334,8 +1334,10 @@ int SketchObject::transferConstraints(
             // For example a B-spline pole being a point instead of a circle.
             continue;
         }
-        else if (vals[i]->involvesGeoIdAndPosId(fromGeoId, fromPosId)
-                 && !vals[i]->involvesGeoIdAndPosId(toGeoId, toPosId)) {
+        else if (
+            vals[i]->involvesGeoIdAndPosId(fromGeoId, fromPosId)
+            && !vals[i]->involvesGeoIdAndPosId(toGeoId, toPosId)
+        ) {
             std::unique_ptr<Constraint> constNew(newVals[i]->clone());
             constNew->substituteIndexAndPos(fromGeoId, fromPosId, toGeoId, toPosId);
             if (vals[i]->First < 0 && vals[i]->Second < 0) {

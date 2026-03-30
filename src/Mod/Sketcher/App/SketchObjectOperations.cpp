@@ -426,7 +426,9 @@ bool SketchObject::seekTrimPoints(
 
     // Not found in will be returned as -1, not as GeoUndef, Part WB is agnostic to the concept of
     // GeoUndef
-    if (!Part2DObject::seekTrimPoints(geos, GeoId, point, localindex1, intersect1, localindex2, intersect2)) {
+    if (
+        !Part2DObject::seekTrimPoints(geos, GeoId, point, localindex1, intersect1, localindex2, intersect2)
+    ) {
         return false;
     }
 
@@ -1331,8 +1333,7 @@ int SketchObject::addSymmetric(
                 if (constr->Type == Sketcher::Coincident) {
                     keepTopological = true;
                 }
-                else if (constr->Type == Sketcher::Tangent
-                         || constr->Type == Sketcher::Perpendicular) {
+                else if (constr->Type == Sketcher::Tangent || constr->Type == Sketcher::Perpendicular) {
                     if (constr->FirstPos != Sketcher::PointPos::none
                         && constr->SecondPos != Sketcher::PointPos::none) {
                         keepTopological = true;
@@ -1599,10 +1600,12 @@ int SketchObject::addSymmetric(
                 createEqualityConstr(geoId1, geoId2);
                 createSymConstr(geoId1, geoId2, PointPos::mid, PointPos::mid);
             }
-            else if (geo->is<Part::GeomArcOfCircle>()        //
-                     || geo->is<Part::GeomArcOfEllipse>()    //
-                     || geo->is<Part::GeomArcOfHyperbola>()  //
-                     || geo->is<Part::GeomArcOfParabola>()) {
+            else if (
+                geo->is<Part::GeomArcOfCircle>()        //
+                || geo->is<Part::GeomArcOfEllipse>()    //
+                || geo->is<Part::GeomArcOfHyperbola>()  //
+                || geo->is<Part::GeomArcOfParabola>()
+            ) {
                 createEqualityConstr(geoId1, geoId2);
                 createSymConstr(
                     geoId1,

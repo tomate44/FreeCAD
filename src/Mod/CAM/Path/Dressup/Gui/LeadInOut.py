@@ -39,7 +39,6 @@ __doc__ = """LeadInOut Dressup USE ROLL-ON ROLL-OFF to profile"""
 
 from PySide.QtCore import QT_TRANSLATE_NOOP
 
-
 translate = App.Qt.translate
 
 if False:
