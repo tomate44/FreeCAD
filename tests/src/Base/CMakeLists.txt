@@ -27,6 +27,7 @@ add_executable(Base_tests_run
         UniqueNameManager.cpp
         Unit.cpp
         UnitsApi.cpp
+        Uuid.cpp
         Vector3D.cpp
         ViewProj.cpp
         Writer.cpp
