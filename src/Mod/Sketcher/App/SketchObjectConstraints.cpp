@@ -31,6 +31,7 @@
 #include <App/Application.h>
 #include <App/Document.h>
 #include <App/Expression.h>
+#include <App/ExpressionParser.h>
 #include <App/ObjectIdentifier.h>
 #include <Base/Console.h>
 #include <Base/Tools.h>
@@ -516,19 +517,69 @@ int SketchObject::moveDatumsToEnd()
 
 void SketchObject::reverseAngleConstraintToSupplementary(Constraint* constr, int constNum)
 {
-    std::swap(constr->First, constr->Second);
-    std::swap(constr->FirstPos, constr->SecondPos);
-    constr->FirstPos = (constr->FirstPos == Sketcher::PointPos::start) ? Sketcher::PointPos::end : Sketcher::PointPos::start;
-
     // Edit the expression if any, else modify constraint value directly
-    if (constraintHasExpression(constNum)) {
-        std::string expression = getConstraintExpression(constNum);
-        setConstraintExpression(constNum, std::move(reverseAngleConstraintExpression(expression)));
+    auto path = Constraints.createPath(constNum);
+    auto expr = getExpression(path).expression;
+    if (expr) {
+        std::shared_ptr<App::Expression> newExpr;
+
+        // if expression matches the pattern "180 - x" without or with a unit, extract "x"
+        auto op = freecad_cast<App::OperatorExpression*>(expr.get());
+        if (op && op->getOperator() == App::OperatorExpression::SUB) {
+            auto leftNum = freecad_cast<App::NumberExpression*>(op->getLeft());
+            if (leftNum && leftNum->getQuantity() == Quantity(180)) {
+                newExpr = op->getRight()->copy();
+            }
+            auto leftOp = freecad_cast<App::OperatorExpression*>(op->getLeft());
+            auto leftOpNum = leftOp ? freecad_cast<App::NumberExpression*>(leftOp->getLeft()) : nullptr;
+            auto leftOpUnit = leftOp ? freecad_cast<App::UnitExpression*>(leftOp->getRight()) : nullptr;
+            auto q = leftOpNum && leftOpUnit ? (leftOpNum->getQuantity() * leftOpUnit->getQuantity()).getValueAs(Base::Quantity::Degree) : 0;
+            if (!newExpr && leftOp && leftOp->getOperator() == App::OperatorExpression::UNIT && fabs(q - 180) < .00001) {
+                newExpr = op->getRight()->copy();
+            }
+        }
+
+        if (!newExpr) {
+            // evaluate expression to check if value is dimensionless or has unit
+            auto result = std::unique_ptr(expr->eval());
+            auto* number = freecad_cast<App::NumberExpression*>(result.get());
+            auto value = number ? number->getQuantity() : Base::Quantity(NAN);
+            if (!value.isValid() || !(value.isDimensionless() || value.getUnit() == Base::Unit::Angle)) {
+                return;
+            }
+
+            // prepend "180 - ..." to expression, with or without unit as required
+            App::Expression* valueExpr = new App::NumberExpression(expr->getOwner(), Base::Quantity(180));
+            if (!value.isDimensionless()) {
+                valueExpr = new App::OperatorExpression(expr->getOwner(),
+                    valueExpr, App::OperatorExpression::UNIT, new App::UnitExpression(expr->getOwner(), Base::Quantity::Degree, "°"));
+            }
+            newExpr = std::make_shared<App::OperatorExpression>(expr->getOwner(),
+                valueExpr, App::OperatorExpression::SUB, expr->copy().release());
+        }
+        try {
+            setExpression(path, newExpr);
+        }
+        catch (const Base::Exception&) {
+            Base::Console().error("Failed to set constraint expression.");
+        }
+
+        // Update value, so constraint arc will have updated size while dragging
+        auto newResult = std::unique_ptr(newExpr->eval());
+        auto* newNumber = freecad_cast<App::NumberExpression*>(newResult.get());
+        auto newValue = newNumber ? newNumber->getQuantity() : Base::Quantity(NAN);
+        if (newValue.isValid()) {
+            constr->setValue(newValue.getValueAs(Base::Quantity::Radian));
+        }
     }
     else {
         double actAngle = constr->getValue();
         constr->setValue(std::numbers::pi - actAngle);
     }
+
+    std::swap(constr->First, constr->Second);
+    std::swap(constr->FirstPos, constr->SecondPos);
+    constr->FirstPos = (constr->FirstPos == Sketcher::PointPos::start) ? Sketcher::PointPos::end : Sketcher::PointPos::start;
 }
 
 void SketchObject::inverseAngleConstraint(Constraint* constr)
@@ -539,63 +590,13 @@ void SketchObject::inverseAngleConstraint(Constraint* constr)
 
 bool SketchObject::constraintHasExpression(int constNum) const
 {
-    App::ObjectIdentifier path = Constraints.createPath(constNum);
-    auto info = getExpression(path);
-    if (info.expression) {
-        return true;
-    }
-    return false;
+    return (bool)getExpression(Constraints.createPath(constNum)).expression;
 }
 
 std::string SketchObject::getConstraintExpression(int constNum) const
 {
-    App::ObjectIdentifier path = Constraints.createPath(constNum);
-    auto info = getExpression(path);
-    if (info.expression) {
-        std::string expression = info.expression->toString();
-        return expression;
-    }
-
-    return {};
-}
-
-void SketchObject::setConstraintExpression(int constNum, const std::string& newExpression)
-{
-    App::ObjectIdentifier path = Constraints.createPath(constNum);
-    auto info = getExpression(path);
-    if (info.expression) {
-        try {
-            std::shared_ptr<App::Expression> expr(App::Expression::parse(this, newExpression));
-            setExpression(path, std::move(expr));
-        }
-        catch (const Base::Exception&) {
-            Base::Console().error("Failed to set constraint expression.");
-        }
-    }
-}
-
-std::string SketchObject::reverseAngleConstraintExpression(std::string expression)
-{
-    // Check if expression contains units (°, deg, rad)
-    if (expression.find("°") != std::string::npos
-        || expression.find("deg") != std::string::npos
-        || expression.find("rad") != std::string::npos) {
-        if (expression.substr(0, 9) == "180 ° - ") {
-            expression = expression.substr(9, expression.size() - 9);
-        }
-        else {
-            expression = "180 ° - (" + expression + ")";
-        }
-    }
-    else {
-        if (expression.substr(0, 6) == "180 - ") {
-            expression = expression.substr(6, expression.size() - 6);
-        }
-        else {
-            expression = "180 - (" + expression + ")";
-        }
-    }
-    return expression;
+    auto expr = getExpression(Constraints.createPath(constNum)).expression;
+    return expr ? expr->toString() : "";
 }
 
 int SketchObject::setVirtualSpace(int ConstrId, bool isinvirtualspace)
