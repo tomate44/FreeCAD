@@ -2633,6 +2633,8 @@ void Application::initConfig(int argc, char ** argv)
     else
         _pConsoleObserverFile = nullptr;
 
+    App::installConsoleQtBridge();
+
     // Banner ===========================================================
     if (mConfig["RunMode"] != "Cmd" && !(vm.contains("verbose") && vm.contains("version"))) {
         // Remove banner if FreeCAD is invoked via the -c command as regular
