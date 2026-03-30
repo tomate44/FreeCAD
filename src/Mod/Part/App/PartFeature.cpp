@@ -2103,17 +2103,19 @@ std::vector<Part::cutTopoShapeFaces> Part::findAllFacesCutBy(
     aPoP.Add(axis.Direction().XYZ() * parameter);
     gp_Pnt center(aPoP);
 
+    // Find intersection of circle with all faces of the shape
+    std::vector<cutTopoShapeFaces> result;
+
+    // TODO: Less precision than Confusion() should be OK?
     gp_Lin line = gce_MakeLin(axis);
     Standard_Real radius = line.Distance(cog);
+    if (radius < Precision::Confusion()) {
+        return result;
+    }
 
     // Create a circle through the centre of gravity
     Handle(Geom_Circle) circle = new Geom_Circle(gce_MakeCirc(center, axis.Direction(), radius));
     GeomAdaptor_Curve adaptor(circle);
-
-    // Find intersection of circle with all faces of the shape
-    std::vector<cutTopoShapeFaces> result;
-    BRepIntCurveSurface_Inter mkSection;
-    // TODO: Less precision than Confusion() should be OK?
 
     // Construct transformation matrix to convert to local coordinates
     gp_Dir vx(gp_Vec(center, cog));
@@ -2122,26 +2124,14 @@ std::vector<Part::cutTopoShapeFaces> Part::findAllFacesCutBy(
     gp_Trsf mat;
     mat.SetTransformation(lcs);
 
+    BRepIntCurveSurface_Inter mkSection;
     for (mkSection.Init(shape.getShape(), adaptor, Precision::Confusion()); mkSection.More();
          mkSection.Next()) {
         gp_Pnt iPnt = mkSection.Pnt();
-        double dsq = cog.SquareDistance(iPnt);
 
+        double dsq = cog.SquareDistance(iPnt);
         if (dsq < Precision::Confusion()) {
             continue;  // intersection with original face
-        }
-
-        // Intersection point in local coords
-        gp_Pnt iLoc = iPnt.Transformed(mat);
-
-        // Get angle with local X axis
-        double angle = 0.0;
-        double x = Base::clamp(iLoc.X(), -radius, radius);
-        if (iLoc.Y() >= 0.0) {
-            angle = std::acos(x / radius);
-        }
-        else {
-            angle = 2.0 * std::numbers::pi - std::acos(x / radius);
         }
 
         // Find out which side of the original face the intersection is on
@@ -2152,6 +2142,15 @@ std::vector<Part::cutTopoShapeFaces> Part::findAllFacesCutBy(
 
         if (mkDir.Value().IsParallel(axis.Direction(), Precision::Confusion())) {
             continue;
+        }
+
+        // Intersection point in local coords
+        gp_Pnt iLoc = iPnt.Transformed(mat);
+        // Get angle with local X axis
+        double x = Base::clamp(iLoc.X(), -radius, radius);
+        double angle = std::acos(x / radius);
+        if (iLoc.Y() < 0.0) {
+            angle = 2.0 * std::numbers::pi - angle;
         }
 
         cutTopoShapeFaces newF;
