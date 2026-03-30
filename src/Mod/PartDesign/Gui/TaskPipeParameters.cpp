@@ -105,6 +105,7 @@ TaskPipeParameters::TaskPipeParameters(ViewProviderPipe* PipeView, bool /*newObj
 
     ui->listWidgetReferences->addAction(remove);
     connect(remove, &QAction::triggered, this, &TaskPipeParameters::onDeleteEdge);
+    connect(ui->buttonRefRemove, &QToolButton::clicked, this, &TaskPipeParameters::onDeleteEdge);
     ui->listWidgetReferences->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     this->groupLayout()->addWidget(proxy);
@@ -631,6 +632,7 @@ TaskPipeOrientation::TaskPipeOrientation(ViewProviderPipe* PipeView, bool /*newO
 
     ui->listWidgetReferences->addAction(remove);
     connect(remove, &QAction::triggered, this, &TaskPipeOrientation::onDeleteItem);
+    connect(ui->buttonRefRemove, &QToolButton::clicked, this, &TaskPipeOrientation::onDeleteItem);
     ui->listWidgetReferences->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     this->groupLayout()->addWidget(proxy);
@@ -921,6 +923,7 @@ TaskPipeScaling::TaskPipeScaling(ViewProviderPipe* PipeView, bool /*newObj*/, QW
     ui->listWidgetReferences->addAction(remove);
     ui->listWidgetReferences->setContextMenuPolicy(Qt::ActionsContextMenu);
     connect(remove, &QAction::triggered, this, &TaskPipeScaling::onDeleteSection);
+    connect(ui->buttonRefRemove, &QToolButton::clicked, this, &TaskPipeScaling::onDeleteSection);
 
     connect(
         ui->listWidgetReferences->model(),
