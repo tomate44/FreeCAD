@@ -608,8 +608,7 @@ public:
             ContentType content,
             const std::string& notifiername,
             const std::string& msg
-        ) const
-            = 0;
+        ) const = 0;
 
         virtual void refresh() const = 0;
     };

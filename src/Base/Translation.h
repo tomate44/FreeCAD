@@ -46,8 +46,7 @@ public:
         std::string_view sourceText,
         std::string_view disambiguation,
         int n
-    ) const
-        = 0;
+    ) const = 0;
 
     virtual bool installTranslator(std::string_view filename) const = 0;
     virtual bool removeTranslators(const std::vector<std::string>& filenames) const = 0;
