@@ -254,6 +254,7 @@ SET(FemSolver_SRCS
 SET(FemSolverCalculix_SRCS
     femsolver/calculix/__init__.py
     femsolver/calculix/calculixtools.py
+    femsolver/calculix/calculixutils.py
     femsolver/calculix/write_constraint_bodyheatsource.py
     femsolver/calculix/write_constraint_centrif.py
     femsolver/calculix/write_constraint_contact.py

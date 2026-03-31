@@ -233,20 +233,21 @@ def get_bit_pattern_dict(femelement_table, femnodes_ele_table, node_set):
 
 
 # ************************************************************************************************
-def get_ccxelement_volumes_elements_from_binary_search(bit_pattern_dict):
-    tet10_mask = {0b1111111111: 1}
-    tet4_mask = {0b1111: 1}
-    hex8_mask = {0b11111111: 1}
-    hex20_mask = {0b11111111111111111111: 1}
-    pent6_mask = {0b111111: 1}
-    pent15_mask = {0b111111111111111: 1}
+def get_element_volumes_elements_from_binary_search(bit_pattern_dict):
+    """get volume element by coincident nodes"""
+    mask_tetra10 = {0b1111111111: 1}
+    mask_tetra4 = {0b1111: 1}
+    mask_hexa8 = {0b11111111: 1}
+    mask_hexa20 = {0b11111111111111111111: 1}
+    mask_penta6 = {0b111111: 1}
+    mask_penta15 = {0b111111111111111: 1}
     vol_dict = {
-        4: tet4_mask,
-        6: pent6_mask,
-        8: hex8_mask,
-        10: tet10_mask,
-        15: pent15_mask,
-        20: hex20_mask,
+        4: mask_tetra4,
+        6: mask_penta6,
+        8: mask_hexa8,
+        10: mask_tetra10,
+        15: mask_penta15,
+        20: mask_hexa20,
     }
     volumes = []
     for ele in bit_pattern_dict:
@@ -257,16 +258,17 @@ def get_ccxelement_volumes_elements_from_binary_search(bit_pattern_dict):
     return volumes
 
 
-def get_ccxelement_faces_elements_from_binary_search(bit_pattern_dict):
-    tria3_mask = {0b111: 1}
-    tria6_mask = {0b111111: 1}
-    quad4_mask = {0b1111: 1}
-    quad8_mask = {0b11111111: 1}
+def get_element_faces_elements_from_binary_search(bit_pattern_dict):
+    """get face element by coincident nodes"""
+    mask_tria3 = {0b111: 1}
+    mask_tria6 = {0b111111: 1}
+    mask_quad4 = {0b1111: 1}
+    mask_quad8 = {0b11111111: 1}
     vol_dict = {
-        3: tria3_mask,
-        6: tria6_mask,
-        4: quad4_mask,
-        8: quad8_mask,
+        3: mask_tria3,
+        6: mask_tria6,
+        4: mask_quad4,
+        8: mask_quad8,
     }
     faces = []
     for ele in bit_pattern_dict:
@@ -277,49 +279,48 @@ def get_ccxelement_faces_elements_from_binary_search(bit_pattern_dict):
     return faces
 
 
-def get_ccxelement_edges_from_binary_search(bit_pattern_dict, sets_getter):
-    shell_mode = sets_getter.solver_obj.ModelSpace == "3D"
-    offset = 2 if shell_mode else 0
-    tria3_mask = {0b011: 1, 0b110: 2, 0b101: 3}
-    tria6_mask = {0b001011: 1, 0b010110: 2, 0b100101: 3}
-    quad4_mask = {0b0011: 1, 0b0110: 2, 0b1100: 3, 0b1001: 4}
-    quad8_mask = {0b00010011: 1, 0b00100110: 2, 0b01001100: 3, 0b10001001: 4}
+def get_element_edges_from_binary_search(
+    bit_pattern_dict, mask_tria3={}, mask_tria6={}, mask_quad4={}, mask_quad8={}
+):
+    """get face element edges by coincident nodes"""
     vol_dict = {
-        3: tria3_mask,
-        6: tria6_mask,
-        4: quad4_mask,
-        8: quad8_mask,
+        3: mask_tria3,
+        4: mask_quad4,
+        6: mask_tria6,
+        8: mask_quad8,
     }
-    faces = []
+    edges = []
     for ele in bit_pattern_dict:
         mask_dict = vol_dict[bit_pattern_dict[ele][0]]
         for key in mask_dict:
             if (key & bit_pattern_dict[ele][1]) == key:
-                faces.append([ele, mask_dict[key] + offset])
+                edges.append([ele, mask_dict[key]])
 
-    return faces
+    return edges
 
 
-def get_ccxelement_faces_from_binary_search(bit_pattern_dict):
-    """get the CalculiX element face numbers"""
+def get_element_faces_from_binary_search(
+    bit_pattern_dict,
+    mask_tetra4={},
+    mask_tetra10={},
+    mask_hexa8={},
+    mask_hexa20={},
+    mask_penta6={},
+    mask_penta15={},
+):
+    """get volume element faces by coincident nodes"""
     # the forum topic discussion with ulrich1a and others ... Better mesh last instead of mesh first
     # https://forum.freecad.org/viewtopic.php?f=18&t=17318#p137171
     # https://forum.freecad.org/viewtopic.php?f=18&t=17318&start=60#p141484
     # https://forum.freecad.org/viewtopic.php?f=18&t=17318&start=50#p141108
     # https://forum.freecad.org/viewtopic.php?f=18&t=17318&start=40#p140371
-    tet10_mask = {119: 1, 411: 2, 717: 3, 814: 4}
-    tet4_mask = {7: 1, 11: 2, 13: 3, 14: 4}
-    hex8_mask = {240: 1, 15: 2, 102: 3, 204: 4, 153: 5, 51: 6}
-    hex20_mask = {61680: 1, 3855: 2, 402022: 3, 804044: 4, 624793: 5, 201011: 6}
-    pent6_mask = {56: 1, 7: 2, 54: 3, 45: 4, 27: 5}
-    pent15_mask = {3640: 1, 455: 2, 25782: 3, 22829: 4, 12891: 5}
     vol_dict = {
-        4: tet4_mask,
-        6: pent6_mask,
-        8: hex8_mask,
-        10: tet10_mask,
-        15: pent15_mask,
-        20: hex20_mask,
+        4: mask_tetra4,
+        6: mask_penta6,
+        8: mask_hexa8,
+        10: mask_tetra10,
+        15: mask_penta15,
+        20: mask_hexa20,
     }
     faces = []
     for ele in bit_pattern_dict:
@@ -1491,7 +1492,7 @@ def pair_obj_reference(obj_ref):
     return pairs
 
 
-def get_ccx_elements(sets_getter, ref_pair):
+def get_elements(sets_getter, ref_pair, face_masks, edge_masks):
     ref_obj, sub_ref = ref_pair
     geom_type = ref_obj.getSubObject(sub_ref).ShapeType
     elem = []
@@ -1508,37 +1509,43 @@ def get_ccx_elements(sets_getter, ref_pair):
         case 3:
             match geom_type:
                 case "Solid":
-                    elem = get_ccx_elements_by_references(sets_getter, ref_pair)
+                    elem = get_elements_by_references(sets_getter, ref_pair)
                     is_sub_element = False
                 case "Face" | "Edge" | "Vertex":
-                    elem = get_ccx_subelements_by_references(sets_getter, ref_pair)
+                    elem = get_subelements_by_references(
+                        sets_getter, ref_pair, face_masks, edge_masks
+                    )
                     is_sub_element = True
         case 2:
             match geom_type:
                 case "Face":
-                    elem = get_ccx_elements_by_references(sets_getter, ref_pair)
+                    elem = get_elements_by_references(sets_getter, ref_pair)
                     is_sub_element = False
                 case "Edge" | "Vertex":
-                    elem = get_ccx_subelements_by_references(sets_getter, ref_pair)
+                    elem = get_subelements_by_references(
+                        sets_getter, ref_pair, face_masks, edge_masks
+                    )
                     is_sub_element = True
         case 1:
             match geom_type:
                 case "Edge":
                     is_sub_element = False
-                    elem = get_ccx_elements_by_references(sets_getter, ref_pair)
+                    elem = get_elements_by_references(sets_getter, ref_pair)
                 case "Vertex":
-                    elem = get_ccx_subelements_by_references(sets_getter, ref_pair)
+                    elem = get_subelements_by_references(
+                        sets_getter, ref_pair, face_masks, edge_masks
+                    )
                     is_sub_element = True
         case 0:
             match geom_type:
                 case "Vertex":
-                    elem = get_ccx_elements_by_references(sets_getter, ref_pair)
+                    elem = get_elements_by_references(sets_getter, ref_pair)
                     is_sub_element = False
 
     return (*elem, is_sub_element)
 
 
-def get_ccx_elements_by_references(sets_getter, femobj_ref):
+def get_elements_by_references(sets_getter, femobj_ref):
     node_set = []
     result = []
     # TODO get elements from mesh groups
@@ -1566,16 +1573,16 @@ def get_ccx_elements_by_references(sets_getter, femobj_ref):
         )
         sh = feat.getSubObject(sub_ref)
         if sh.ShapeType == "Solid":
-            elem = get_ccxelement_volumes_elements_from_binary_search(bit_pattern_dict)
+            elem = get_element_volumes_elements_from_binary_search(bit_pattern_dict)
         elif sh.ShapeType == "Face":
-            elem = get_ccxelement_faces_elements_from_binary_search(bit_pattern_dict)
+            elem = get_element_faces_elements_from_binary_search(bit_pattern_dict)
 
         result = (sub, elem)
 
     return result
 
 
-def get_ccx_subelements_by_references(sets_getter, femobj_ref):
+def get_subelements_by_references(sets_getter, femobj_ref, face_masks, edge_masks):
     node_set = []
     result = []
     # TODO get elements from mesh groups
@@ -1603,9 +1610,9 @@ def get_ccx_subelements_by_references(sets_getter, femobj_ref):
         )
         sh = feat.getSubObject(sub_ref)
         if sh.ShapeType == "Face":
-            sub_elem = get_ccxelement_faces_from_binary_search(bit_pattern_dict)
+            sub_elem = get_element_faces_from_binary_search(bit_pattern_dict, **face_masks)
         elif sh.ShapeType == "Edge":
-            sub_elem = get_ccxelement_edges_from_binary_search(bit_pattern_dict, sets_getter)
+            sub_elem = get_element_edges_from_binary_search(bit_pattern_dict, **edge_masks)
 
         result = (sub, sub_elem)
 

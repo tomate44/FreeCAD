@@ -37,13 +37,7 @@ from femtools.femutils import type_of_obj
 
 
 class MeshSetsGetter:
-    def __init__(
-        self,
-        analysis_obj,
-        solver_obj,
-        mesh_obj,
-        member,
-    ):
+    def __init__(self, analysis_obj, solver_obj, mesh_obj, member):
         # class attributes from parameter values
         self.analysis = analysis_obj
         self.solver_obj = solver_obj  # TODO without _obj
@@ -101,6 +95,21 @@ class MeshSetsGetter:
         self.femelement_count_test = True
         self.mat_geo_sets = []
 
+        # subelements masks
+        self.edge_masks = {
+            "mask_tria3": {},
+            "mask_tria6": {},
+            "mask_quad4": {},
+            "mask_quad8": {},
+        }
+        self.face_masks = {
+            "mask_tetra4": {},
+            "mask_tetra10": {},
+            "mask_hexa8": {},
+            "mask_hexa20": {},
+            "mask_penta6": {},
+            "mask_penta15": {},
+        }
         self._load_tables()
 
     def _load_tables(self):
@@ -114,6 +123,86 @@ class MeshSetsGetter:
                     self.femnodes_mesh, self.femelement_table
                 )
 
+    @property
+    def mask_tria3(self):
+        self.edge_masks["mask_tria3"]
+
+    @mask_tria3.setter
+    def mask_tria3(self, value):
+        self.edge_masks["mask_tria3"] = value
+
+    @property
+    def mask_tria6(self):
+        self.edge_masks["mask_tria6"]
+
+    @mask_tria6.setter
+    def mask_tria6(self, value):
+        self.edge_masks["mask_tria6"] = value
+
+    @property
+    def mask_quad4(self):
+        self.edge_masks["mask_quad4"]
+
+    @mask_quad4.setter
+    def mask_quad4(self, value):
+        self.edge_masks["mask_quad4"] = value
+
+    @property
+    def mask_quad8(self):
+        self.edge_masks["mask_quad8"]
+
+    @mask_quad8.setter
+    def mask_quad8(self, value):
+        self.edge_masks["mask_quad8"] = value
+
+    @property
+    def mask_tetra4(self):
+        self.face_masks["mask_tetra4"]
+
+    @mask_tetra4.setter
+    def mask_tetra4(self, value):
+        self.face_masks["mask_tetra4"] = value
+
+    @property
+    def mask_tetra10(self):
+        self.face_masks["mask_tetra10"]
+
+    @mask_tetra10.setter
+    def mask_tetra10(self, value):
+        self.face_masks["mask_tetra10"] = value
+
+    @property
+    def mask_hexa8(self):
+        self.face_masks["mask_hexa8"]
+
+    @mask_hexa8.setter
+    def mask_hexa8(self, value):
+        self.face_masks["mask_hexa8"] = value
+
+    @property
+    def mask_hexa20(self):
+        self.face_masks["mask_hexa20"]
+
+    @mask_hexa20.setter
+    def mask_hexa20(self, value):
+        self.face_masks["mask_hexa20"] = value
+
+    @property
+    def mask_penta6(self):
+        self.face_masks["mask_penta6"]
+
+    @mask_penta6.setter
+    def mask_penta6(self, value):
+        self.face_masks["mask_penta6"] = value
+
+    @property
+    def mask_penta15(self):
+        self.face_masks["mask_penta15"]
+
+    @mask_penta15.setter
+    def mask_penta15(self, value):
+        self.face_masks["mask_penta15"] = value
+
     # ********************************************************************************************
     # ********************************************************************************************
     # use set for node sets to be sure all nodes are unique
@@ -125,6 +214,7 @@ class MeshSetsGetter:
     # ********************************************************************************************
     # ********************************************************************************************
     # get all known sets
+
     def get_mesh_sets(self):
 
         FreeCAD.Console.PrintMessage("\n")  # because of time print in separate line
@@ -364,12 +454,12 @@ class MeshSetsGetter:
 
     # ********************************************************************************************
     # ********************************************************************************************
-    def _get_ccx_elements(self, obj):
+    def _get_elements(self, obj):
         print_obj_info(obj)
         result = []
         ref_data = meshtools.pair_obj_reference(obj.References)
         for ref_pair in ref_data:
-            result.append(meshtools.get_ccx_elements(self, ref_pair))
+            result.append(meshtools.get_elements(self, ref_pair, self.face_masks, self.edge_masks))
 
         return result
 
@@ -377,7 +467,7 @@ class MeshSetsGetter:
     def get_constraints_pressure_faces(self):
         for femobj in self.member.cons_pressure:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["PressureFaces"] = result
 
@@ -385,14 +475,14 @@ class MeshSetsGetter:
         for femobj in self.member.cons_electrostatic:
             obj = femobj["Object"]
             if obj.BoundaryCondition == "Neumann":
-                result = self._get_ccx_elements(obj)
+                result = self._get_elements(obj)
 
                 femobj["ElectricFluxFaces"] = result
 
     def get_constraints_electricchargedensity_faces(self):
         for femobj in self.member.cons_electricchargedensity:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             if obj.Mode in ["Interface", "Total Interface"]:
                 femobj["ChargeDensityFaces"] = result
@@ -402,7 +492,7 @@ class MeshSetsGetter:
     def get_constraints_contact_faces(self):
         for femobj in self.member.cons_contact:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["ContactSlaveFaces"] = result[:-1]
             femobj["ContactMasterFaces"] = result[-1:]
@@ -417,7 +507,7 @@ class MeshSetsGetter:
     def get_constraints_tie_faces(self):
         for femobj in self.member.cons_tie:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["TieSlaveFaces"] = result[:-1]
             femobj["TieMasterFaces"] = result[-1:]
@@ -425,14 +515,14 @@ class MeshSetsGetter:
     def get_constraints_sectionprint_faces(self):
         for femobj in self.member.cons_sectionprint:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["SectionPrintFaces"] = result
 
     def get_constraints_heatflux_faces(self):
         for femobj in self.member.cons_heatflux:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["HeatFluxFaces"] = result
 
@@ -442,14 +532,14 @@ class MeshSetsGetter:
     def get_constraints_centrif_elements(self):
         for femobj in self.member.cons_centrif:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["CentrifElements"] = result
 
     def get_constraints_bodyheatsource_elements(self):
         for femobj in self.member.cons_bodyheatsource:
             obj = femobj["Object"]
-            result = self._get_ccx_elements(obj)
+            result = self._get_elements(obj)
 
             femobj["BodyHeatSourceElements"] = result
 
