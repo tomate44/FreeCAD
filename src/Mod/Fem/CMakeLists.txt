@@ -342,8 +342,6 @@ SET(FemSolverMystran_SRCS
 
 SET(FemSolverZ88_SRCS
     femsolver/z88/__init__.py
-    femsolver/z88/solver.py
-    femsolver/z88/tasks.py
     femsolver/z88/write_constraint_displacement.py
     femsolver/z88/write_constraint_fixed.py
     femsolver/z88/write_constraint_force.py
