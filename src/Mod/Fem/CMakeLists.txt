@@ -217,6 +217,7 @@ SET(FemObjects_SRCS
     femobjects/solver_calculix.py
     femobjects/solver_ccxtools.py
     femobjects/solver_elmer.py
+    femobjects/solver_z88.py
 )
 
 if(BUILD_FEM_VTK_PYTHON)
@@ -343,7 +344,17 @@ SET(FemSolverZ88_SRCS
     femsolver/z88/__init__.py
     femsolver/z88/solver.py
     femsolver/z88/tasks.py
+    femsolver/z88/write_constraint_displacement.py
+    femsolver/z88/write_constraint_fixed.py
+    femsolver/z88/write_constraint_force.py
+    femsolver/z88/write_constraint_pressure.py
+    femsolver/z88/write_element1D.py
+    femsolver/z88/write_element2D.py
+    femsolver/z88/write_material.py
     femsolver/z88/writer.py
+    femsolver/z88/writer_list.py
+    femsolver/z88/z88tools.py
+    femsolver/z88/z88utils.py
 )
 
 SET(FemTests_SRCS
@@ -637,6 +648,7 @@ SET(FemGuiTaskPanels_SRCS
     femtaskpanels/task_solver_calculix.py
     femtaskpanels/task_solver_ccxtools.py
     femtaskpanels/task_solver_elmer.py
+    femtaskpanels/task_solver_z88.py
 )
 
 if(BUILD_FEM_VTK_PYTHON)
@@ -708,6 +720,7 @@ SET(FemGuiViewProvider_SRCS
     femviewprovider/view_solver_calculix.py
     femviewprovider/view_solver_ccxtools.py
     femviewprovider/view_solver_elmer.py
+    femviewprovider/view_solver_z88.py
 )
 
 if(BUILD_FEM_VTK_PYTHON)
