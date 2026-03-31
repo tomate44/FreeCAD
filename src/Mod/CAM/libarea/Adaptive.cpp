@@ -2240,15 +2240,10 @@ bool Adaptive2d::ResolveLinkPath(
                 IntPoint checkPoint1(midPoint.X + offset * pDir.X, midPoint.Y + offset * pDir.Y);
                 IntPoint checkPoint2(midPoint.X - offset * pDir.X, midPoint.Y - offset * pDir.Y);
 
-                if (DistancePointToPathsSqrd(clearedArea.GetCleared(), checkPoint1, clp, pindex, sindex, par)
-                    < DistancePointToPathsSqrd(
-                        clearedArea.GetCleared(),
-                        checkPoint2,
-                        clp,
-                        pindex,
-                        sindex,
-                        par
-                    )) {
+                if (
+                    DistancePointToPathsSqrd(clearedArea.GetCleared(), checkPoint1, clp, pindex, sindex, par)
+                    < DistancePointToPathsSqrd(clearedArea.GetCleared(), checkPoint2, clp, pindex, sindex, par)
+                ) {
                     // exchange points
                     IntPoint tmp = checkPoint2;
                     checkPoint2 = checkPoint1;

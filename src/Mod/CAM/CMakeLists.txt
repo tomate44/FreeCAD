@@ -518,6 +518,7 @@ SET(Tests_SRCS
     CAMTests/test_holes00.fcstd
     CAMTests/TestCAMSanity.py
     CAMTests/TestCentroidLegacyPost.py
+    CAMTests/TestDxfPost.py
     CAMTests/TestFanucPost.py
     CAMTests/TestGenericPost.py
     CAMTests/TestGenericPlasma.py
@@ -588,6 +589,7 @@ SET(Tests_SRCS
     CAMTests/TestPostMCodes.py
     CAMTests/TestSnapmakerPost.py
     CAMTests/TestPostToolProcessing.py
+    CAMTests/TestSVGPost.py
     CAMTests/TestTSPSolver.py
     CAMTests/TestGcodeProcessingUtils.py
     CAMTests/Tools/Bit/test-path-tool-bit-bit-00.fctb

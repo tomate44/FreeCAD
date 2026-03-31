@@ -562,10 +562,11 @@ std::string PythonConverter::process(const Sketcher::Constraint* constraint, Geo
                 || constraint->AlignmentType == ParabolaFocalAxis) {
                 res = "InternalAlignment:" + alignType + "', " + id1 + ", " + id2;
             }
-            else if (constraint->AlignmentType == EllipseFocus1
-                     || constraint->AlignmentType == EllipseFocus2
-                     || constraint->AlignmentType == HyperbolaFocus
-                     || constraint->AlignmentType == ParabolaFocus) {
+            else if (
+                constraint->AlignmentType == EllipseFocus1 || constraint->AlignmentType == EllipseFocus2
+                || constraint->AlignmentType == HyperbolaFocus
+                || constraint->AlignmentType == ParabolaFocus
+            ) {
                 res = "InternalAlignment:" + alignType + "', " + id1pos1 + ", " + id2;
             }
             else if (constraint->AlignmentType == BSplineControlPoint) {
