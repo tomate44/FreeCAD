@@ -458,13 +458,9 @@ void NaviCubeImplementation::syncNodeState(SoAction* action)
     const int posY = static_cast<int>(m_RelPos[1] * m_PosAreaSize[1]) + m_PosAreaBase[1]
         - viewportHeight / 2;
 
-    if (!populateRenderParams(
-            m_Hovering ? 1.0F : m_InactiveOpacity,
-            posX,
-            posY,
-            viewportWidth,
-            viewportHeight
-        )) {
+    if (
+        !populateRenderParams(m_Hovering ? 1.0F : m_InactiveOpacity, posX, posY, viewportWidth, viewportHeight)
+    ) {
         return;
     }
 

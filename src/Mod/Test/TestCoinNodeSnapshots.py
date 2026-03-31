@@ -35,7 +35,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 _BASELINE_REL = Path("tests") / "visual" / "baselines" / "coin-nodes"
 _FONT_REL = Path("tests") / "visual" / "fonts"
 _DEFAULT_FONT_FAMILY = "Noto Sans"
