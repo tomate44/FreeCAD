@@ -462,7 +462,7 @@ SET(FemTestsMesh_SRCS
     femtest/data/mesh/tetra10_mesh.z88
 )
 
-SET(FemTestsGMESH_SRCS
+SET(FemTestsGMSH_SRCS
     femtest/data/gmsh/Hexagon_4_Sided_Surface_Recombined.vtk
     femtest/data/gmsh/Hexagon_4_Sided_Non_symmetric_Surface_Recombined.vtk
     femtest/data/gmsh/Hexagon_3_Sided_Surface_Recombined.vtk
@@ -614,7 +614,7 @@ SET(FemAllScripts
     ${FemTestsCcx_SRCS}
     ${FemTestsElmer_SRCS}
     ${FemTestsMesh_SRCS}
-    ${FemTestsGMESH_SRCS}
+    ${FemTestsGMSH_SRCS}
     ${FemTestsMystran_SRCS}
     ${FemTestsOpen_SRCS}
     ${FemTestsZ88Main_SRCS}
@@ -661,6 +661,7 @@ INSTALL(FILES ${FemTestsZ88CcxcantiEleHex20_SRCS} DESTINATION Mod/Fem/femtest/da
 INSTALL(FILES ${FemTestsZ88CcxcantiEleTria6_SRCS} DESTINATION Mod/Fem/femtest/data/z88/ccx_cantilever_ele_tria6)
 INSTALL(FILES ${FemTestsZ88Ccxcantifl_SRCS} DESTINATION Mod/Fem/femtest/data/z88/ccx_cantilever_faceload)
 INSTALL(FILES ${FemTestsZ88Ccxcantinl_SRCS} DESTINATION Mod/Fem/femtest/data/z88/ccx_cantilever_nodeload)
+INSTALL(FILES ${FemTestsGMSH_SRCS} DESTINATION Mod/Fem/femtest/data/gmsh)
 INSTALL(FILES ${FemTools_SRCS} DESTINATION Mod/Fem/femtools)
 
 
