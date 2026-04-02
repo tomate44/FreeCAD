@@ -1421,7 +1421,7 @@ void SketchObject::setOrientation(Constraint* constr, bool reset)
         return signedArea > 0.0 ? ConstraintOrientations::CounterClockwise : ConstraintOrientations::Clockwise;
     };
 
-    if (constr->Type != Distance || (!reset && !constr->Orientation.testFlag(ConstraintOrientations::None))) {
+    if ((constr->Type != Distance && constr->Type != Tangent) || (!reset && !constr->Orientation.testFlag(ConstraintOrientations::None))) {
         return;
     }
 

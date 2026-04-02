@@ -933,6 +933,9 @@ double ConstraintP2LDistance::grad(double* param)
             deriv += ((x1 - x0) * d - (dy / d) * area) / d2;
         }
     }
+    if (param == distance()) {
+        deriv += ccw ? -1 : +1;
+    }
 
     return scale * deriv;
 }
