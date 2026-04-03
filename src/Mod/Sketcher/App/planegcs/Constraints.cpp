@@ -895,7 +895,7 @@ double ConstraintP2LDistance::signed_value()
 }
 double ConstraintP2LDistance::error()
 {
-    double dist = ccw ? *distance() : -*distance();
+    double dist = ccw ? std::abs(*distance()) : -std::abs(*distance());
 
     return scale * (signed_value() - dist);
 }
