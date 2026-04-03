@@ -686,10 +686,10 @@ void View3DInventorViewer::init()
     // filter a few qt events
     viewerEventFilter = new ViewerEventFilter;
     installEventFilter(viewerEventFilter);
-#if defined(USE_3DCONNEXION_NAVLIB)
     ParameterGrp::handle hViewGrp = App::GetApplication().GetParameterGroupByPath(
         "User parameter:BaseApp/Preferences/View"
     );
+#if defined(USE_3DCONNEXION_NAVLIB)
     if (hViewGrp->GetBool("LegacySpaceMouseDevices", false)) {
         getEventFilter()->registerInputDevice(new SpaceNavigatorDevice);
     }
@@ -719,13 +719,8 @@ void View3DInventorViewer::init()
     );
 
     naviCube = new NaviCube(this);
-    if (auto node = naviCube->getCoinNode()) {
-        if (naviCubeAnnotation) {
-            naviCubeAnnotation->removeAllChildren();
-            naviCubeAnnotation->addChild(node);
-        }
-    }
-    naviCubeEnabled = true;
+    naviCubeEnabled = hViewGrp->GetBool("ShowNaviCube", true);
+    syncNaviCubeVisibility();
 
     updateColors();
 }
@@ -1519,6 +1514,7 @@ void View3DInventorViewer::setRenderCache(int mode)
 void View3DInventorViewer::setEnabledNaviCube(bool on)
 {
     naviCubeEnabled = on;
+    syncNaviCubeVisibility();
 }
 
 bool View3DInventorViewer::isEnabledNaviCube() const
@@ -1550,6 +1546,24 @@ View3DInventorViewer::RenderIntent View3DInventorViewer::currentRenderIntent() c
 bool View3DInventorViewer::shouldRenderDecorations(RenderIntent intent)
 {
     return intent == RenderIntent::LiveInteractive;
+}
+
+void View3DInventorViewer::syncNaviCubeVisibility()
+{
+    if (!naviCubeAnnotation) {
+        return;
+    }
+
+    naviCubeAnnotation->removeAllChildren();
+    if (naviCubeEnabled && naviCube) {
+        if (auto node = naviCube->getCoinNode()) {
+            naviCubeAnnotation->addChild(node);
+        }
+    }
+
+    if (auto* rm = getSoRenderManager()) {
+        rm->scheduleRedraw();
+    }
 }
 
 void View3DInventorViewer::setNaviCubeCorner(int cc)

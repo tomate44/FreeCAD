@@ -578,6 +578,7 @@ private:
     static void deselectCB(void* viewer, SoPath* path);
     static SoPath* pickFilterCB(void* viewer, const SoPickedPoint* pp);
     void initialize();
+    void syncNaviCubeVisibility();
     void drawAxisCross();
     static void drawArrow();
     static void drawSingleBackground(const QColor&);
