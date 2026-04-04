@@ -83,9 +83,12 @@ TEST_F(FileInfoTest, TestSetPermission)
     EXPECT_TRUE(file.isReadable());
     EXPECT_FALSE(file.isWritable());
 
+#ifndef _WIN32
+    // Windows ACLs do not support write-only files: removing read permission has no effect.
     file.setPermissions(Base::FileInfo::WriteOnly);
     EXPECT_FALSE(file.isReadable());
     EXPECT_TRUE(file.isWritable());
+#endif
 
     file.setPermissions(Base::FileInfo::ReadWrite);
     EXPECT_TRUE(file.isReadable());
@@ -114,7 +117,12 @@ TEST_F(FileInfoTest, TestCheckDirectory)
 
 TEST_F(FileInfoTest, TestSize)
 {
+#ifdef _WIN32
+    // Text mode writes \r\n on Windows, so "Test\n" becomes 6 bytes.
+    EXPECT_EQ(file.size(), 6);
+#else
     EXPECT_EQ(file.size(), 5);
+#endif
 }
 
 TEST_F(FileInfoTest, TestLastModified)
