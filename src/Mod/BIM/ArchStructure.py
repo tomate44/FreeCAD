@@ -411,6 +411,11 @@ class _CommandStructure:
             return
         if self.bmode and (self.bpoint is None):
             self.bpoint = point
+            # Recreate precast/dents task boxes. The getPoint() call below replaces the task panel,
+            # destroying the task boxes that were embedded via extradlg by the first call.
+            self.precast = ArchPrecast._PrecastTaskPanel()
+            self.dents = ArchPrecast._DentsTaskPanel()
+            self.precast.Dents = self.dents
             FreeCADGui.Snapper.getPoint(
                 last=point,
                 callback=self.getPoint,
