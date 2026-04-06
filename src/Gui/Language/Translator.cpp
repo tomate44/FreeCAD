@@ -359,8 +359,17 @@ void Translator::setLocale(const std::string& language) const
             loc = QLocale(QString::fromStdString(bcp47));
         }
     }
+
+    auto icuLocaleId = loc.name().toStdString();
+    if (language.empty()) {
+        // QLocale keeps the effective numeric separators, but loc.name() may still report LANG.
+        const auto operatingSystemNumericLocale = Base::Tools::getOperatingSystemNumericLocale();
+        if (!operatingSystemNumericLocale.empty()) {
+            icuLocaleId = operatingSystemNumericLocale;
+        }
+    }
     QLocale::setDefault(loc);
-    Base::Tools::setIcuDefaultLocale(isCLocale ? "C" : loc.name().toStdString());
+    Base::Tools::setIcuDefaultLocale(isCLocale ? "C" : icuLocaleId);
     updateLocaleChange();
 
 #ifdef FC_DEBUG
