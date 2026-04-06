@@ -40,5 +40,6 @@
         <file>translations/Inspection_ms.qm</file>
         <file>translations/Inspection_ta.qm</file>
         <file>translations/Inspection_ga-IE.qm</file>
+        <file>translations/Inspection_sv.qm</file>
     </qresource>
 </RCC>
