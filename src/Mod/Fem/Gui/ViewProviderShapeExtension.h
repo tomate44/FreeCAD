@@ -88,7 +88,7 @@ private:
 
 class FemGuiExport ViewProviderShapeExtension : public Gui::ViewProviderExtension {
 
-    EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderBoxExtension);
+    EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderShapeExtension);
     using inherited = Gui::ViewProviderExtension;
 
 public:
@@ -151,7 +151,7 @@ private:
     SoSeparator* m_geometrySeperator;
     SoTransformManip* m_manip;
     SoScale* m_scale;
-    bool m_isDragging, m_autoRecompute;
+    bool m_isDragging{false}, m_autoRecompute{false};
 };
 
 // ***************************************************************************
@@ -311,7 +311,7 @@ protected:
     void extensionOnChanged(const App::Property*) override;
 
 private:
-    bool m_detectscale;
+    bool m_detectscale{false};
 };
 
 using ViewProviderPlaneExtensionPython = Gui::ViewProviderExtensionPythonT<ViewProviderPlaneExtension>;

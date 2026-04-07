@@ -129,11 +129,6 @@ void FemPostBoxFunction::handleChangedPropertyName(
 )
 {
 
-        App::PropertyVectorDistance BoxCenter;
-    App::PropertyDistance       BoxLength;
-    App::PropertyDistance       BoxWidth;
-    App::PropertyDistance       BoxHeight;
-
     if (strcmp(propName, "Center") == 0
         && Base::Type::fromName(typeName) == App::PropertyVectorDistance::getClassTypeId()) {
 

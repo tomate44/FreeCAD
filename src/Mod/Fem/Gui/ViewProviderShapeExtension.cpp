@@ -109,13 +109,17 @@ ViewProviderShapeExtension::ViewProviderShapeExtension()
     m_scale->ref();
     m_scale->scaleFactor = SbVec3f(1, 1, 1);
 
+    m_manip = nullptr;
 }
 
 ViewProviderShapeExtension::~ViewProviderShapeExtension() {
 
     m_geometrySeperator->unref();
-    m_manip->unref();
     m_scale->unref();
+
+    if (m_manip != nullptr) {
+        m_manip->unref();
+    }
 }
 
 
@@ -1096,7 +1100,7 @@ SoGroup* postCylinder()
 SoGroup* postPlane()
 {
     SoCoordinate3* points = new SoCoordinate3();
-    points->point.setNum(4);
+    points->point.setNum(5);
     points->point.set1Value(0, -0.5, -0.5, 0.0);
     points->point.set1Value(1, -0.5, 0.5, 0.0);
     points->point.set1Value(2, 0.5, 0.5, 0.0);
