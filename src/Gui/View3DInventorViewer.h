@@ -223,7 +223,14 @@ public:
     RenderType getRenderType() const;
     void renderToFramebuffer(QOpenGLFramebufferObject*);
     QImage grabFramebuffer();
-    void imageFromFramebuffer(int width, int height, int samples, const QColor& bgcolor, QImage& img);
+    void imageFromFramebuffer(
+        int width,
+        int height,
+        int samples,
+        const QColor& bgcolor,
+        QImage& img,
+        RenderIntent intent = RenderIntent::LiveInteractive
+    );
 
     void setViewing(bool enable) override;
     virtual void setCursorEnabled(bool enable);

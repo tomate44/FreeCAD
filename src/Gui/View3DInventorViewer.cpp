@@ -1838,7 +1838,7 @@ void View3DInventorViewer::savePicture(
     ScopedRenderIntent scopedIntent(*self, intent);
 
     if (useFramebufferObject) {
-        self->imageFromFramebuffer(width, height, sample, bg, img);
+        self->imageFromFramebuffer(width, height, sample, bg, img, intent);
         return;
     }
 
@@ -2409,9 +2409,13 @@ void View3DInventorViewer::imageFromFramebuffer(
     int height,
     int samples,
     const QColor& bgcolor,
-    QImage& img
+    QImage& img,
+    RenderIntent intent
 )
 {
+    auto self = const_cast<View3DInventorViewer*>(this);  // NOLINT
+    ScopedRenderIntent scopedIntent(*self, intent);
+
     auto gl = static_cast<QOpenGLWidget*>(this->viewport());  // NOLINT
     gl->makeCurrent();
 
