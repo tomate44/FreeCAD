@@ -55,10 +55,6 @@ class PartDesignWorkbench(Workbench):
                 FreeCAD.Console.PrintWarning(
                     "PartDesign WizardShaft could not be imported: {err}\n".format(err=str(err))
                 )
-                try:
-                    from FeatureHole import HoleGui
-                except Exception:
-                    pass
 
         import PartDesignGui
         import PartDesign
