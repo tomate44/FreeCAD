@@ -582,7 +582,7 @@ void ProjectFile::readInputFile(const std::string& name, std::ostream& str)
 
 // Read the given input file from the zip directly into the given stream (not using a temporary
 // file)
-void ProjectFile::readInputFileDirect(const std::string& name, std::ostream& str)
+void ProjectFile::readInputFileDirect(const std::string& name, std::ostream& str) const
 {
     zipios::ZipFile project(stdFile);
     std::unique_ptr<std::istream> istr(project.getInputStream(name));
