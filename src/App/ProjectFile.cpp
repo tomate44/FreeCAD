@@ -488,6 +488,13 @@ bool ProjectFile::containsFile(const std::string& name) const
     return entry != nullptr;
 }
 
+uint32_t ProjectFile::sizeOfFile(const std::string& name) const
+{
+    zipios::ZipFile project(stdFile);
+    auto entry = project.getEntry(name);
+    return entry == nullptr ? 0 : entry->getSize();
+}
+
 std::list<std::string> ProjectFile::getInputFiles(const std::string& name) const
 {
     // <ObjectData Count="1">

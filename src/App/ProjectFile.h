@@ -148,6 +148,11 @@ public:
      */
     bool containsFile(const std::string& name) const;
     /**
+     * Retrieves the (uncompressed) file size of @a name, or 0 if it does not
+     * exist in the project file.
+     */
+    uint32_t sizeOfFile(const std::string& name) const;
+    /**
      * Retrieves a list of input file names referenced to the given object name.
      * This method does the same as @ref getPropertyFiles() unless that it only
      * returns the file names.
