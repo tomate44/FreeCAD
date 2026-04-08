@@ -535,11 +535,17 @@ void View3DInventorViewer::init()
     naviCubeAnnotation->ref();
     naviCubeAnnotation->setName("naviCubeAnnotation");
 
-    auto lm = new SoLightModel;
-    lm->model = SoLightModel::BASE_COLOR;
+    auto decorationLightModel = new SoLightModel;
+    decorationLightModel->model = SoLightModel::BASE_COLOR;
 
-    auto bc = new SoBaseColor;
-    bc->rgb = SbColor(1, 1, 0);
+    auto decorationBaseColor = new SoBaseColor;
+    decorationBaseColor->rgb = SbColor(1, 1, 0);
+
+    auto foregroundLightModel = new SoLightModel;
+    foregroundLightModel->model = SoLightModel::BASE_COLOR;
+
+    auto foregroundBaseColor = new SoBaseColor;
+    foregroundBaseColor->rgb = SbColor(1, 1, 0);
 
     // NOLINTBEGIN
     cam = new SoOrthographicCamera;
@@ -554,8 +560,8 @@ void View3DInventorViewer::init()
     lightRotation->rotation.connectFrom(&cam->orientation);
 
     this->decorationroot->addChild(cam);
-    this->decorationroot->addChild(lm);
-    this->decorationroot->addChild(bc);
+    this->decorationroot->addChild(decorationLightModel);
+    this->decorationroot->addChild(decorationBaseColor);
     this->decorationroot->addChild(naviCubeAnnotation);
 
     auto threePointLightingSeparator = new SoTransformSeparator;
@@ -563,6 +569,8 @@ void View3DInventorViewer::init()
     threePointLightingSeparator->addChild(this->fillLight);
 
     this->foregroundroot->addChild(cam);
+    this->foregroundroot->addChild(foregroundLightModel);
+    this->foregroundroot->addChild(foregroundBaseColor);
 
     // NOTE: For every mouse click event the SoFCUnifiedSelection searches for the picked
     // point which causes a certain slow-down because for all objects the primitives
