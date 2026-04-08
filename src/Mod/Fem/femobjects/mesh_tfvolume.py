@@ -29,7 +29,9 @@ __url__ = "https://www.freecad.org"
 
 from . import base_femmeshelement
 from . import base_fempythonobject
+
 _PropHelper = base_fempythonobject._PropHelper
+
 
 class MeshTransfiniteVolume(base_femmeshelement.BaseFemMeshElement):
     """
@@ -40,7 +42,8 @@ class MeshTransfiniteVolume(base_femmeshelement.BaseFemMeshElement):
 
     def _get_properties(self):
 
-        props = [_PropHelper(
+        props = [
+            _PropHelper(
                 type="App::PropertyBool",
                 name="MixedElements",
                 group="Transfinite",
@@ -52,7 +55,7 @@ class MeshTransfiniteVolume(base_femmeshelement.BaseFemMeshElement):
                 name="TriangleOrientation",
                 group="Automation",
                 doc="Define how the triangles are oriented within the transfinite mesh (if not recombined) for surfaces that are automatically converted to be transfinite",
-                value=["Left", "Right",  "AlternateRight", "AlternateLeft"],
+                value=["Left", "Right", "AlternateRight", "AlternateLeft"],
             ),
             _PropHelper(
                 type="App::PropertyBool",
@@ -66,7 +69,7 @@ class MeshTransfiniteVolume(base_femmeshelement.BaseFemMeshElement):
                 name="UseAutomation",
                 group="Automation",
                 doc="Enables the automatic application of transfinite curve and surface definitions on all yet undefined edges",
-                value=False
+                value=False,
             ),
             _PropHelper(
                 type="App::PropertyInteger",
@@ -95,6 +98,7 @@ class MeshTransfiniteVolume(base_femmeshelement.BaseFemMeshElement):
                 group="Automation",
                 doc="Inverts the direction of of the non-constant distributions",
                 value=False,
-            ),]
+            ),
+        ]
 
         return super()._get_properties() + props

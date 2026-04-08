@@ -29,7 +29,9 @@ __url__ = "https://www.freecad.org"
 
 from . import base_femmeshelement
 from . import base_fempythonobject
+
 _PropHelper = base_fempythonobject._PropHelper
+
 
 class MeshManipulate(base_femmeshelement.BaseFemMeshElement):
     """
@@ -55,7 +57,6 @@ class MeshManipulate(base_femmeshelement.BaseFemMeshElement):
                 doc="Which manipulation is applied to the refinement",
                 value=["Restrict", "Threshold", "Mean", "Gradient", "Curvature", "Laplacian"],
             ),
-
             # restrict
             _PropHelper(
                 type="App::PropertyBool",
@@ -64,7 +65,6 @@ class MeshManipulate(base_femmeshelement.BaseFemMeshElement):
                 doc="Include the boundary of the selected entities",
                 value=True,
             ),
-
             # threshold
             _PropHelper(
                 type="App::PropertyLength",
@@ -108,16 +108,14 @@ class MeshManipulate(base_femmeshelement.BaseFemMeshElement):
                 doc="Defines if the SizeMaximum value shall be defined for input values larger then InputMaximum",
                 value=True,
             ),
-
             # Gradient
             _PropHelper(
                 type="App::PropertyEnumeration",
                 name="Kind",
                 group="Gradient",
                 doc="Component of the gradient to evaluate",
-                value= ["X", "Y", "Z", "Mean"],
+                value=["X", "Y", "Z", "Mean"],
             ),
-
             # mean  + Curvature + Laplacian
             _PropHelper(
                 type="App::PropertyLength",
@@ -126,9 +124,7 @@ class MeshManipulate(base_femmeshelement.BaseFemMeshElement):
                 doc="Distance over which the field shall be computed",
                 value="10mm",
             ),
-
         ]
 
         # super() props needed as restrict requires selected elements
         return super()._get_properties() + props
-

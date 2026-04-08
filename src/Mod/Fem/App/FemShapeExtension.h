@@ -48,10 +48,9 @@ public:
 
     /// Properties
     App::PropertyVectorDistance BoxCenter;
-    App::PropertyDistance       BoxLength;
-    App::PropertyDistance       BoxWidth;
-    App::PropertyDistance       BoxHeight;
-
+    App::PropertyDistance BoxLength;
+    App::PropertyDistance BoxWidth;
+    App::PropertyDistance BoxHeight;
 };
 
 using BoxExtensionPython = App::ExtensionPythonT<BoxExtension>;
@@ -72,7 +71,6 @@ public:
     App::PropertyVector CylinderAxis;
     App::PropertyVectorDistance CylinderCenter;
     App::PropertyDistance CylinderRadius;
-
 };
 
 using CylinderExtensionPython = App::ExtensionPythonT<CylinderExtension>;
@@ -92,7 +90,6 @@ public:
     /// Properties
     App::PropertyDistance SphereRadius;
     App::PropertyVectorDistance SphereCenter;
-
 };
 
 using SphereExtensionPython = App::ExtensionPythonT<SphereExtension>;

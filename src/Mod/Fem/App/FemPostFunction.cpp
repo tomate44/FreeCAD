@@ -84,7 +84,8 @@ DocumentObjectExecReturn* FemPostFunction::execute()
 PROPERTY_SOURCE_WITH_EXTENSIONS(Fem::FemPostBoxFunction, Fem::FemPostFunction)
 
 FemPostBoxFunction::FemPostBoxFunction()
-    : FemPostFunction(), BoxExtension()
+    : FemPostFunction()
+    , BoxExtension()
 {
     BoxExtension::initExtension(this);
 
@@ -160,7 +161,8 @@ void FemPostBoxFunction::handleChangedPropertyName(
 PROPERTY_SOURCE_WITH_EXTENSIONS(Fem::FemPostCylinderFunction, Fem::FemPostFunction)
 
 FemPostCylinderFunction::FemPostCylinderFunction()
-    : FemPostFunction(), CylinderExtension()
+    : FemPostFunction()
+    , CylinderExtension()
 {
     CylinderExtension::initExtension(this);
 
@@ -228,7 +230,8 @@ void FemPostCylinderFunction::handleChangedPropertyName(
 PROPERTY_SOURCE_WITH_EXTENSIONS(Fem::FemPostPlaneFunction, Fem::FemPostFunction)
 
 FemPostPlaneFunction::FemPostPlaneFunction()
-    : FemPostFunction(), PlaneExtension()
+    : FemPostFunction()
+    , PlaneExtension()
 {
 
     PlaneExtension::initExtension(this);
@@ -288,7 +291,8 @@ void FemPostPlaneFunction::handleChangedPropertyName(
 PROPERTY_SOURCE_WITH_EXTENSIONS(Fem::FemPostSphereFunction, Fem::FemPostFunction)
 
 FemPostSphereFunction::FemPostSphereFunction()
-    : FemPostFunction(), SphereExtension()
+    : FemPostFunction()
+    , SphereExtension()
 {
     SphereExtension::initExtension(this);
 

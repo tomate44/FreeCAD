@@ -55,7 +55,6 @@
 #include "ui_SphereWidget.h"
 
 
-
 using namespace FemGui;
 namespace sp = std::placeholders;
 
@@ -65,11 +64,21 @@ EXTENSION_PROPERTY_SOURCE(FemGui::ViewProviderCylinderExtension, FemGui::ViewPro
 EXTENSION_PROPERTY_SOURCE(FemGui::ViewProviderSphereExtension, FemGui::ViewProviderShapeExtension)
 EXTENSION_PROPERTY_SOURCE(FemGui::ViewProviderPlaneExtension, FemGui::ViewProviderShapeExtension)
 
-namespace Gui {
+namespace Gui
+{
 EXTENSION_PROPERTY_SOURCE_TEMPLATE(FemGui::ViewProviderBoxExtensionPython, FemGui::ViewProviderBoxExtension)
-EXTENSION_PROPERTY_SOURCE_TEMPLATE(FemGui::ViewProviderCylinderExtensionPython, FemGui::ViewProviderCylinderExtension)
-EXTENSION_PROPERTY_SOURCE_TEMPLATE(FemGui::ViewProviderSphereExtensionPython, FemGui::ViewProviderSphereExtension)
-EXTENSION_PROPERTY_SOURCE_TEMPLATE(FemGui::ViewProviderPlaneExtensionPython, FemGui::ViewProviderPlaneExtension)
+EXTENSION_PROPERTY_SOURCE_TEMPLATE(
+    FemGui::ViewProviderCylinderExtensionPython,
+    FemGui::ViewProviderCylinderExtension
+)
+EXTENSION_PROPERTY_SOURCE_TEMPLATE(
+    FemGui::ViewProviderSphereExtensionPython,
+    FemGui::ViewProviderSphereExtension
+)
+EXTENSION_PROPERTY_SOURCE_TEMPLATE(
+    FemGui::ViewProviderPlaneExtensionPython,
+    FemGui::ViewProviderPlaneExtension
+)
 
 
 // explicit template instantiation
@@ -87,7 +96,8 @@ void ShapeWidget::setViewProvider(Gui::ViewProviderDocumentObject* view)
     m_view = view;
     m_object = view->getObject();
     m_connection = m_object->getDocument()->signalChangedObject.connect(
-        std::bind(&ShapeWidget::onObjectsChanged, this, sp::_1, sp::_2));
+        std::bind(&ShapeWidget::onObjectsChanged, this, sp::_1, sp::_2)
+    );
     // NOLINTEND
 }
 
@@ -112,7 +122,8 @@ ViewProviderShapeExtension::ViewProviderShapeExtension()
     m_manip = nullptr;
 }
 
-ViewProviderShapeExtension::~ViewProviderShapeExtension() {
+ViewProviderShapeExtension::~ViewProviderShapeExtension()
+{
 
     m_geometrySeperator->unref();
     m_scale->unref();
@@ -175,7 +186,8 @@ void ViewProviderShapeExtension::dragStartCallback(void* data, SoDragger*)
 {
     // This is called when a manipulator is about to manipulating
     Gui::Application::Instance->activeDocument()->openCommand(
-        QT_TRANSLATE_NOOP("Command", "Edit Shape"));
+        QT_TRANSLATE_NOOP("Command", "Edit Shape")
+    );
 
     ViewProviderShapeExtension* that = static_cast<ViewProviderShapeExtension*>(data);
     that->m_isDragging = true;
@@ -210,8 +222,9 @@ SbBox3f ViewProviderShapeExtension::getBoundingsOfView() const
 {
     SbBox3f box;
     Gui::Document* doc = getExtendedViewProvider()->getDocument();
-    Gui::View3DInventor* view =
-        qobject_cast<Gui::View3DInventor*>(doc->getViewOfViewProvider(getExtendedViewProvider()));
+    Gui::View3DInventor* view = qobject_cast<Gui::View3DInventor*>(
+        doc->getViewOfViewProvider(getExtendedViewProvider())
+    );
     if (view) {
         Gui::View3DInventorViewer* viewer = view->getViewer();
         box = viewer->getBoundingBox();
@@ -269,30 +282,42 @@ BoxWidget::BoxWidget()
     ui->width->setDecimals(UserDecimals);
     ui->height->setDecimals(UserDecimals);
 
-    connect(ui->centerX,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &BoxWidget::centerChanged);
-    connect(ui->centerY,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &BoxWidget::centerChanged);
-    connect(ui->centerZ,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &BoxWidget::centerChanged);
-    connect(ui->length,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &BoxWidget::lengthChanged);
-    connect(ui->width,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &BoxWidget::widthChanged);
-    connect(ui->height,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &BoxWidget::heightChanged);
+    connect(
+        ui->centerX,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &BoxWidget::centerChanged
+    );
+    connect(
+        ui->centerY,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &BoxWidget::centerChanged
+    );
+    connect(
+        ui->centerZ,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &BoxWidget::centerChanged
+    );
+    connect(
+        ui->length,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &BoxWidget::lengthChanged
+    );
+    connect(
+        ui->width,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &BoxWidget::widthChanged
+    );
+    connect(
+        ui->height,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &BoxWidget::heightChanged
+    );
 }
 
 BoxWidget::~BoxWidget() = default;
@@ -348,9 +373,11 @@ void BoxWidget::onChange(const App::Property& p)
 void BoxWidget::centerChanged(double)
 {
     if (!blockObjectUpdates()) {
-        Base::Vector3d vec(ui->centerX->value().getValue(),
-                           ui->centerY->value().getValue(),
-                           ui->centerZ->value().getValue());
+        Base::Vector3d vec(
+            ui->centerX->value().getValue(),
+            ui->centerY->value().getValue(),
+            ui->centerZ->value().getValue()
+        );
         getObjectExtension<Fem::BoxExtension>()->BoxCenter.setValue(vec);
     }
 }
@@ -411,7 +438,8 @@ void ViewProviderBoxExtension::extensionUpdateData(const App::Property* p)
 {
     Fem::BoxExtension* box = getObjectExtension<Fem::BoxExtension>();
     if (!isDragging()
-        && (p == &box->BoxCenter || p == &box->BoxLength || p == &box->BoxWidth || p == &box->BoxHeight)) {
+        && (p == &box->BoxCenter || p == &box->BoxLength || p == &box->BoxWidth
+            || p == &box->BoxHeight)) {
         const Base::Vector3d& center = box->BoxCenter.getValue();
         float l = box->BoxLength.getValue();
         float w = box->BoxWidth.getValue();
@@ -462,34 +490,48 @@ CylinderWidget::CylinderWidget()
     ui->axisY->setDecimals(UserDecimals);
     ui->axisZ->setDecimals(UserDecimals);
 
-    connect(ui->centerX,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::centerChanged);
-    connect(ui->centerY,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::centerChanged);
-    connect(ui->centerZ,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::centerChanged);
-    connect(ui->axisX,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::axisChanged);
-    connect(ui->axisY,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::axisChanged);
-    connect(ui->axisZ,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::axisChanged);
-    connect(ui->radius,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &CylinderWidget::radiusChanged);
+    connect(
+        ui->centerX,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::centerChanged
+    );
+    connect(
+        ui->centerY,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::centerChanged
+    );
+    connect(
+        ui->centerZ,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::centerChanged
+    );
+    connect(
+        ui->axisX,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::axisChanged
+    );
+    connect(
+        ui->axisY,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::axisChanged
+    );
+    connect(
+        ui->axisZ,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::axisChanged
+    );
+    connect(
+        ui->radius,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &CylinderWidget::radiusChanged
+    );
 }
 
 CylinderWidget::~CylinderWidget() = default;
@@ -537,9 +579,11 @@ void CylinderWidget::onChange(const App::Property& p)
 void CylinderWidget::centerChanged(double)
 {
     if (!blockObjectUpdates()) {
-        Base::Vector3d vec(ui->centerX->value().getValue(),
-                           ui->centerY->value().getValue(),
-                           ui->centerZ->value().getValue());
+        Base::Vector3d vec(
+            ui->centerX->value().getValue(),
+            ui->centerY->value().getValue(),
+            ui->centerZ->value().getValue()
+        );
         getObjectExtension<Fem::CylinderExtension>()->CylinderCenter.setValue(vec);
     }
 }
@@ -547,9 +591,11 @@ void CylinderWidget::centerChanged(double)
 void CylinderWidget::axisChanged(double)
 {
     if (!blockObjectUpdates()) {
-        Base::Vector3d vec(ui->axisX->value().getValue(),
-                           ui->axisY->value().getValue(),
-                           ui->axisZ->value().getValue());
+        Base::Vector3d vec(
+            ui->axisX->value().getValue(),
+            ui->axisY->value().getValue(),
+            ui->axisZ->value().getValue()
+        );
         getObjectExtension<Fem::CylinderExtension>()->CylinderAxis.setValue(vec);
     }
 }
@@ -557,7 +603,9 @@ void CylinderWidget::axisChanged(double)
 void CylinderWidget::radiusChanged(double)
 {
     if (!blockObjectUpdates()) {
-        getObjectExtension<Fem::CylinderExtension>()->CylinderRadius.setValue(ui->radius->value().getValue());
+        getObjectExtension<Fem::CylinderExtension>()->CylinderRadius.setValue(
+            ui->radius->value().getValue()
+        );
     }
 }
 
@@ -588,16 +636,15 @@ void ViewProviderCylinderExtension::draggerUpdate(SoDragger* m)
 void ViewProviderCylinderExtension::extensionUpdateData(const App::Property* p)
 {
     Fem::CylinderExtension* cyl = getObjectExtension<Fem::CylinderExtension>();
-    if (!isDragging() && (p == &cyl->CylinderCenter || p == &cyl->CylinderRadius || p == &cyl->CylinderAxis)) {
+    if (!isDragging()
+        && (p == &cyl->CylinderCenter || p == &cyl->CylinderRadius || p == &cyl->CylinderAxis)) {
         Base::Vector3d trans = cyl->CylinderCenter.getValue();
         Base::Vector3d axis = cyl->CylinderAxis.getValue();
         double radius = cyl->CylinderRadius.getValue();
 
         SbMatrix translate;
         SbRotation rot(SbVec3f(0.0, 0.0, 1.0), SbVec3f(axis.x, axis.y, axis.z));
-        translate.setTransform(SbVec3f(trans.x, trans.y, trans.z),
-                               rot,
-                               SbVec3f(radius, radius, radius));
+        translate.setTransform(SbVec3f(trans.x, trans.y, trans.z), rot, SbVec3f(radius, radius, radius));
         getManipulator()->setMatrix(translate);
     }
 
@@ -634,22 +681,30 @@ SphereWidget::SphereWidget()
     ui->centerY->setDecimals(UserDecimals);
     ui->centerZ->setDecimals(UserDecimals);
 
-    connect(ui->centerX,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &SphereWidget::centerChanged);
-    connect(ui->centerY,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &SphereWidget::centerChanged);
-    connect(ui->centerZ,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &SphereWidget::centerChanged);
-    connect(ui->radius,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &SphereWidget::radiusChanged);
+    connect(
+        ui->centerX,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &SphereWidget::centerChanged
+    );
+    connect(
+        ui->centerY,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &SphereWidget::centerChanged
+    );
+    connect(
+        ui->centerZ,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &SphereWidget::centerChanged
+    );
+    connect(
+        ui->radius,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &SphereWidget::radiusChanged
+    );
 }
 
 SphereWidget::~SphereWidget() = default;
@@ -690,9 +745,11 @@ void SphereWidget::onChange(const App::Property& p)
 void SphereWidget::centerChanged(double)
 {
     if (!blockObjectUpdates()) {
-        Base::Vector3d vec(ui->centerX->value().getValue(),
-                           ui->centerY->value().getValue(),
-                           ui->centerZ->value().getValue());
+        Base::Vector3d vec(
+            ui->centerX->value().getValue(),
+            ui->centerY->value().getValue(),
+            ui->centerZ->value().getValue()
+        );
         getObjectExtension<Fem::SphereExtension>()->SphereCenter.setValue(vec);
     }
 }
@@ -700,7 +757,9 @@ void SphereWidget::centerChanged(double)
 void SphereWidget::radiusChanged(double)
 {
     if (!blockObjectUpdates()) {
-        getObjectExtension<Fem::SphereExtension>()->SphereRadius.setValue(ui->radius->value().getValue());
+        getObjectExtension<Fem::SphereExtension>()->SphereRadius.setValue(
+            ui->radius->value().getValue()
+        );
     }
 }
 
@@ -774,7 +833,6 @@ ShapeWidget* ViewProviderSphereExtension::createShapeWidget()
 }
 
 
-
 // Plane Manipulation
 // *********************
 
@@ -799,30 +857,42 @@ PlaneWidget::PlaneWidget()
     ui->normalY->setDecimals(UserDecimals);
     ui->normalZ->setDecimals(UserDecimals);
 
-    connect(ui->originX,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &PlaneWidget::originChanged);
-    connect(ui->originY,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &PlaneWidget::originChanged);
-    connect(ui->originZ,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &PlaneWidget::originChanged);
-    connect(ui->normalX,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &PlaneWidget::normalChanged);
-    connect(ui->normalY,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &PlaneWidget::normalChanged);
-    connect(ui->normalZ,
-            qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
-            this,
-            &PlaneWidget::normalChanged);
+    connect(
+        ui->originX,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &PlaneWidget::originChanged
+    );
+    connect(
+        ui->originY,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &PlaneWidget::originChanged
+    );
+    connect(
+        ui->originZ,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &PlaneWidget::originChanged
+    );
+    connect(
+        ui->normalX,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &PlaneWidget::normalChanged
+    );
+    connect(
+        ui->normalY,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &PlaneWidget::normalChanged
+    );
+    connect(
+        ui->normalZ,
+        qOverload<double>(&Gui::QuantitySpinBox::valueChanged),
+        this,
+        &PlaneWidget::normalChanged
+    );
 }
 
 PlaneWidget::~PlaneWidget() = default;
@@ -865,9 +935,11 @@ void PlaneWidget::onChange(const App::Property& p)
 void PlaneWidget::normalChanged(double)
 {
     if (!blockObjectUpdates()) {
-        Base::Vector3d vec(ui->normalX->value().getValue(),
-                           ui->normalY->value().getValue(),
-                           ui->normalZ->value().getValue());
+        Base::Vector3d vec(
+            ui->normalX->value().getValue(),
+            ui->normalY->value().getValue(),
+            ui->normalZ->value().getValue()
+        );
         getObjectExtension<Fem::PlaneExtension>()->PlaneNormal.setValue(vec);
     }
 }
@@ -875,27 +947,29 @@ void PlaneWidget::normalChanged(double)
 void PlaneWidget::originChanged(double)
 {
     if (!blockObjectUpdates()) {
-        Base::Vector3d vec(ui->originX->value().getValue(),
-                           ui->originY->value().getValue(),
-                           ui->originZ->value().getValue());
+        Base::Vector3d vec(
+            ui->originX->value().getValue(),
+            ui->originY->value().getValue(),
+            ui->originZ->value().getValue()
+        );
         getObjectExtension<Fem::PlaneExtension>()->PlaneOrigin.setValue(vec);
     }
 }
 
 
 // NOTE: The technical lower limit is at 1e-4 that the Coin3D manipulator can handle
-static const App::PropertyFloatConstraint::Constraints scaleConstraint = {
-    1e-4,
-    std::numeric_limits<double>::max(),
-    1.0};
+static const App::PropertyFloatConstraint::Constraints scaleConstraint
+    = {1e-4, std::numeric_limits<double>::max(), 1.0};
 
 ViewProviderPlaneExtension::ViewProviderPlaneExtension()
 {
-    EXTENSION_ADD_PROPERTY_TYPE(Scale,
-                                (10),
-                                "Manipulator",
-                                App::Prop_None,
-                                "Scaling factor for the manipulator");
+    EXTENSION_ADD_PROPERTY_TYPE(
+        Scale,
+        (10),
+        "Manipulator",
+        App::Prop_None,
+        "Scaling factor for the manipulator"
+    );
 
     Scale.setConstraints(&scaleConstraint);
 
@@ -996,8 +1070,6 @@ ShapeWidget* ViewProviderPlaneExtension::createShapeWidget()
 }
 
 
-
-
 namespace FemGui
 {
 
@@ -1061,20 +1133,20 @@ SoGroup* postCylinder()
     // top and bottom
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < nCirc + 1; ++j) {
-            points->point.set1Value(idx,
-                                    SbVec3f(std::cos(2 * pi / nCirc * j),
-                                            std::sin(2 * pi / nCirc * j),
-                                            -h / 2. + h * i));
+            points->point.set1Value(
+                idx,
+                SbVec3f(std::cos(2 * pi / nCirc * j), std::sin(2 * pi / nCirc * j), -h / 2. + h * i)
+            );
             ++idx;
         }
     }
     // sides
     for (int i = 0; i < nSide; ++i) {
         for (int j = 0; j < 2; ++j) {
-            points->point.set1Value(idx,
-                                    SbVec3f(std::cos(2 * pi / nSide * i),
-                                            std::sin(2 * pi / nSide * i),
-                                            -h / 2. + h * j));
+            points->point.set1Value(
+                idx,
+                SbVec3f(std::cos(2 * pi / nSide * i), std::sin(2 * pi / nSide * i), -h / 2. + h * j)
+            );
             ++idx;
         }
     }
@@ -1124,19 +1196,27 @@ SoGroup* postSphere()
     int idx = 0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 21; j++) {
-            points->point.set1Value(idx,
-                                    SbVec3f(std::sin(2 * pi / 20 * j) * std::cos(pi / 4 * i),
-                                            std::sin(2 * pi / 20 * j) * std::sin(pi / 4 * i),
-                                            std::cos(2 * pi / 20 * j)));
+            points->point.set1Value(
+                idx,
+                SbVec3f(
+                    std::sin(2 * pi / 20 * j) * std::cos(pi / 4 * i),
+                    std::sin(2 * pi / 20 * j) * std::sin(pi / 4 * i),
+                    std::cos(2 * pi / 20 * j)
+                )
+            );
             ++idx;
         }
     }
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 21; j++) {
-            points->point.set1Value(idx,
-                                    SbVec3f(std::sin(pi / 4 * i) * std::cos(2 * pi / 20 * j),
-                                            std::sin(pi / 4 * i) * std::sin(2 * pi / 20 * j),
-                                            std::cos(pi / 4 * i)));
+            points->point.set1Value(
+                idx,
+                SbVec3f(
+                    std::sin(pi / 4 * i) * std::cos(2 * pi / 20 * j),
+                    std::sin(pi / 4 * i) * std::sin(2 * pi / 20 * j),
+                    std::cos(pi / 4 * i)
+                )
+            );
             ++idx;
         }
     }
@@ -1151,5 +1231,5 @@ SoGroup* postSphere()
 }
 
 
-}
-}
+}  // namespace ShapeNodes
+}  // namespace FemGui

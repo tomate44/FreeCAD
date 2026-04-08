@@ -45,7 +45,7 @@ class Ui_SphereWidget;
 namespace FemGui
 {
 
-class FemGuiExport ShapeWidget : public QWidget
+class FemGuiExport ShapeWidget: public QWidget
 {
     Q_OBJECT
 public:
@@ -70,7 +70,9 @@ protected:
     {
         auto extension = m_object->getExtension<T>();
         if (!extension) {
-            throw Base::AbortException("Provided viewproviders object does not have the correct extension");
+            throw Base::AbortException(
+                "Provided viewproviders object does not have the correct extension"
+            );
         }
         return extension;
     }
@@ -86,13 +88,13 @@ private:
 };
 
 
-class FemGuiExport ViewProviderShapeExtension : public Gui::ViewProviderExtension {
+class FemGuiExport ViewProviderShapeExtension: public Gui::ViewProviderExtension
+{
 
     EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderShapeExtension);
     using inherited = Gui::ViewProviderExtension;
 
 public:
-
     ViewProviderShapeExtension();
     ~ViewProviderShapeExtension() override;
 
@@ -109,8 +111,11 @@ public:
     }
 
 protected:
-    virtual SoTransformManip* setupManipulator() {return nullptr;};
-    virtual void draggerUpdate(SoDragger*){};
+    virtual SoTransformManip* setupManipulator()
+    {
+        return nullptr;
+    };
+    virtual void draggerUpdate(SoDragger*) {};
 
     bool isDragging()
     {
@@ -130,7 +135,9 @@ protected:
     {
         auto extension = getExtendedViewProvider()->getObject()->getExtension<T>();
         if (!extension) {
-            throw Base::AbortException("Provided viewproviders object does not have the correct extension");
+            throw Base::AbortException(
+                "Provided viewproviders object does not have the correct extension"
+            );
         }
         return extension;
     }
@@ -151,7 +158,7 @@ private:
     SoSeparator* m_geometrySeperator;
     SoTransformManip* m_manip;
     SoScale* m_scale;
-    bool m_isDragging{false}, m_autoRecompute{false};
+    bool m_isDragging {false}, m_autoRecompute {false};
 };
 
 // ***************************************************************************
@@ -175,7 +182,7 @@ private:
     std::unique_ptr<Ui_BoxWidget> ui;
 };
 
-class FemGuiExport ViewProviderBoxExtension : public ViewProviderShapeExtension
+class FemGuiExport ViewProviderBoxExtension: public ViewProviderShapeExtension
 {
     EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderBoxExtension);
     using inherited = ViewProviderShapeExtension;
@@ -215,7 +222,7 @@ private:
     std::unique_ptr<Ui_CylinderWidget> ui;
 };
 
-class FemGuiExport ViewProviderCylinderExtension : public ViewProviderShapeExtension
+class FemGuiExport ViewProviderCylinderExtension: public ViewProviderShapeExtension
 {
     EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderCylinderExtension);
     using inherited = ViewProviderShapeExtension;
@@ -232,7 +239,8 @@ protected:
     void extensionUpdateData(const App::Property*) override;
 };
 
-using ViewProviderCylinderExtensionPython = Gui::ViewProviderExtensionPythonT<ViewProviderCylinderExtension>;
+using ViewProviderCylinderExtensionPython
+    = Gui::ViewProviderExtensionPythonT<ViewProviderCylinderExtension>;
 
 // ***************************************************************************
 class FemGuiExport SphereWidget: public ShapeWidget
@@ -253,7 +261,7 @@ private:
     std::unique_ptr<Ui_SphereWidget> ui;
 };
 
-class FemGuiExport ViewProviderSphereExtension : public ViewProviderShapeExtension
+class FemGuiExport ViewProviderSphereExtension: public ViewProviderShapeExtension
 {
     EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderSphereExtension);
     using inherited = ViewProviderShapeExtension;
@@ -270,7 +278,8 @@ protected:
     void extensionUpdateData(const App::Property*) override;
 };
 
-using ViewProviderSphereExtensionPython = Gui::ViewProviderExtensionPythonT<ViewProviderSphereExtension>;
+using ViewProviderSphereExtensionPython
+    = Gui::ViewProviderExtensionPythonT<ViewProviderSphereExtension>;
 
 // ***************************************************************************
 class FemGuiExport PlaneWidget: public ShapeWidget
@@ -291,7 +300,7 @@ private:
     std::unique_ptr<Ui_PlaneWidget> ui;
 };
 
-class FemGuiExport ViewProviderPlaneExtension : public ViewProviderShapeExtension
+class FemGuiExport ViewProviderPlaneExtension: public ViewProviderShapeExtension
 {
     EXTENSION_PROPERTY_HEADER_WITH_OVERRIDE(FemGui::ViewProviderPlaneExtension);
     using inherited = ViewProviderShapeExtension;
@@ -311,7 +320,7 @@ protected:
     void extensionOnChanged(const App::Property*) override;
 
 private:
-    bool m_detectscale{false};
+    bool m_detectscale {false};
 };
 
 using ViewProviderPlaneExtensionPython = Gui::ViewProviderExtensionPythonT<ViewProviderPlaneExtension>;
@@ -323,6 +332,6 @@ SoGroup* postBox();
 SoGroup* postCylinder();
 SoGroup* postPlane();
 SoGroup* postSphere();
-}
+}  // namespace ShapeNodes
 
-}  // namespace Fem
+}  // namespace FemGui
