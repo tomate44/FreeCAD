@@ -1778,22 +1778,29 @@ class MachineFactory:
     def _scan_installed_addon_dirs(cls) -> None:
         """Scan FreeCAD Mod directories for machine addons via package.xml content.
 
-        Finds every installed addon whose package.xml declares a ``<machine>``
+        Finds every installed addon whose package.xml declares a ``<Machine>``
         content element inside ``<content>`` and registers the corresponding
-        subdirectory.  Falls back to ``<tag>Machine</tag>`` with a ``machines/``
-        subdirectory for backward compatibility with older addons.
+        subdirectory.
 
         Name-agnostic — does not rely on the addon folder name or on Init.py
         execution order.
         Supplements the Init.py push mechanism; duplicate registrations are ignored.
+
+        Sentinel files:
+          - ``Mod/ALL_ADDONS_DISABLED`` — skip the entire Mod tree.
+          - ``<addon>/ADDON_DISABLED``  — skip a single addon.
         """
         for get_dir in (FreeCAD.getUserAppDataDir, FreeCAD.getHomePath):
             try:
                 mod_root = pathlib.Path(get_dir()) / "Mod"
                 if not mod_root.is_dir():
                     continue
+                if (mod_root / "ALL_ADDONS_DISABLED").exists():
+                    continue
                 for entry in sorted(mod_root.iterdir(), key=lambda e: e.name.lower()):
                     if not entry.is_dir():
+                        continue
+                    if (entry / "ADDON_DISABLED").exists():
                         continue
                     pkg_xml = entry / "package.xml"
                     if not pkg_xml.exists():
