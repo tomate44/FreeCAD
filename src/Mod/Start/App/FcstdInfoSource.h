@@ -23,33 +23,32 @@
 
 #pragma once
 
-#include <QtClassHelperMacros>
 #include <QObject>
 #include <QRunnable>
 #include <QString>
 
+#include "DisplayedFilesModel.h"
+
 namespace Start
 {
 
-class ThumbnailSourceSignals: public QObject
+class FcstdInfoSourceSignals: public QObject
 {
     Q_OBJECT
 public:
 Q_SIGNALS:
-    void thumbnailAvailable(const QString& file, const QByteArray& data);
+    void infoAvailable(const QString& filePath, const FileStats& stats, const QByteArray& thumbnail);
 };
 
-class ThumbnailSource: public QRunnable
+class FcstdInfoSource: public QRunnable
 {
-    // Don't make copies of a ThumbnailSource (it's probably running a process, what would it mean
-    // to copy it?):
-    Q_DISABLE_COPY_MOVE(ThumbnailSource)
+    Q_DISABLE_COPY_MOVE(FcstdInfoSource)
 
 public:
-    using Signals = ThumbnailSourceSignals;
+    using Signals = FcstdInfoSourceSignals;
 
-    explicit ThumbnailSource(QString file);
-    ~ThumbnailSource() override = default;
+    explicit FcstdInfoSource(QString filePath);
+    ~FcstdInfoSource() override = default;
 
     void run() override;
 
@@ -62,8 +61,7 @@ private:
     // Having a signal QObject as part of the QRunnable ensures signal connections
     // are properly cleaned up when the QRunnable gets destroyed as it finishes its work.
     Signals _signals;
-    QString _file;
-    QString _thumbnailPath;
+    QString _filePath;
 };
 
 }  // namespace Start
